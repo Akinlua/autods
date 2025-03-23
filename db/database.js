@@ -203,7 +203,7 @@ const initDatabase = async () => {
     }
     
     // Connect to MongoDB
-    const dbUri = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT || 27017}/${process.env.DB_NAME}`;
+    const dbUri = process.env.MONGODB_URI;
     console.log(dbUri);
     await mongoose.connect(dbUri, {directConnection: true});
     
