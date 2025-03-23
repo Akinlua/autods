@@ -40,3 +40,4 @@
 {"error":"SRV URI does not support directConnection","level":"error","message":"Unable to connect to the database:","service":"ebay-autods-integration","timestamp":"2025-03-23 06:28:21"}
 {"error":"SRV URI does not support directConnection","level":"error","message":"Unable to connect to the database:","service":"ebay-autods-integration","timestamp":"2025-03-23 06:28:21"}
 {"error":"SRV URI does not support directConnection","level":"error","message":"Unable to connect to the database:","service":"ebay-autods-integration","timestamp":"2025-03-23 06:28:21"}
+{"error":"Authorization timed out after 5 minutes","level":"error","message":"Error in product listing scheduler","service":"ebay-autods-integration","timestamp":"2025-03-23 06:51:12"}

@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const express = require('express');
+const morgan = require('morgan');
 const cron = require('node-cron');
 const { productListingScheduler } = require('./services/productListing');
 const { productRemovalScheduler } = require('./services/productRemoval');
@@ -11,10 +12,15 @@ const ebayRoutes = require('./routes/ebay');
 const db = require('./db/database');
 
 const app = express();
-app.use(express.json());
 
-// Default port
-const PORT = process.env.PORT || 3000;
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Logging middleware
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
 
 // Routes
 app.get('/health', (req, res) => {
@@ -24,23 +30,77 @@ app.get('/health', (req, res) => {
 // eBay OAuth routes
 app.use('/ebay', ebayRoutes);
 
+// Global error handler middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const errorMessage = err.message || 'Internal Server Error';
+  
+  // Log the error with stack trace
+  logger.error(`Error handling request: ${req.method} ${req.url}`, {
+    error: errorMessage,
+    stack: err.stack,
+    requestBody: req.body,
+    requestParams: req.params,
+    requestQuery: req.query
+  });
+  
+  // Don't expose stack traces in production
+  const response = {
+    error: errorMessage,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  };
+  
+  res.status(statusCode).json(response);
+});
+
+// Catch 404 errors
+app.use((req, res) => {
+  logger.warn(`Route not found: ${req.method} ${req.url}`);
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Handle uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', { error: error.message, stack: error.stack });
+  // Keep the server running instead of crashing
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Promise Rejection:', { 
+    reason: reason?.message || reason,
+    stack: reason?.stack,
+    promise: promise.toString().substring(0, 100) // Limit to 100 chars
+  });
+  // Keep the server running instead of crashing
+});
+
 // Start the server
 const startServer = async () => {
   try {
     // Initialize database connection
     await db.initDatabase();
-    logger.info('Database initialized');
+    logger.info('Database connection established');
   } catch (error) {
-    logger.warn('Failed to connect to database', { error: error.message });
-    logger.warn('Application will continue without database persistence');
+    logger.error('Failed to start server:', { error: error.message });
+    
+    // If database connection fails, retry after delay
+    if (error.name === 'MongoConnectionError' || error.name === 'MongoNetworkError') {
+      logger.info('Retrying database connection in 10 seconds...');
+      setTimeout(() => {
+        startServer().catch(err => {
+          logger.error('Server start retry failed:', { error: err.message });
+        });
+      }, 10000);
+    }
   }
 
   // Start the HTTP server
+  const PORT = process.env.PORT || 3000;
   app.listen(PORT, async () => {
     logger.info(`Server running on port ${PORT}`);
     
     // Initialize schedulers
-    // await productListingScheduler.run();
+    await productListingScheduler.run();
     
     // Schedule product listing - Run every day at 9 AM
     cron.schedule('0 9 * * *', async () => {

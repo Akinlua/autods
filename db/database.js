@@ -5,6 +5,7 @@ const logger = require('../utils/logger');
 
 // Connection state tracking
 let isConnected = false;
+let connectionPromise = null;
 
 // Configure mongoose
 mongoose.set('strictQuery', false);
@@ -113,126 +114,129 @@ const MessageSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const TokenSchema = new mongoose.Schema({
-  service: {
-    type: String,
-    required: true,
-    enum: ['ebay'],
-    default: 'ebay'
-  },
-  accessToken: {
-    type: String,
-    required: true
-  },
-  refreshToken: {
-    type: String,
-    required: true
-  },
-  expiresAt: {
-    type: Date,
-    required: true
-  },
-  scopes: {
-    type: [String],
-    required: true
-  },
-  active: {
-    type: Boolean,
-    default: true
-  }
-}, { timestamps: true });
+  service: { type: String, required: true },
+  accessToken: { type: String, required: true },
+  refreshToken: { type: String },
+  expiresAt: { type: Date, required: true },
+  scopes: { type: [String], default: [] },
+  active: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now }
+});
 
 const AuthCodeSchema = new mongoose.Schema({
-  service: {
-    type: String,
-    required: true,
-    enum: ['ebay'],
-    default: 'ebay'
-  },
-  authorizationCode: {
-    type: String,
-    required: true
-  },
-  state: {
-    type: String
-  },
-  processed: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 3600 // Auto-expire in 1 hour
-  }
+  service: { type: String, required: true },
+  authorizationCode: { type: String, required: true },
+  state: { type: String },
+  processed: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
 });
 
 // Create models
 const Listing = mongoose.model('Listing', ListingSchema);
 const Message = mongoose.model('Message', MessageSchema);
-const Token = mongoose.model('Token', TokenSchema);
-const AuthCode = mongoose.model('AuthCode', AuthCodeSchema);
+const Tokens = mongoose.model('Token', TokenSchema);
+const AuthCodes = mongoose.model('AuthCode', AuthCodeSchema);
 
 // Initialize database
 const initDatabase = async () => {
-  // If already connected, return early
-  if (isConnected) {
-    logger.info('Database connection already established');
-    return true;
-  }
-  
   try {
-    if (mongoose.connection.readyState === 1) {
-      isConnected = true;
-      logger.info('Using existing database connection');
-      return true;
+    // If already connected or connecting, return the existing promise
+    if (isConnected) {
+      return;
     }
     
-    // Connection options
-    const options = {
-      serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      // family: 4, // Use IPv4, skip trying IPv6
-      // directConnection: true,
-      autoIndex: process.env.NODE_ENV !== 'production' // Don't build indexes in production
-    };
+    if (connectionPromise) {
+      return connectionPromise;
+    }
+    
+    // Set up connection with retry logic
+    connectionPromise = connectWithRetry();
+    await connectionPromise;
+    
+    return;
+  } catch (error) {
+    logger.error('Failed to initialize database', { error: error.message });
+    connectionPromise = null;
+    throw error;
+  }
+};
 
-    // Add credentials if provided
-    if (process.env.DB_USER && process.env.DB_PASSWORD) {
-      options.user = process.env.DB_USER;
-      options.pass = process.env.DB_PASSWORD;
+// Connect with retry logic
+async function connectWithRetry(retries = 5, interval = 5000) {
+  try {
+    const uri = process.env.MONGODB_URI;
+    
+    if (!uri) {
+      throw new Error('MONGODB_URI environment variable is not set');
     }
     
     // Connect to MongoDB
-    const dbUri = process.env.MONGODB_URI;
-    console.log(dbUri);
-    await mongoose.connect(dbUri);
+    await mongoose.connect(uri, {
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
+    });
     
+    // Initialize models if they don't exist
+    if (!Tokens) {
+      Tokens = mongoose.model('Token', TokenSchema);
+    }
+    
+    if (!AuthCodes) {
+      AuthCodes = mongoose.model('AuthCode', AuthCodeSchema);
+    }
+    
+    // Set connection status
     isConnected = true;
-    logger.info('Database connection established successfully');
+    connectionPromise = null;
     
-    // Add connection event listeners
+    logger.info('Successfully connected to database');
+    
+    // Add connection error handler
     mongoose.connection.on('error', (err) => {
       logger.error('MongoDB connection error', { error: err.message });
       isConnected = false;
     });
     
+    // Add disconnection handler
     mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected');
+      logger.warn('MongoDB disconnected, attempting to reconnect');
       isConnected = false;
+      // Attempt to reconnect in the background
+      setTimeout(() => {
+        connectWithRetry().catch(error => {
+          logger.error('Failed to reconnect to database', { error: error.message });
+        });
+      }, 5000);
     });
     
-    mongoose.connection.on('reconnected', () => {
-      logger.info('MongoDB reconnected');
-      isConnected = true;
-    });
-    
-    return true;
+    return;
   } catch (error) {
-    isConnected = false;
-    logger.error('Unable to connect to the database:', { error: error.message });
+    logger.error(`Database connection attempt failed (retries left: ${retries})`, { error: error.message });
+    
+    if (retries > 0) {
+      // Wait and retry
+      await new Promise(resolve => setTimeout(resolve, interval));
+      return connectWithRetry(retries - 1, interval);
+    }
+    
+    // Reset state
+    connectionPromise = null;
     throw error;
   }
-};
+}
+
+// Safe database operations with error handling
+async function safeDBOperation(operation, fallback = null) {
+  try {
+    if (!isConnected) {
+      await initDatabase();
+    }
+    return await operation();
+  } catch (error) {
+    logger.error('Database operation failed', { error: error.message });
+    return fallback;
+  }
+}
 
 // Export database connection and models
 module.exports = {
@@ -240,6 +244,16 @@ module.exports = {
   isConnected: () => isConnected,
   listings: Listing,
   messages: Message,
-  tokens: Token,
-  authCodes: AuthCode
+  tokens: Tokens ? Tokens : { 
+    findOne: async (...args) => safeDBOperation(async () => Tokens.findOne(...args)),
+    create: async (...args) => safeDBOperation(async () => Tokens.create(...args)),
+    updateMany: async (...args) => safeDBOperation(async () => Tokens.updateMany(...args)),
+    deleteMany: async (...args) => safeDBOperation(async () => Tokens.deleteMany(...args))
+  },
+  authCodes: AuthCodes ? AuthCodes : {
+    findOne: async (...args) => safeDBOperation(async () => AuthCodes.findOne(...args)),
+    create: async (...args) => safeDBOperation(async () => AuthCodes.create(...args)),
+    updateOne: async (...args) => safeDBOperation(async () => AuthCodes.updateOne(...args)),
+    deleteMany: async (...args) => safeDBOperation(async () => AuthCodes.deleteMany(...args))
+  }
 };

@@ -200,6 +200,7 @@ class EbayAPI {
         }
       } catch (error) {
         logger.error('Error polling for authorization codes', { error: error.message });
+        // Continue polling despite errors
       }
     }, 15000); // Poll every 15 seconds
   }
@@ -333,12 +334,17 @@ class EbayAPI {
       this.tokenExpiry = Date.now() + (response.data.expires_in * 1000) - 300000; // 5 min buffer
       
       // Save tokens to database
-      await this.saveTokensToDb(
-        this.accessToken, 
-        this.refreshToken, 
-        response.data.expires_in,
-        this.scopes
-      );
+      try {
+        await this.saveTokensToDb(
+          this.accessToken, 
+          this.refreshToken, 
+          response.data.expires_in,
+          this.scopes
+        );
+      } catch (dbError) {
+        logger.error('Error saving tokens to database', { error: dbError.message });
+        // Continue even if db save fails - we have tokens in memory
+      }
       
       // Notify any waiting processes
       this.authorizationCompleted();
@@ -352,7 +358,10 @@ class EbayAPI {
       // Notify any waiting processes of the error
       this.authorizationCompleted(error);
       
-      console.error('Error exchanging code for token:', error.response?.data || error.message);
+      logger.error('Error exchanging code for token:', { 
+        error: error.message,
+        response: error.response?.data
+      });
       throw new Error(`Failed to exchange authorization code: ${error.message}`);
     }
   }
@@ -405,32 +414,37 @@ class EbayAPI {
   }
 
   async getAccessToken() {
-    // Check if token exists and is not expired
-    if (this.accessToken && this.tokenExpiry > Date.now()) {
-      return this.accessToken;
-    }
-
-    // Try connecting to DB if not initialized yet
-    if (!this.dbInitialized) {
-      try {
-        await this.initializeTokens();
-      } catch (error) {
-        logger.warn('Failed to initialize database connection, proceeding with in-memory tokens only');
+    try {
+      // Check if token exists and is not expired
+      if (this.accessToken && this.tokenExpiry > Date.now()) {
+        return this.accessToken;
       }
-    }
-
-    // If we have a refresh token, try to refresh the access token
-    if (this.refreshToken) {
-      try {
-        return await this.refreshAccessToken();
-      } catch (error) {
-        logger.error('Failed to refresh token', { error: error.message });
-        // If refresh fails, continue to authorization flow
+  
+      // Try connecting to DB if not initialized yet
+      if (!this.dbInitialized) {
+        try {
+          await this.initializeTokens();
+        } catch (error) {
+          logger.warn('Failed to initialize database connection, proceeding with in-memory tokens only');
+        }
       }
+  
+      // If we have a refresh token, try to refresh the access token
+      if (this.refreshToken) {
+        try {
+          return await this.refreshAccessToken();
+        } catch (error) {
+          logger.error('Failed to refresh token', { error: error.message });
+          // If refresh fails, continue to authorization flow
+        }
+      }
+  
+      // If we don't have tokens or refresh failed, trigger authorization flow
+      return this.triggerAuthorizationFlow();
+    } catch (error) {
+      logger.error('Unexpected error in getAccessToken', { error: error.message, stack: error.stack });
+      throw new Error(`Failed to get access token: ${error.message}`);
     }
-
-    // If we don't have tokens or refresh failed, trigger authorization flow
-    return this.triggerAuthorizationFlow();
   }
 
   // Set tokens manually (e.g., when loading from database)

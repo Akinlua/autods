@@ -202,3 +202,66 @@
 {"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 06:39:18"}
 {"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:39:19"}
 {"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:39:32"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:10"}
+{"level":"info","message":"Database initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:10"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:10"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:10"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:13"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:13"}
+{"level":"info","message":"Opening browser for eBay authorization at: https://auth.sandbox.ebay.com/oauth2/authorize?client_id=BruceAlm-automati-SBX-2b7ec7265-1fe90d87&redirect_uri=Bruce_Almanza-BruceAlm-automa-elvkxb&response_type=code&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing&state=4cbb91937b2edda19e60c58f2d861980","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:13"}
+{"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:13"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:14"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:44:52"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:09"}
+{"level":"info","message":"Database initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:09"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:09"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:09"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:12"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:12"}
+{"level":"info","message":"Opening browser for eBay authorization at: https://auth.sandbox.ebay.com/oauth2/authorize?client_id=BruceAlm-automati-SBX-2b7ec7265-1fe90d87&redirect_uri=Bruce_Almanza-BruceAlm-automa-elvkxb&response_type=code&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing&state=c8a854be6d3926e836e4168fbaf74d1f","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:12"}
+{"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:12"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:46:13"}
+{"error":"Authorization timed out after 5 minutes","level":"error","message":"Error in product listing scheduler","service":"ebay-autods-integration","timestamp":"2025-03-23 06:51:12"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:14"}
+{"level":"info","message":"Database initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:14"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:14"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:14"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:15"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:52"}
+{"level":"info","message":"Database initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:52"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:52"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:52"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:55"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:55"}
+{"level":"info","message":"Opening browser for eBay authorization at: https://auth.sandbox.ebay.com/oauth2/authorize?client_id=BruceAlm-automati-SBX-2b7ec7265-1fe90d87&redirect_uri=Bruce_Almanza-BruceAlm-automa-cphjyxoi&response_type=code&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing&state=a6c67ce93ce0c9466a6f4541bbe3e6e7","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:55"}
+{"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:55"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:58:56"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:20"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:23"}
+{"level":"info","message":"Database initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:23"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:23"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:23"}
+{"level":"info","message":"Database connection established successfully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:26"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:27"}
+{"level":"info","message":"Opening browser for eBay authorization at: https://auth.sandbox.ebay.com/oauth2/authorize?client_id=BruceAlm-automati-SBX-2b7ec7265-1fe90d87&redirect_uri=Bruce_Almanza-BruceAlm-automa-cphjyxoi&response_type=code&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing&state=c474469965add365e5730d2fb6f1b858","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:27"}
+{"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:27"}
+{"level":"info","message":"No active eBay tokens found in database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:27"}
+{"level":"info","message":"Found authorization code in database, processing...","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:42"}
+{"level":"info","message":"Saved eBay tokens to database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:44"}
+{"level":"info","message":"Stopped polling for eBay authorization codes","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:44"}
+{"level":"info","message":"Successfully processed authorization code from database","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:44"}
+{"level":"info","message":"All schedulers initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:45"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 06:59:58"}
+{"level":"info","message":"Successfully connected to database","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Database connection established","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Server running on port 3000","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Fetching products from AutoDS","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Opening browser for eBay authorization at: https://auth.sandbox.ebay.com/oauth2/authorize?client_id=BruceAlm-automati-SBX-2b7ec7265-1fe90d87&redirect_uri=Bruce_Almanza-BruceAlm-automa-cphjyxoi&response_type=code&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.inventory+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.account+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.fulfillment+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing.readonly+https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fsell.marketing&state=1dd545746c88f643ead85b98686d2809","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Starting to poll for eBay authorization codes every 15 seconds","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:11"}
+{"level":"info","message":"Loaded eBay tokens from database","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:12"}
+{"level":"info","message":"Found authorization code in database, processing...","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:27"}
+{"level":"info","message":"Saved eBay tokens to database","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:29"}
+{"level":"info","message":"Stopped polling for eBay authorization codes","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:29"}
+{"level":"info","message":"Successfully processed authorization code from database","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:29"}
+{"level":"info","message":"All schedulers initialized","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:29"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully","service":"ebay-autods-integration","timestamp":"2025-03-23 07:10:35"}
