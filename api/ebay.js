@@ -61,6 +61,8 @@ class EbayAPI {
     this.authorizationInProgress = false;
     this.tokenCallbacks = [];
     this.dbInitialized = false;
+    this.pollingInterval = null;
+    this.currentAuthState = null;
     
     // Initialize by loading tokens from database - don't await in constructor
     this.initializeTokens();
@@ -157,16 +159,136 @@ class EbayAPI {
     }
   }
 
+  // Start polling for authorization codes in development mode
+  startPollingForAuthCodes() {
+    if (this.pollingInterval) {
+      // Already polling
+      return;
+    }
+    
+    logger.info('Starting to poll for eBay authorization codes every 15 seconds');
+    
+    this.pollingInterval = setInterval(async () => {
+      try {
+        if (!this.dbInitialized) {
+          return; // Skip if DB not initialized
+        }
+        
+        // Find unprocessed auth codes, sorted by creation time (oldest first)
+        const authCode = await db.authCodes.findOne({ 
+          service: 'ebay',
+          processed: false,
+          state: this.currentAuthState // Match the state for security
+        }).sort({ createdAt: 1 }).lean().exec();
+        
+        if (authCode) {
+          logger.info('Found authorization code in database, processing...');
+          
+          // Mark as processed immediately to prevent duplicate processing
+          await db.authCodes.updateOne(
+            { _id: authCode._id },
+            { processed: true }
+          );
+          
+          // Process the code
+          try {
+            await this.exchangeCodeForToken(authCode.authorizationCode);
+            logger.info('Successfully processed authorization code from database');
+          } catch (error) {
+            logger.error('Failed to process authorization code from database', { error: error.message });
+          }
+        }
+      } catch (error) {
+        logger.error('Error polling for authorization codes', { error: error.message });
+      }
+    }, 15000); // Poll every 15 seconds
+  }
+  
+  // Stop polling for authorization codes
+  stopPollingForAuthCodes() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+      logger.info('Stopped polling for eBay authorization codes');
+    }
+  }
+
+  // Function to trigger authorization flow
+  async triggerAuthorizationFlow() {
+    if (this.authorizationInProgress) {
+      // If authorization is already in progress, wait for it to complete
+      return this.waitForTokenAuthentication();
+    }
+    
+    this.authorizationInProgress = true;
+    
+    // Generate a state for this authorization request
+    this.currentAuthState = crypto.randomBytes(16).toString('hex');
+    const authUrl = this.getAuthorizationUrl(this.scopes, this.currentAuthState);
+    
+    try {
+      // For local development, open the browser and start polling
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(`Opening browser for eBay authorization at: ${authUrl}`);
+        
+        // Start polling for auth codes
+        this.startPollingForAuthCodes();
+        
+        try {
+          await openBrowser(authUrl);
+        } catch (err) {
+          logger.warn(`Failed to automatically open browser. Please visit: ${authUrl}`);
+          console.log(`Please visit this URL to authorize the application: ${authUrl}`);
+        }
+      } else {
+        // For production, log the URL
+        logger.info(`eBay authorization required. Please visit: ${authUrl}`);
+        console.log(`eBay authorization required. Please visit: ${authUrl}`);
+        // Here you could also implement email notification
+      }
+      
+      // Wait for user to complete authorization
+      return this.waitForTokenAuthentication();
+    } catch (error) {
+      this.authorizationInProgress = false;
+      this.stopPollingForAuthCodes();
+      throw error;
+    }
+  }
+
+  // Called by the callback route when authorization is completed
+  authorizationCompleted(error = null) {
+    // Stop polling as we've completed authorization
+    this.stopPollingForAuthCodes();
+    
+    if (error) {
+      // Reject all pending promises
+      this.tokenCallbacks.forEach(callback => callback.reject(error));
+    } else {
+      // Resolve all pending promises
+      this.tokenCallbacks.forEach(callback => callback.resolve(this.accessToken));
+    }
+    
+    // Clear the callback queue and reset flag
+    this.tokenCallbacks = [];
+    this.authorizationInProgress = false;
+    this.currentAuthState = null;
+  }
+
   // Generate the consent URL for the user to authorize the application
-  getAuthorizationUrl(scopes = DEFAULT_SCOPES) {
+  getAuthorizationUrl(scopes = DEFAULT_SCOPES, state = null) {
     this.scopes = scopes;
     const scopeString = Array.isArray(scopes) ? scopes.join(' ') : scopes;
+    
+    // Use provided state or generate a new one
+    const authState = state || crypto.randomBytes(16).toString('hex');
+    
     const params = new URLSearchParams({
       client_id: this.clientId,
       redirect_uri: this.ruName,
       response_type: 'code',
       scope: scopeString,
-      state: crypto.randomBytes(16).toString('hex')
+      state: authState
     });
 
     return `${this.authUrl}?${params.toString()}`;
@@ -191,56 +313,6 @@ class EbayAPI {
         }, 5 * 60 * 1000); // 5 minutes timeout
       }
     });
-  }
-
-  // Function to trigger authorization flow
-  async triggerAuthorizationFlow() {
-    if (this.authorizationInProgress) {
-      // If authorization is already in progress, wait for it to complete
-      return this.waitForTokenAuthentication();
-    }
-    
-    this.authorizationInProgress = true;
-    const authUrl = this.getAuthorizationUrl();
-    
-    try {
-      // For local development, open the browser
-      if (process.env.NODE_ENV === 'development') {
-        logger.info(`Opening browser for eBay authorization at: ${authUrl}`);
-        try {
-          await openBrowser(authUrl);
-        } catch (err) {
-          logger.warn(`Failed to automatically open browser. Please visit: ${authUrl}`);
-          console.log(`Please visit this URL to authorize the application: ${authUrl}`);
-        }
-      } else {
-        // For production, log the URL
-        logger.warn(`eBay authorization required. Please visit: ${authUrl}`);
-        console.log(`eBay authorization required. Please visit: ${authUrl}`);
-        // Here you could also implement email notification
-      }
-      
-      // Wait for user to complete authorization
-      return this.waitForTokenAuthentication();
-    } catch (error) {
-      this.authorizationInProgress = false;
-      throw error;
-    }
-  }
-
-  // Called by the callback route when authorization is completed
-  authorizationCompleted(error = null) {
-    if (error) {
-      // Reject all pending promises
-      this.tokenCallbacks.forEach(callback => callback.reject(error));
-    } else {
-      // Resolve all pending promises
-      this.tokenCallbacks.forEach(callback => callback.resolve(this.accessToken));
-    }
-    
-    // Clear the callback queue and reset flag
-    this.tokenCallbacks = [];
-    this.authorizationInProgress = false;
   }
 
   // Exchange authorization code for access and refresh tokens

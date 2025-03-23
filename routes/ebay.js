@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const ebayAPI = require('../api/ebay');
 const logger = require('../utils/logger');
-const { tokens } = require('../db/database');
+const db = require('../db/database');
 
 // Define the required scopes for your application
 const REQUIRED_SCOPES = [
@@ -32,7 +32,79 @@ router.get('/authorize', (req, res) => {
   }
 });
 
-// OAuth callback route
+// OAuth callback route for localhost development (store-only)
+router.get('/callback/store', async (req, res) => {
+  const { code, state, error } = req.query;
+  
+  if (error) {
+    logger.error('Error in eBay OAuth callback/store', { error });
+    
+    // Return a simple error page
+    return res.status(400).send(`
+      <html>
+        <body>
+          <h1>Authorization Failed</h1>
+          <p>Error: ${error}</p>
+          <p>You can close this window now.</p>
+        </body>
+      </html>
+    `);
+  }
+  
+  if (!code) {
+    const noCodeError = new Error('No authorization code received');
+    logger.error(noCodeError.message);
+    
+    // Return a simple error page
+    return res.status(400).send(`
+      <html>
+        <body>
+          <h1>Authorization Failed</h1>
+          <p>Error: No authorization code received</p>
+          <p>You can close this window now.</p>
+        </body>
+      </html>
+    `);
+  }
+  
+  try {
+    // Store the code in the database for polling
+    await db.authCodes.create({
+      service: 'ebay',
+      authorizationCode: code,
+      state: state,
+      processed: false
+    });
+    
+    logger.info('Stored eBay authorization code in database for processing');
+    
+    // Return a nice success page
+    return res.status(200).send(`
+      <html>
+        <body>
+          <h1>Authorization Successful</h1>
+          <p>Your eBay account has been connected successfully.</p>
+          <p>You can close this window now.</p>
+        </body>
+      </html>
+    `);
+  } catch (error) {
+    logger.error('Error storing authorization code', { error: error.message });
+    
+    // Return a simple error page
+    return res.status(500).send(`
+      <html>
+        <body>
+          <h1>Authorization Failed</h1>
+          <p>Error: ${error.message}</p>
+          <p>You can close this window now.</p>
+        </body>
+      </html>
+    `);
+  }
+});
+
+// OAuth callback route for production (direct processing)
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
   
@@ -50,6 +122,7 @@ router.get('/callback', async (req, res) => {
   }
   
   try {
+    // For production, process the code immediately
     const tokenData = await ebayAPI.exchangeCodeForToken(code);
     
     // The tokens are now saved to the database by the ebayAPI class
@@ -67,7 +140,7 @@ router.get('/callback', async (req, res) => {
 router.get('/token-status', async (req, res) => {
   try {
     // Check db for the latest token
-    const dbToken = await tokens.findOne({ service: 'ebay', active: true }).sort({ createdAt: -1 });
+    const dbToken = await db.tokens.findOne({ service: 'ebay', active: true }).sort({ createdAt: -1 });
     
     const tokenStatus = {
       memory: {
@@ -116,7 +189,7 @@ router.post('/clear-tokens', async (req, res) => {
     ebayAPI.tokenExpiry = null;
     
     // Deactivate tokens in database
-    await tokens.updateMany({ service: 'ebay', active: true }, { active: false });
+    await db.tokens.updateMany({ service: 'ebay', active: true }, { active: false });
     
     res.json({ success: true, message: 'Tokens cleared successfully' });
   } catch (error) {

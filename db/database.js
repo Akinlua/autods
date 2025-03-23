@@ -141,10 +141,36 @@ const TokenSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+const AuthCodeSchema = new mongoose.Schema({
+  service: {
+    type: String,
+    required: true,
+    enum: ['ebay'],
+    default: 'ebay'
+  },
+  authorizationCode: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String
+  },
+  processed: {
+    type: Boolean,
+    default: false
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 3600 // Auto-expire in 1 hour
+  }
+});
+
 // Create models
 const Listing = mongoose.model('Listing', ListingSchema);
 const Message = mongoose.model('Message', MessageSchema);
 const Token = mongoose.model('Token', TokenSchema);
+const AuthCode = mongoose.model('AuthCode', AuthCodeSchema);
 
 // Initialize database
 const initDatabase = async () => {
@@ -214,5 +240,6 @@ module.exports = {
   isConnected: () => isConnected,
   listings: Listing,
   messages: Message,
-  tokens: Token
+  tokens: Token,
+  authCodes: AuthCode
 };
