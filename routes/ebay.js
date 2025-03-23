@@ -32,6 +32,104 @@ router.get('/authorize', (req, res) => {
   }
 });
 
+// Policy page - this can be used to meet eBay's requirements for an accessible privacy policy
+router.get('/policy', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>Privacy Policy for eBay Integration</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+          }
+          .container {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          h1 {
+            color: #4a4a4a;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+          }
+          h2 {
+            color: #5a5a5a;
+            margin-top: 30px;
+          }
+          p {
+            margin-bottom: 15px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Privacy Policy for eBay Integration</h1>
+          
+          <p><strong>Last Updated:</strong> ${new Date().toISOString().split('T')[0]}</p>
+          
+          <h2>Introduction</h2>
+          <p>
+            This privacy policy describes how we collect, use, and handle your information when you use our eBay integration service.
+            We take your privacy seriously and are committed to protecting your personal and business information.
+          </p>
+          
+          <h2>Information We Collect</h2>
+          <p>
+            When you use our eBay integration, we collect the following types of information:
+          </p>
+          <ul>
+            <li>eBay authorization tokens that allow our service to access your eBay account</li>
+            <li>Information about your eBay listings, inventory, and transactions</li>
+            <li>Messages between you and buyers on the eBay platform</li>
+          </ul>
+          
+          <h2>How We Use Your Information</h2>
+          <p>
+            The information we collect is used solely for the purpose of:
+          </p>
+          <ul>
+            <li>Facilitating the management of your eBay listings</li>
+            <li>Synchronizing inventory between systems</li>
+            <li>Processing orders and automating fulfillment</li>
+            <li>Providing analytics and reporting on your eBay business performance</li>
+          </ul>
+          
+          <h2>Data Storage and Security</h2>
+          <p>
+            Your eBay authorization tokens and related data are stored securely in our database. 
+            We implement appropriate security measures to protect your information against unauthorized access.
+          </p>
+          
+          <h2>Third-Party Sharing</h2>
+          <p>
+            We do not sell, trade, or otherwise transfer your information to outside parties except 
+            when necessary to provide the services you've requested.
+          </p>
+          
+          <h2>Your Rights</h2>
+          <p>
+            You have the right to revoke access to your eBay account at any time through your eBay account settings.
+            You can also contact us to request deletion of any stored information related to your account.
+          </p>
+          
+          <h2>Changes to This Policy</h2>
+          <p>
+            We may update this privacy policy periodically. We will notify you of any changes by posting the new privacy policy on this page.
+          </p>
+          
+          <h2>Contact Us</h2>
+          <p>
+            If you have any questions about this privacy policy, please contact us.
+          </p>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
 // OAuth callback route for localhost development (store-only)
 router.get('/callback/store', async (req, res) => {
   const { code, state, error } = req.query;
