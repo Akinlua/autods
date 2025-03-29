@@ -49,11 +49,33 @@ class AutoDSAPI {
     }
   }
 
-  async getProducts(filters = [], limit = 20, offset = 0) {
+  async getProducts(filters = [], limit = null, offset = 0) {
     try {
       const token = await this.ensureAuthenticated();
       
-      // Always use the store IDs from the constructor
+      // First, get the total count of products
+      if (limit === null) {
+        const countUrl = `${this.baseUrl}/products/${this.storeIds}/count/`;
+        
+        const countResponse = await axios({
+          method: 'post',
+          url: countUrl,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          data: {
+            condition: "or",
+            filters,
+            product_status: 2
+          }
+        });
+        
+        // Extract the total count from the response
+        limit = countResponse.data.total_results || 20;
+      }
+      
+      // Now get all products with the total count as the limit
       const url = `${this.baseUrl}/products/${this.storeIds}/list/`;
 
       const payload = {
