@@ -1,0 +1,2096 @@
+
+https://v2-api.autods.com/products/1173617,1197312/list/
+{"limit":20,"offset":0,"condition":"or","filters":[],"order_by":{"name":"upload_date","direction":"desc"},"product_status":2,"projection":["id","title","main_picture_url","upload_date","note","variation_statistics","amount_of_variations","total_sold_count","last_sold_date","autods_store_id","tags","category","item_id_on_site","site_id","preview_url","bulk_action_started","configuration","file_exchange_update_status","watchers","views","days_left","status","system_keyword_violations","error_list","catalog_asin","mutation_status","dynamic_policy_enabled","is_updated"]}
+
+https://v2-api.autods.com/products/1173617,1197312/count/
+{"total_results":133}
+
+https://v2-api.autods.com/products/1173617,1197312/list/
+
+{"condition":"and","product_status":2,"filters":[{"name":"id","value":"67d80ad30d6a46c05fc0027f","op":"=","value_type":"string"}]}
+
+// details 
+
+{
+    "results": [
+        {
+            "days_left": "2025-04-19T21:03:40.631000+00:00",
+            "preview_url": "https://www.ebay.com.au/itm/Stainless-Steel-Handheld-Douche-Bidet-Toilet-Spray-Shower-Shattaf-Diverter-Kit-/356688098694",
+            "sku": "2255801165496831_366",
+            "private_listing": true,
+            "note": "",
+            "variation_statistics": {
+                "in_stock": {
+                    "total": 1
+                },
+                "min_buy_price": 27.5,
+                "max_buy_price": 27.5,
+                "min_sell_price": 82.1,
+                "max_profit": 22.09,
+                "min_profit": 22.09,
+                "on_hold": {
+                    "total": 0
+                },
+                "max_sell_price": 82.1,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "supplier_region": [
+                    {
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=2255801165496831",
+                        "item_id_on_site": "2255801165496831_366",
+                        "site_id": 2
+                    }
+                ],
+                "sell_currency": "AUD"
+            },
+            "payment_policy_name": "Immediate Payment",
+            "postal_code": "310052",
+            "autods_store_id": 1197312,
+            "error_list": [
+                {
+                    "error_type": 6,
+                    "error_task": "general_pre_draft_item_validation",
+                    "message": "Product title contains a word you blacklisted, keyword (shower head)",
+                    "error_code": "400",
+                    "severity": 2
+                }
+            ],
+            "dynamic_policy_enabled": false,
+            "is_ai_generated_draft": false,
+            "_cls": "AutoDSItem.EbayItem",
+            "pre_draft_status": 5,
+            "payment_policy_id": "351352530023",
+            "item_specifics": {
+                "spary type": "Vertical",
+                "origin": "Mainland China",
+                "tap hole": "2 Holes",
+                "certification": "None",
+                "faucet tapping": "2 Holes",
+                "installation type": "Wall Mounted"
+            },
+            "status": 2,
+            "pre_draft_initial_id": "72d72503-5aad-4267-8a3d-e89df1bd6273",
+            "images_processed": true,
+            "upload_date": "2025-03-19T20:03:42.633000+00:00",
+            "amount_of_variations": 1,
+            "main_picture_url": {
+                "actions": {
+                    "resize_y": null,
+                    "flip_x": false,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "rotate": 0,
+                    "flip_y": false
+                },
+                "image_id": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                "index": 6,
+                "image_id_on_site": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/FlkAAOSwQfhn2yMT/$_3.PNG"
+            },
+            "title": "Stainless Steel Handheld Douche Bidet Toilet Spray Shower Shattaf Diverter Kit",
+            "is_ai_generated": false,
+            "site_id": 1,
+            "variations": [
+                {
+                    "upc": "744110407181",
+                    "quantity": 1,
+                    "inventory_status": 1,
+                    "sku": "2255801165496831_366",
+                    "weight_type": 4,
+                    "sold_count": 0,
+                    "price": 82.1,
+                    "mpn": "",
+                    "basic_configuration": {
+                        "include_shipping_price": true,
+                        "is_compare_price_precentage": true,
+                        "percentage_profit": 50.0,
+                        "dollar_profit": 0.3,
+                        "listing_fee": 0.0,
+                        "allow_marketplace_seller": false,
+                        "break_even_percentage": 20.0,
+                        "default_quantity": 1,
+                        "currency_pair": {
+                            "buy_currency": "USD",
+                            "sell_currency": "AUD",
+                            "rate": 1.585062,
+                            "updated_ts": 1743045791
+                        }
+                    },
+                    "weight": 0.1,
+                    "main_picture_url": {
+                        "actions": {
+                            "flip_x": false,
+                            "rotate": 0,
+                            "flip_y": false
+                        },
+                        "index": 5,
+                        "image_id": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                        "image_id_on_site": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                        "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/FlkAAOSwQfhn2yMT/$_3.PNG"
+                    },
+                    "active_buy_item": {
+                        "url": "https://www.aliexpress.com/item/2255801165496831.html",
+                        "brand": "DQOK",
+                        "price": 27.5,
+                        "quantity": 90699,
+                        "shipping_price": 0.0,
+                        "item_id_on_site": "2255801165496831_366",
+                        "region": 6,
+                        "item_id_without_variant": "2255801165496831",
+                        "shipping_time": 14,
+                        "manufacturer": "DQOK",
+                        "title": "Handheld Toilet Bidet Sprayer Set Kit Stainless Steel Hand Bidet faucet for Bathroom Hand Sprayer Shower Head Self Cleaning",
+                        "site_id": 2
+                    },
+                    "shipping_price": 0.0,
+                    "product_dimensions": {
+                        "length": {
+                            "value": 3.0,
+                            "unit_type": "inches"
+                        },
+                        "height": {
+                            "value": 3.0,
+                            "unit_type": "inches"
+                        },
+                        "weight": {
+                            "value": 0.1,
+                            "unit_type": "kg"
+                        },
+                        "width": {
+                            "value": 3.0,
+                            "unit_type": "inches"
+                        }
+                    },
+                    "total_profit": 22.09,
+                    "attributes": {
+                        "Color": "Mt01 (366)"
+                    }
+                }
+            ],
+            "dynamic_policy_gsp_enabled": false,
+            "total_sold_count": 0,
+            "options": [
+                {
+                    "values": [
+                        {
+                            "value": "Mt01 (366)",
+                            "id": 0
+                        }
+                    ],
+                    "original_key": "Color",
+                    "key": "Color",
+                    "id": 0
+                }
+            ],
+            "return_policy_id": "351352900023",
+            "shipping_policy_name": "Domestic AU Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "name": "Toilets & Bidets -> Toilet Parts & Attachments",
+                    "category_id": "259860",
+                    "url": "https://www.ebay.com/b/259860"
+                }
+            ],
+            "dynamic_policy_handling_time": 3,
+            "tags": [
+                "Home Improvement",
+                "Bathroom Fixture",
+                "Bidets & Bidet Parts"
+            ],
+            "id": "67d80ad30d6a46c05fc0027f",
+            "images": [
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "5fca425b-12f2-4730-9fb3-93abd77d9ce8",
+                    "index": 0,
+                    "image_id_on_site": "5fca425b-12f2-4730-9fb3-93abd77d9ce8",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/gmIAAOSwpD1n2yMT/$_3.JPG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "3404b840-80e3-4162-a5aa-0839ea545f89",
+                    "index": 1,
+                    "image_id_on_site": "3404b840-80e3-4162-a5aa-0839ea545f89",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/JrMAAOSwt39n2yMU/$_3.JPG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "c82a6025-9677-4377-a778-d40b185bbe0d",
+                    "index": 2,
+                    "image_id_on_site": "c82a6025-9677-4377-a778-d40b185bbe0d",
+                    "url": "https://i.ebayimg.com/00/s/MTQ3NFgxNTAw/z/SjEAAOSwolRn2yMZ/$_3.JPG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "9c7c866c-d2db-4b22-ae5e-ede9bfeb334e",
+                    "index": 3,
+                    "image_id_on_site": "9c7c866c-d2db-4b22-ae5e-ede9bfeb334e",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/TJ0AAOSwj7ln2yMa/$_3.JPG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "75890871-f5d2-4290-98ea-6bba7649da39",
+                    "index": 4,
+                    "image_id_on_site": "75890871-f5d2-4290-98ea-6bba7649da39",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/woAAAOSwOM5n2yMa/$_3.JPG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                    "index": 5,
+                    "image_id_on_site": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/FlkAAOSwQfhn2yMT/$_3.PNG"
+                },
+                {
+                    "actions": {
+                        "resize_y": null,
+                        "flip_x": false,
+                        "paste_watermark": false,
+                        "resize_x": null,
+                        "rotate": 0,
+                        "flip_y": false
+                    },
+                    "image_id": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                    "index": 6,
+                    "image_id_on_site": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                    "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/FlkAAOSwQfhn2yMT/$_3.PNG"
+                }
+            ],
+            "action_source": 2,
+            "return_policy_name": "All Returns Allowed Within 30 Days",
+            "item_id_on_site": "356688098694",
+            "created_date": "2025-03-17T11:43:15.485000+00:00",
+            "shipping_policy_id": "351353535023",
+            "category_specific": {
+                "Type": "Does not apply"
+            },
+            "recomended_category": [
+                {
+                    "category_parent_id": "260575",
+                    "category_parent_name": "Toilets & Bidets",
+                    "name": "Toilets & Bidets -> Toilet Parts & Attachments",
+                    "category_name": "Toilet Parts & Attachments",
+                    "category_id": "259860",
+                    "url": "https://www.ebay.com/b/259860"
+                },
+                {
+                    "category_parent_id": "260575",
+                    "category_parent_name": "Toilets & Bidets",
+                    "name": "Toilets & Bidets -> Bidets",
+                    "category_name": "Bidets",
+                    "category_id": "260623",
+                    "url": "https://www.ebay.com/b/260623"
+                },
+                {
+                    "category_parent_id": "259327",
+                    "category_parent_name": "Bathroom Accessories",
+                    "name": "Bathroom Accessories -> Bathroom Accessory Sets",
+                    "category_name": "Bathroom Accessory Sets",
+                    "category_id": "260578",
+                    "url": "https://www.ebay.com/b/260578"
+                },
+                {
+                    "category_parent_id": "260590",
+                    "category_parent_name": "Bathroom Accessories",
+                    "name": "Bathroom Accessories -> Other Bathroom Accessories",
+                    "category_name": "Other Bathroom Accessories",
+                    "category_id": "19783",
+                    "url": "https://www.ebay.com/b/19783"
+                }
+            ],
+            "configuration": {
+                "disable_stock_monitoring": false,
+                "template_id": 78826,
+                "disable_supplier_changes_error": false,
+                "preferred_shipping_type": 2,
+                "item_country_location": "China",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "item_city_location": "Shenzhen"
+            },
+            "modified_at": "2025-03-28T04:46:29.401000+00:00",
+            "description": "<div>\n<div>\n<p>✔ Premium Stainless Steel &ndash; Rust-resistant and durable for long-term use.<br />\n✔ Adjustable Water Pressure &ndash; Gentle spray to strong jet for customized cleansing.<br />\n✔ Multi-Purpose Use &ndash; Ideal for personal hygiene, cloth diaper cleaning, pet washing, and more.<br />\n✔ Easy Installation &ndash; Includes all necessary components for quick setup.<br />\n✔ Leak-Proof Design &ndash; High-quality materials prevent drips and leaks.</p>\n\n<p>🚿 Upgrade your bathroom with a reliable and eco-friendly hygiene solution!</p>\n</div>\n\n<p>&nbsp;</p>\n</div>\n",
+            "url": "https://bulksell.ebay.com.au/ws/eBayISAPI.dll?SingleList&sellingMode=ReviseItem&lineID=356688098694"
+        }
+    ]
+}
+
+
+
+
+// all
+
+{
+    "results": [
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d80ad30d6a46c05fc0027f",
+            "category": [
+                {
+                    "name": "Toilets & Bidets -> Toilet Parts & Attachments",
+                    "category_id": "259860",
+                    "url": "https://www.ebay.com/b/259860",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 20.44,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "2255801165496831_366",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=2255801165496831"
+                    }
+                ],
+                "max_buy_price": 25.3,
+                "max_sell_price": 75.91,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 75.91,
+                "min_buy_price": 25.3,
+                "min_profit": 20.44,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:40.631000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Stainless Steel Handheld Douche Bidet Toilet Spray Shower Shattaf Diverter Kit",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home Improvement",
+                "Bathroom Fixture",
+                "Bidets & Bidet Parts"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098694",
+            "preview_url": "https://www.ebay.com.au/itm/Stainless-Steel-Handheld-Douche-Bidet-Toilet-Spray-Shower-Shattaf-Diverter-Kit-/356688098694",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/FlkAAOSwQfhn2yMT/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a",
+                "index": 6,
+                "image_id": "1dd8ea96-e32b-4c4c-a41b-5c3c1126e65a"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product title contains a word you blacklisted, keyword (shower head)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:42.633000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d80e8251018f062266108a",
+            "category": [
+                {
+                    "name": "Cats -> Toys",
+                    "category_id": "20741",
+                    "_cls": "ItemCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 6.63,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808307713285_366",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808307713285"
+                    }
+                ],
+                "max_buy_price": 7.95,
+                "max_sell_price": 24.11,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 24.11,
+                "min_buy_price": 7.95,
+                "min_profit": 6.63,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:39.832000+00:00",
+            "is_ai_generated_draft": false,
+            "bulk_action_started": "2025-03-19T20:03:21.354000+00:00",
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Automatic Rolling Ball Smart Cat Dog Toy Electric Pet Self-moving Kitten Game",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Pet Products",
+                "Cat Supplies"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098664",
+            "preview_url": "https://www.ebay.com.au/itm/Automatic-Rolling-Ball-Smart-Cat-Dog-Toy-Electric-Pet-Self-moving-Kitten-Game-/356688098664",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTE5OVgxMTk2/z/43QAAOSwujBn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "228bb64b-7814-43ca-9c56-bd85c70bef58",
+                "index": 5,
+                "image_id": "228bb64b-7814-43ca-9c56-bd85c70bef58"
+            },
+            "upload_date": "2025-03-19T20:03:41.835000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d80dcd688131cddfe8585d",
+            "category": [
+                {
+                    "name": "Dogs -> Nappies & Belly Bands",
+                    "category_id": "116373",
+                    "_cls": "ItemCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 19.24,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256807996226248_200661158_4181",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256807996226248"
+                    }
+                ],
+                "max_buy_price": 23.79,
+                "max_sell_price": 71.4,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 71.4,
+                "min_buy_price": 23.79,
+                "min_profit": 19.24,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:38.750000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Pet Training Pads Puppy Dog Toilet Pee Indoor Super Absorbent",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Pet Products",
+                "Dog Supplies"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098572",
+            "preview_url": "https://www.ebay.com.au/itm/Pet-Training-Pads-Puppy-Dog-Toilet-Pee-Indoor-Super-Absorbent-/356688098572",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/E04AAOSwXf5n2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "77016b4e-3944-4fbc-a5df-ac6220a354cf",
+                "index": 6,
+                "image_id": "77016b4e-3944-4fbc-a5df-ac6220a354cf"
+            },
+            "upload_date": "2025-03-19T20:03:40.753000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d567374b8c2a8e3f379879",
+            "category": [
+                {
+                    "name": "Coffee & Tea Makers -> Milk Frothers",
+                    "category_id": "171754",
+                    "url": "https://www.ebay.com/b/171754",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 8.67,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256806835651780_29",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256806835651780"
+                    }
+                ],
+                "max_buy_price": 10.53,
+                "max_sell_price": 31.76,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 31.76,
+                "min_buy_price": 10.53,
+                "min_profit": 8.67,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:37.484000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Rechargeable Electric Egg Beater 3-Speed Hand Whisk Milk Frother",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Kitchen,Dining & Bar",
+                "Kitchen Tools & Gadgets"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098544",
+            "preview_url": "https://www.ebay.com.au/itm/Rechargeable-Electric-Egg-Beater-3-Speed-Hand-Whisk-Milk-Frother-/356688098544",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/WWIAAOSwRQpn2yMP/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "9b158893-70a0-4d37-a289-4a116001b941",
+                "index": 7,
+                "image_id": "9b158893-70a0-4d37-a289-4a116001b941"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product Description contains a word you blacklisted, keyword (Battery)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:40.487000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d80c6b292eb331a5e844a5",
+            "category": [
+                {
+                    "name": "Women's Accessories -> Hats",
+                    "category_id": "45230",
+                    "url": "https://www.ebay.com/b/45230",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 4.07,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256807486516793_350853",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256807486516793"
+                    }
+                ],
+                "max_buy_price": 4.73,
+                "max_sell_price": 14.5,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 14.5,
+                "min_buy_price": 4.73,
+                "min_profit": 4.07,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:37.732000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Sleeping Bonnet Hair Wrap Silk Satin Cap Women Elastic Soft Hat Headwear NEW AU",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Household Merchandises",
+                "Bathroom Products"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098473",
+            "preview_url": "https://www.ebay.com.au/itm/Sleeping-Bonnet-Hair-Wrap-Silk-Satin-Cap-Women-Elastic-Soft-Hat-Headwear-NEW-AU-/356688098473",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/O5IAAOSwNrZn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "fdcd4b88-03c2-4956-b0ad-07d3e2981594",
+                "index": 18,
+                "image_id": "fdcd4b88-03c2-4956-b0ad-07d3e2981594"
+            },
+            "upload_date": "2025-03-19T20:03:39.734000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d56b0d4b8c2a8e3f3798cb",
+            "category": [
+                {
+                    "name": "Seasonal Decoration -> Figurines",
+                    "category_id": "117413",
+                    "url": "https://www.ebay.com/b/117413",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 4.16,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808114715068_202422807",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808114715068"
+                    }
+                ],
+                "max_buy_price": 4.86,
+                "max_sell_price": 14.86,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 14.86,
+                "min_buy_price": 4.86,
+                "min_profit": 4.16,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:36.513000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Fillable Golden Easter Eggs Plastic Gift Box DIY Wedding Party Decor",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Festive & Party Supplies",
+                "Event & Party"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098263",
+            "preview_url": "https://www.ebay.com.au/itm/Fillable-Golden-Easter-Eggs-Plastic-Gift-Box-DIY-Wedding-Party-Decor-/356688098263",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/F1YAAOSw1g9n2yMR/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "4f58f97f-df6c-41ed-9da1-7dc51f436bb5",
+                "index": 7,
+                "image_id": "4f58f97f-df6c-41ed-9da1-7dc51f436bb5"
+            },
+            "upload_date": "2025-03-19T20:03:39.515000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d56a6c9ed0298f0eb0056a",
+            "category": [
+                {
+                    "name": "Kitchen Tools & Gadgets -> Timers",
+                    "category_id": "98852",
+                    "url": "https://www.ebay.com/b/98852",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 3.42,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "2255800577231629_691",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=2255800577231629"
+                    }
+                ],
+                "max_buy_price": 3.92,
+                "max_sell_price": 12.06,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 12.06,
+                "min_buy_price": 3.92,
+                "min_profit": 3.42,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:36.651000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Digital Kitchen Timer Large LCD Loud Alarm Magnetic Backing Stand",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Kitchen,Dining & Bar",
+                "Kitchen Tools & Gadgets"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098337",
+            "preview_url": "https://www.ebay.com.au/itm/Digital-Kitchen-Timer-Large-LCD-Loud-Alarm-Magnetic-Backing-Stand-/356688098337",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/6NIAAOSwdqNn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "720cd168-08a8-45ec-a59d-ccf06cc2cf18",
+                "index": 5,
+                "image_id": "720cd168-08a8-45ec-a59d-ccf06cc2cf18"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product Description contains a word you blacklisted, keyword (Battery)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:38.653000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d816cb238c70fa81ddba7d",
+            "category": [
+                {
+                    "name": "Barware -> Other Barware",
+                    "category_id": "20690",
+                    "url": "https://www.ebay.com/b/20690",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 2.0,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256807018491247_193",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256807018491247"
+                    }
+                ],
+                "max_buy_price": 2.13,
+                "max_sell_price": 6.73,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 6.73,
+                "min_buy_price": 2.13,
+                "min_profit": 2.0,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:35.071000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "100x Multicolor Drinking Straw Plastic Bendable Party Straws Straight Bulk",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Kitchen,Dining & Bar",
+                "Drinkware"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098127",
+            "preview_url": "https://www.ebay.com.au/itm/100x-Multicolor-Drinking-Straw-Plastic-Bendable-Party-Straws-Straight-Bulk-/356688098127",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/UcIAAOSwKHln2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "dde12d93-da6e-44c4-8299-3d1a7b7ed00e",
+                "index": 7,
+                "image_id": "dde12d93-da6e-44c4-8299-3d1a7b7ed00e"
+            },
+            "upload_date": "2025-03-19T20:03:37.074000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d56c10225f9e32b9bfd43b",
+            "category": [
+                {
+                    "name": "Gift Wrapping & Supplies -> Gift Bags",
+                    "category_id": "102379",
+                    "url": "https://www.ebay.com/b/102379",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 4.74,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808212514267_202422807_202638846",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808212514267"
+                    }
+                ],
+                "max_buy_price": 5.58,
+                "max_sell_price": 17.01,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 17.01,
+                "min_buy_price": 5.58,
+                "min_profit": 4.74,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:34.596000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Easter Plastic Carrot Candy Box Clear Gift Boxes Party Favors Decor",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Festive & Party Supplies",
+                "Event & Party"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098110",
+            "preview_url": "https://www.ebay.com.au/itm/Easter-Plastic-Carrot-Candy-Box-Clear-Gift-Boxes-Party-Favors-Decor-/356688098110",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/XLwAAOSworFn2yMP/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "196bec0c-8c54-42eb-9a39-d1c83f6a1fc6",
+                "index": 9,
+                "image_id": "196bec0c-8c54-42eb-9a39-d1c83f6a1fc6"
+            },
+            "upload_date": "2025-03-19T20:03:36.598000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d569904b8c2a8e3f3798ae",
+            "category": [
+                {
+                    "name": "Hand Percussion -> Shakers & Small Percussion",
+                    "category_id": "47090",
+                    "url": "https://www.ebay.com/b/47090",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 3.09,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "2255800326465501_200005536",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=2255800326465501"
+                    }
+                ],
+                "max_buy_price": 3.51,
+                "max_sell_price": 10.85,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 10.85,
+                "min_buy_price": 3.51,
+                "min_profit": 3.09,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:34.228000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Wooden Hand Shaker Egg Percussion Toy for Early Learning Music",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Sports & Entertainment",
+                "Musical Instruments",
+                "Percussion Instruments"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098092",
+            "preview_url": "https://www.ebay.com.au/itm/Wooden-Hand-Shaker-Egg-Percussion-Toy-Early-Learning-Music-/356688098092",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTAyNFgxMDI0/z/NiMAAOSw5SFn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "ba1deec8-bfd0-4321-85b9-f3519db34b89",
+                "index": 7,
+                "image_id": "ba1deec8-bfd0-4321-85b9-f3519db34b89"
+            },
+            "upload_date": "2025-03-19T20:03:36.229000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d568002fe48852b76607f1",
+            "category": [
+                {
+                    "name": "Home D\u00e9cor -> Sculptures & Figurines",
+                    "category_id": "36025",
+                    "url": "https://www.ebay.com/b/36025",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 2.76,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808050531338_200006151",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808050531338"
+                    }
+                ],
+                "max_buy_price": 3.09,
+                "max_sell_price": 9.6,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 9.6,
+                "min_buy_price": 3.09,
+                "min_profit": 2.76,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:34.089000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Creative 3D Printed Dragon Egg Chameleon Pendulum Decompression Toy Set",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Home Decor",
+                "Decoration Crafts"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098093",
+            "preview_url": "https://www.ebay.com.au/itm/Creative-3D-Printed-Dragon-Egg-Chameleon-Pendulum-Decompression-Toy-Set-/356688098093",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/euoAAOSw8~Vn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "b9449fcf-7abf-4c73-b2b3-ea5ab82b07cf",
+                "index": 7,
+                "image_id": "b9449fcf-7abf-4c73-b2b3-ea5ab82b07cf"
+            },
+            "upload_date": "2025-03-19T20:03:36.091000+00:00",
+            "system_keyword_violations": [
+                {
+                    "keyword_name": "fidget",
+                    "severity": 1,
+                    "location": 2
+                }
+            ]
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d815eed15d9bf3a464d2c5",
+            "category": [
+                {
+                    "name": "Kitchen Tools & Gadgets -> Colanders, Strainers & Sifters",
+                    "category_id": "20636",
+                    "url": "https://www.ebay.com/b/20636",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 7.27,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256806778724130_201526811",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256806778724130"
+                    }
+                ],
+                "max_buy_price": 8.76,
+                "max_sell_price": 26.53,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 26.53,
+                "min_buy_price": 8.76,
+                "min_profit": 7.27,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:34.934000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "2X High Quality Stainless Steel Kitchen Waste Sink Drain Strainer Plug Stopper",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home Improvement",
+                "Kitchen Fixture",
+                "Kitchen Sink Accessories"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098146",
+            "preview_url": "https://www.ebay.com.au/itm/2X-High-Quality-Stainless-Steel-Kitchen-Waste-Sink-Drain-Strainer-Plug-Stopper-/356688098146",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/WwwAAOSwadNn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "164e271f-3835-4fc4-81b6-607f2da44630",
+                "index": 7,
+                "image_id": "164e271f-3835-4fc4-81b6-607f2da44630"
+            },
+            "upload_date": "2025-03-19T20:03:35.936000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d814ab238c70fa81ddba6e",
+            "category": [
+                {
+                    "name": "Kitchen Tools & Gadgets -> Cooking Thermometers",
+                    "category_id": "43421",
+                    "url": "https://www.ebay.com/b/43421",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 11.45,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256806110126179_193",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256806110126179"
+                    }
+                ],
+                "max_buy_price": 14.0,
+                "max_sell_price": 42.17,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 42.17,
+                "min_buy_price": 14.0,
+                "min_profit": 11.45,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:32.564000+00:00",
+            "is_ai_generated_draft": false,
+            "bulk_action_started": "2025-03-19T20:03:21.415000+00:00",
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Foldable Digital Cooking Food Thermometer Probe Temperature Kitchen Meat BBQ",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Household Merchandises",
+                "Home Thermometers"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098083",
+            "preview_url": "https://www.ebay.com.au/itm/Foldable-Digital-Cooking-Food-Thermometer-Probe-Temperature-Kitchen-Meat-BBQ-/356688098083",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/Yy0AAOSw1IFn2yMP/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "1072712a-f0b9-4635-bb57-cd162578d499",
+                "index": 5,
+                "image_id": "1072712a-f0b9-4635-bb57-cd162578d499"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product Description contains a word you blacklisted, keyword (Battery)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:35.566000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d568c92fe48852b7660807",
+            "category": [
+                {
+                    "name": "Kitchen Tools & Gadgets -> Cutting Boards",
+                    "category_id": "46282",
+                    "url": "https://www.ebay.com/b/46282",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 6.88,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808282405082_10",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808282405082"
+                    }
+                ],
+                "max_buy_price": 8.26,
+                "max_sell_price": 25.04,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 25.04,
+                "min_buy_price": 8.26,
+                "min_profit": 6.88,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:32.239000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Titanium Stainless Steel Cutting Board 304 Thick Double-Sided Chopping",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Kitchen,Dining & Bar",
+                "Kitchen Knives & Accessories"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098081",
+            "preview_url": "https://www.ebay.com.au/itm/Titanium-Stainless-Steel-Cutting-Board-304-Thick-Double-Sided-Chopping-/356688098081",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTA5OVg4MDA=/z/678AAOSwQA1n2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "f9c73194-0638-424b-a220-d410f7b04f72",
+                "index": 7,
+                "image_id": "f9c73194-0638-424b-a220-d410f7b04f72"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product Description contains a word you blacklisted, keyword (Knife)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:35.241000+00:00",
+            "system_keyword_violations": [
+                {
+                    "keyword_name": "Knife",
+                    "severity": 1,
+                    "location": 2
+                }
+            ]
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d565c0e193f243b1c0569a",
+            "category": [
+                {
+                    "name": "Party Supplies -> Party Decorations",
+                    "category_id": "170103",
+                    "url": "https://www.ebay.com/b/170103",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 2.22,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808269227181_200006154_202638846",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808269227181"
+                    }
+                ],
+                "max_buy_price": 2.44,
+                "max_sell_price": 7.57,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 7.57,
+                "min_buy_price": 2.44,
+                "min_profit": 2.22,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:32.109000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Fillable Easter Eggs Colorful Plastic Shell Candy Gift Box Hunt Game",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Festive & Party Supplies",
+                "Event & Party"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098077",
+            "preview_url": "https://www.ebay.com.au/itm/Fillable-Easter-Eggs-Colorful-Plastic-Shell-Candy-Gift-Box-Hunt-Game-/356688098077",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/odAAAOSwPftn2yMN/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "410e92ab-dc08-4eca-8464-8a22369d033e",
+                "index": 7,
+                "image_id": "410e92ab-dc08-4eca-8464-8a22369d033e"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product title contains a word you blacklisted, keyword (game)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:34.111000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d8130736f578c1ef64dd1e",
+            "category": [
+                {
+                    "name": "Coffee & Tea Makers -> Coffee, Tea & Espresso Parts",
+                    "category_id": "99565",
+                    "url": "https://www.ebay.com/b/99565",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 4.81,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256806378446389_2674",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256806378446389"
+                    }
+                ],
+                "max_buy_price": 5.66,
+                "max_sell_price": 17.27,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 17.27,
+                "min_buy_price": 5.66,
+                "min_profit": 4.81,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:30.920000+00:00",
+            "is_ai_generated_draft": false,
+            "bulk_action_started": "2025-03-19T20:03:21.385000+00:00",
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "Descaler Cleaner Espresso Coffee Machine ",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Household Merchandises",
+                "Household Cleaning Chemicals"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098060",
+            "preview_url": "https://www.ebay.com.au/itm/Descaler-Cleaner-Espresso-Coffee-Machine-/356688098060",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/ZDQAAOSwI2Nn2yMN/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "88ff3039-1bad-48ef-a739-a000c54f6775",
+                "index": 6,
+                "image_id": "88ff3039-1bad-48ef-a739-a000c54f6775"
+            },
+            "error_list": [
+                {
+                    "error_code": "400",
+                    "error_task": "general_pre_draft_item_validation",
+                    "error_type": 6,
+                    "message": "Product Description contains a word you blacklisted, keyword (powder)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T20:03:33.922000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d5667d84aa0d81423792d2",
+            "category": [
+                {
+                    "name": "Kitchen Tools & Gadgets -> Cooking Utensils",
+                    "category_id": "20649",
+                    "url": "https://www.ebay.com/b/20649",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 5.86,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256805975251529_10",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256805975251529"
+                    }
+                ],
+                "max_buy_price": 6.98,
+                "max_sell_price": 21.21,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 21.21,
+                "min_buy_price": 6.98,
+                "min_profit": 5.86,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:31.563000+00:00",
+            "is_ai_generated_draft": false,
+            "bulk_action_started": "2025-03-19T20:03:20.990000+00:00",
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "2-In-1 USB Rechargeable Milk Frother Electric Egg Beater Mixer",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Kitchen,Dining & Bar",
+                "Kitchen Tools & Gadgets"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098078",
+            "preview_url": "https://www.ebay.com.au/itm/2-In-1-USB-Rechargeable-Milk-Frother-Electric-Egg-Beater-Mixer-/356688098078",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/fjgAAOSwB6Rn2yMO/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "6f8eb07f-624d-4860-bb73-f09e8b8a9f22",
+                "index": 7,
+                "image_id": "6f8eb07f-624d-4860-bb73-f09e8b8a9f22"
+            },
+            "upload_date": "2025-03-19T20:03:33.566000+00:00"
+        },
+        {
+            "autods_store_id": 1197312,
+            "amount_of_variations": 1,
+            "id": "67d56bc39ed0298f0eb00579",
+            "category": [
+                {
+                    "name": "Accessories -> Other",
+                    "category_id": "82161",
+                    "url": "https://www.ebay.com/b/82161",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 3.92,
+                "sell_currency": "AUD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256808093484624_202419806_202638846",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256808093484624"
+                    }
+                ],
+                "max_buy_price": 4.55,
+                "max_sell_price": 13.94,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 13.94,
+                "min_buy_price": 4.55,
+                "min_profit": 3.92,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T21:03:30.529000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "5Pcs Easter Carrot Candy Boxes Transparent Gift Boxes Party Favors",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Festive & Party Supplies",
+                "Event & Party"
+            ],
+            "configuration": {
+                "template_id": 78826,
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "356688098061",
+            "preview_url": "https://www.ebay.com.au/itm/5Pcs-Easter-Carrot-Candy-Boxes-Transparent-Gift-Boxes-Party-Favors-/356688098061",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/VrkAAOSw55Nn2yMP/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "c74ea73e-3cec-44c0-8de6-a6478cec54a6",
+                "index": 4,
+                "image_id": "c74ea73e-3cec-44c0-8de6-a6478cec54a6"
+            },
+            "upload_date": "2025-03-19T20:03:33.532000+00:00"
+        },
+        {
+            "autods_store_id": 1173617,
+            "amount_of_variations": 1,
+            "id": "67a4a81d924bc85c4c0d8f04",
+            "category": [
+                {
+                    "name": "Paint, Stain & Varnish -> Other Paint, Stain & Varnish",
+                    "category_id": "180980",
+                    "_cls": "ItemCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 9.93,
+                "sell_currency": "USD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256802892229660",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256802892229660"
+                    }
+                ],
+                "max_buy_price": 19.26,
+                "max_sell_price": 36.49,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 36.49,
+                "min_buy_price": 19.26,
+                "min_profit": 9.93,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T19:59:44.651000+00:00",
+            "is_ai_generated_draft": false,
+            "bulk_action_started": "2025-03-19T19:57:30.884000+00:00",
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "14Pcs Furniture & Floor Repair Set Wax Crayons & Scratch Paint Pens",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home Improvement",
+                "Hardware",
+                "Adhesives & Sealers"
+            ],
+            "configuration": {
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "388115734871",
+            "preview_url": "https://www.ebay.com/itm/14Pcs-Furniture-Floor-Repair-Set-Wax-Crayons-Scratch-Paint-Pens-/388115734871",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDg1NA==/z/96AAAOSwSN9n2yIt/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "2d12167f-1a6e-4015-9072-e10996a65691",
+                "index": 0,
+                "image_id": "2d12167f-1a6e-4015-9072-e10996a65691"
+            },
+            "error_list": [
+                {
+                    "error_task": "preprocess_draft_images",
+                    "error_type": 6,
+                    "message": "HTTPConnectionPool(host='scraper-api-v3-prod-scrapers.prod-scrapers.svc', port=80): Read timed out. (read timeout=20)",
+                    "severity": 2
+                }
+            ],
+            "upload_date": "2025-03-19T19:59:45.653000+00:00"
+        },
+        {
+            "autods_store_id": 1173617,
+            "amount_of_variations": 1,
+            "id": "67a4b01aa56162b79d8586a0",
+            "category": [
+                {
+                    "name": "Kitchen Storage & Organization -> Food Storage Containers",
+                    "category_id": "20655",
+                    "url": "https://www.ebay.com/b/20655",
+                    "_cls": "ItemEbayCategory"
+                }
+            ],
+            "status": 2,
+            "note": "",
+            "site_id": 1,
+            "dynamic_policy_gsp_enabled": false,
+            "variation_statistics": {
+                "max_profit": 6.0,
+                "sell_currency": "USD",
+                "supplier_region": [
+                    {
+                        "item_id_on_site": "3256807060880372_200006153",
+                        "site_id": 2,
+                        "region": 6,
+                        "url": "https://sites.autods.com/aliexpress/?id=3256807060880372"
+                    }
+                ],
+                "max_buy_price": 4.21,
+                "max_sell_price": 12.76,
+                "on_hold": {
+                    "total": 0
+                },
+                "min_sell_price": 12.76,
+                "min_buy_price": 4.21,
+                "min_profit": 6.0,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "in_stock": {
+                    "total": 1
+                }
+            },
+            "days_left": "2025-04-19T19:57:49.032000+00:00",
+            "is_ai_generated_draft": false,
+            "total_sold_count": 0,
+            "dynamic_policy_handling_time": 3,
+            "title": "3 Pack 4Oz Leakproof Salad Dressing Containers with Lids",
+            "dynamic_policy_enabled": false,
+            "tags": [
+                "Home & Garden",
+                "Home Storage & Organization",
+                "Kitchen Storage & Organization"
+            ],
+            "configuration": {
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_auto_order": false,
+                "item_country_location": "China",
+                "disable_stock_monitoring": false,
+                "disable_price_monitoring": false,
+                "disable_supplier_changes_error": false
+            },
+            "item_id_on_site": "388115732596",
+            "preview_url": "https://www.ebay.com/itm/3-Pack-4Oz-Leakproof-Salad-Dressing-Containers-Lids-/388115732596",
+            "is_ai_generated": false,
+            "main_picture_url": {
+                "url": "https://i.ebayimg.com/00/s/ODAwWDgwMA==/z/Gm0AAOSwNXNn2yG0/$_3.PNG",
+                "actions": {
+                    "flip_x": false,
+                    "resize_x": null,
+                    "flip_y": false,
+                    "paste_watermark": false,
+                    "rotate": 0,
+                    "resize_y": null
+                },
+                "image_id_on_site": "63152ff7-1bb3-48ab-94f2-e01cbbd6d078",
+                "index": 7,
+                "image_id": "63152ff7-1bb3-48ab-94f2-e01cbbd6d078"
+            },
+            "upload_date": "2025-03-19T19:57:51.034000+00:00"
+        }
+    ]
+}

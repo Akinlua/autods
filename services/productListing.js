@@ -9,102 +9,138 @@ const config = require('../config/config');
 class ProductListingScheduler {
   constructor() {
     this.markup = config.pricing.defaultMarkup || 1.3; // 30% markup by default
-    this.stockThreshold = config.inventory.minimumStock || 5;
+    this.stockThreshold = config.inventory.minimumStock || 1;
+    // Store IDs are now handled in the AutoDS API client
   }
 
   async run() {
     try {
-      logger.info('Fetching products from AutoDS');
-      // const products = await autoDSAPI.getProducts();
-      // logger.info(`Found ${products.length} products from AutoDS`);
+      const storeIds = autoDSAPI.getStoreIds();
+      logger.info(`Fetching products from AutoDS for store IDs: ${storeIds}`);
+      
+      // Get products from AutoDS using the updated API
+      const products = await autoDSAPI.getProducts();
+      logger.info(`Found ${products.length} products from AutoDS`);
 
       // Get existing eBay listings to avoid duplicates
       const existingListings = await ebayAPI.getSellerList();
-      console.log("exisging listings")
-      console.log(existingListings)
+      logger.info(`Found ${existingListings.length} existing eBay listings`);
       const existingSkus = existingListings.map(listing => listing.sku);
 
-      // Filter products that are not already listed and have enough stock
-      // for (const product of products) {
-      //   try {
-      //     // Skip if already listed
-      //     if (existingSkus.includes(product.id.toString())) {
-      //       logger.info(`Product ${product.id} already listed on eBay, skipping`);
-      //       continue;
-      //     }
+      // Filter products that are not already listed and have enough stock based on variation_statistics
+      const eligibleProducts = products.filter(product => {
+        // Skip products that are already listed
+        if (existingSkus.includes(product.id.toString())) {
+          logger.info(`Product ${product.id} already listed on eBay, skipping`);
+          return false;
+        }
 
-      //     // Check stock
-      //     const stockInfo = await autoDSAPI.getProductStock(product.id);
-      //     console.log("stockInfo")
-      //     console.log(stockInfo)
-      //     if (stockInfo.quantity < this.stockThreshold) {
-      //       logger.info(`Product ${product.id} has insufficient stock (${stockInfo.quantity}), skipping`);
-      //       continue;
-      //     }
+        // Skip products with errors
+        if (product.error_list && product.error_list.length > 0) {
+          const errorMessages = product.error_list.map(error => error.message).join('; ');
+          logger.info(`Product ${product.id} has errors: ${errorMessages}, skipping`);
+          return false;
+        }
 
-      //     // Get detailed product info
-      //     const productDetails = await autoDSAPI.getProductDetails(product.id);
-      //     console.log("productDetails")
-      //     console.log(productDetails)
-          
-      //     // Calculate price with markup
-      //     const sellingPrice = (parseFloat(productDetails.price) * this.markup).toFixed(2);
-          
-      //     // Create eBay listing
-      //     const itemData = {
-      //       sku: product.id.toString(),
-      //       product: {
-      //         title: productDetails.title,
-      //         description: productDetails.description,
-      //         imageUrls: productDetails.images.map(img => img.url),
-      //         aspects: this.mapProductAspects(productDetails),
-      //         brand: productDetails.brand || "Unbranded"
-      //       },
-      //       availability: {
-      //         shipToLocationAvailability: {
-      //           quantity: Math.min(stockInfo.quantity, 10) // Limit to 10 at a time
-      //         }
-      //       },
-      //       condition: "NEW",
-      //       categoryId: this.mapToEbayCategory(productDetails.category),
-      //       format: "FIXED_PRICE",
-      //       listingPolicies: {
-      //         fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
-      //         paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
-      //         returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
-      //       },
-      //       pricingSummary: {
-      //         price: {
-      //           currency: "USD",
-      //           value: sellingPrice
-      //         }
-      //       }
-      //     };
+        // Check if product has adequate stock from variation_statistics
+        if (product.variation_statistics) {
+          const inStock = product.variation_statistics.in_stock?.total || 0;
+          if (inStock < this.stockThreshold) {
+            logger.info(`Product ${product.id} has insufficient stock (${inStock}), skipping`);
+            return false;
+          }
+          return true;
+        }
+        
+        logger.info(`Product ${product.id} has no variation statistics, skipping`);
+        return false;
+      });
 
-      //     // Add the item to eBay
-      //     const result = await ebayAPI.addItem(itemData);
-      //     logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId}`);
+      logger.info(`Found ${eligibleProducts.length} eligible products to list`);
+
+      // Process eligible products for listing
+      for (const product of eligibleProducts) {
+        try {
+          // Get detailed product info (includes enriched data)
+          const productDetails = await autoDSAPI.getProductDetails(product.id);
           
-      //     // Store listing details in database
-      //     await db.listings.create({
-      //       autodsId: product.id,
-      //       ebayListingId: result.listingId,
-      //       sku: product.id.toString(),
-      //       title: productDetails.title,
-      //       price: sellingPrice,
-      //       cost: productDetails.price,
-      //       stock: stockInfo.quantity,
-      //       listedAt: new Date()
-      //     });
+          // No need to separately get stock info since it's in variation_statistics
           
-      //     // Small delay to avoid API rate limits
-      //     await new Promise(resolve => setTimeout(resolve, 1000));
+          // Calculate price with markup using variation_statistics
+          const basePrice = productDetails.variation_statistics.min_sell_price;
+          const sellingPrice = (parseFloat(basePrice) * this.markup).toFixed(2);
           
-      //   } catch (error) {
-      //     logger.error(`Error processing product ${product.id}`, { error: error.message });
-      //     continue; // Continue with next product
-      //   }
-      // }
+          // Extract all image URLs from the product
+          const imageUrls = [];
+          // Add main picture URL if present
+          if (productDetails.main_picture_url && productDetails.main_picture_url.url) {
+            imageUrls.push(productDetails.main_picture_url.url);
+          }
+          // Add any additional images
+          if (productDetails.images && Array.isArray(productDetails.images)) {
+            productDetails.images.forEach(image => {
+              // Avoid duplicates
+              if (image.url && !imageUrls.includes(image.url)) {
+                imageUrls.push(image.url);
+              }
+            });
+          }
+          
+          // Create eBay listing
+          const itemData = {
+            sku: productDetails.id.toString(),
+            product: {
+              title: productDetails.title,
+              description: productDetails.description,
+              imageUrls: imageUrls,
+              aspects: this.mapProductAspects(productDetails),
+              brand: productDetails.variations[0].active_buy_item.brand
+            },
+            availability: {
+              shipToLocationAvailability: {
+                quantity: Math.min(productDetails.variation_statistics.in_stock.total, 10) // Limit to 10 at a time
+              }
+            },
+            condition: "NEW",
+            categoryId: this.mapToEbayCategory(productDetails.category),
+            format: "FIXED_PRICE",
+            // listingPolicies: {
+            //   fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
+            //   paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
+            //   returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
+            // },
+            pricingSummary: {
+              price: {
+                currency: productDetails.variation_statistics.sell_currency || "USD",
+                value: sellingPrice
+              }
+            }
+          };
+
+          // Add the item to eBay
+          const result = await ebayAPI.addItem(itemData);
+          logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId}`);
+          
+          // Store listing details in database
+          await db.listings.create({
+            autodsId: product.id,
+            ebayListingId: result.listingId,
+            sku: product.id.toString(),
+            title: productDetails.title,
+            price: sellingPrice,
+            cost: productDetails.variation_statistics.min_buy_price,
+            stock: productDetails.variation_statistics.in_stock.total,
+            listedAt: new Date()
+          });
+          
+          // Small delay to avoid API rate limits
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+        } catch (error) {
+          logger.error(`Error processing product ${product.id}`, { error: error.message });
+          continue; // Continue with next product
+        }
+      }
       
       return true;
     } catch (error) {
@@ -118,38 +154,187 @@ class ProductListingScheduler {
     const aspects = {};
     
     // Map standard aspects
-    if (productDetails.brand) aspects["Brand"] = [productDetails.brand];
-    if (productDetails.model) aspects["Model"] = [productDetails.model];
-    if (productDetails.color) aspects["Color"] = [productDetails.color];
-    if (productDetails.size) aspects["Size"] = [productDetails.size];
-    if (productDetails.material) aspects["Material"] = [productDetails.material];
+    if (productDetails.variations[0].active_buy_item.brand) aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
     
-    // Map custom attributes if they exist
-    if (productDetails.attributes && Array.isArray(productDetails.attributes)) {
-      productDetails.attributes.forEach(attr => {
-        if (attr.name && attr.value) {
-          aspects[attr.name] = [attr.value];
+    // Add tags as aspects (tags often contain useful attributes)
+    if (productDetails.tags && Array.isArray(productDetails.tags)) {
+      productDetails.tags.forEach(tag => {
+        // Skip tags that are too generic or already mapped
+        if (!aspects[tag] && tag.length < 30) {
+          aspects[tag] = ["Yes"];
         }
       });
+    }
+    
+    // Map category into aspects
+    if (productDetails.category && productDetails.category.length > 0) {
+      const categoryName = productDetails.category[0].name || '';
+      // Split category names like "Kitchen Tools & Gadgets -> Cutting Boards"
+      if (categoryName.includes('->')) {
+        const categories = categoryName.split('->').map(c => c.trim());
+        categories.forEach(cat => {
+          if (cat && !aspects[cat] && cat.length < 30) {
+            aspects[cat] = ["Yes"];
+          }
+        });
+      }
     }
     
     return aspects;
   }
   
-  mapToEbayCategory(autodsCategory) {
-    // This would ideally be a more comprehensive mapping
-    // Simplified example mapping
-    const categoryMap = {
-      'electronics': '293',
-      'clothing': '11450',
-      'home': '11700',
-      'toys': '220',
-      'beauty': '26395',
-      'sports': '888',
-      // Add more categories as needed
-    };
+  mapToEbayCategory(categories) {
+    // Extract category from the AutoDS category format
+    // Categories in v2 API might be in an array format
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+      return '220'; // Default to 'Everything Else' category
+    }
     
-    return categoryMap[autodsCategory.toLowerCase()] || '220'; // Default to 'Everything Else' category
+    // Try to get the category ID from the first category entry
+    const firstCategory = categories[0];
+    if (firstCategory.category_id) {
+      return firstCategory.category_id;
+    }
+    
+    // Fallback to category mapping based on name
+    if (firstCategory.name) {
+      const categoryName = firstCategory.name.toLowerCase();
+      // This would ideally be a more comprehensive mapping
+      const categoryMap = {
+        // Electronics
+        'electronics': '293',
+        'computers': '58058',
+        'tablets': '171485',
+        'cell phones': '15032',
+        'smartphones': '9355',
+        'cameras': '625',
+        'video games': '1249',
+        'car electronics': '14923',
+        'tv': '32852',
+        'audio': '14969',
+        'headphones': '112529',
+        'smart home': '175574',
+        
+        // Fashion
+        'clothing': '11450',
+        'men': '1059',
+        'women': '15724',
+        'shoes': '63889',
+        'jewelry': '281',
+        'watches': '14324',
+        'accessories': '4251',
+        'handbags': '169291',
+        'kids clothing': '171146',
+        
+        // Home & Garden
+        'home': '11700',
+        'kitchen': '20625',
+        'furniture': '3197',
+        'bedding': '20444',
+        'bathroom': '26677',
+        'garden': '159912',
+        'tools': '631',
+        'decor': '10033',
+        'appliances': '20710',
+        'lighting': '20697',
+        
+        // Toys & Hobbies
+        'toys': '220',
+        'collectibles': '1',
+        'action figures': '246',
+        'dolls': '237',
+        'games': '233',
+        'puzzles': '19169',
+        'rc toys': '2562',
+        'building toys': '183446',
+        
+        // Health & Beauty
+        'beauty': '26395',
+        'health': '67588',
+        'makeup': '31786',
+        'skin care': '11863',
+        'fragrances': '180345',
+        'hair care': '11854',
+        'bath & body': '11838',
+        'massage': '36447',
+        'vitamins': '180959',
+        
+        // Sports & Outdoors
+        'sports': '888',
+        'fitness': '15273',
+        'cycling': '7294',
+        'camping': '16034',
+        'fishing': '1492',
+        'hunting': '7301',
+        'golf': '1513',
+        'swimming': '74952',
+        'tennis': '1585',
+        'winter sports': '1059',
+        'outdoor recreation': '159043',
+        
+        // Pets
+        'pet supplies': '1281',
+        'dog supplies': '20742',
+        'cat supplies': '20741',
+        'fish supplies': '20753',
+        'bird supplies': '20744',
+        'small animal supplies': '20754',
+        
+        // Automotive
+        'automotive': '6028',
+        'car parts': '33612',
+        'motorcycle parts': '10063',
+        'atv parts': '43962',
+        'boat parts': '26429',
+        'truck parts': '33637',
+        
+        // Business & Industrial
+        'business': '12576',
+        'industrial': '11804',
+        'office': '1185',
+        'manufacturing': '92074',
+        'retail': '11818',
+        
+        // Books, Movies & Music
+        'books': '267',
+        'movies': '11232',
+        'music': '11233',
+        'magazines': '280',
+        
+        // Baby
+        'baby': '2984',
+        'baby clothing': '3082',
+        'strollers': '66700',
+        'car seats': '66692',
+        'feeding': '20400',
+        'toys': '19069',
+        
+        // Crafts
+        'crafts': '14339',
+        'art supplies': '28102',
+        'sewing': '160737',
+        'scrapbooking': '160724',
+        'knitting': '160722',
+        
+        // Musical Instruments
+        'instruments': '619',
+        'guitars': '33034',
+        'drums': '180010',
+        'keyboards': '180016',
+        
+        // Default
+        'other': '220' // Everything Else
+      };
+      
+      // Check if any keywords from the map are in the category name
+      for (const [key, value] of Object.entries(categoryMap)) {
+        if (categoryName.includes(key)) {
+          return value;
+        }
+      }
+    }
+    
+    return '220'; // Default to 'Everything Else' category
   }
 }
 
