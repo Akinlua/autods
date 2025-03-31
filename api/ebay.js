@@ -631,7 +631,7 @@ class EbayAPI {
       
       return response.data.offers || [];
     } catch (error) {
-      logger.warn(`Failed to get offers for inventory item ${inventoryItemKey}`, { error: error.message });
+      logger.info(`Found 0 previous offers for inventory item ${inventoryItemKey}`, { error: error.message });
       return [];
     }
   }
@@ -832,11 +832,11 @@ class EbayAPI {
         }
       }
       
-      if (offerData.listingPolicies) {
-        console.log("offerData.listingPolicies:", JSON.stringify(offerData.listingPolicies));
-      } else {
-        console.log("No listing policies set for offer");
-      }
+      // if (offerData.listingPolicies) {
+      //   console.log("offerData.listingPolicies:", JSON.stringify(offerData.listingPolicies));
+      // } else {
+      //   console.log("No listing policies set for offer");
+      // }
       
       // Create offer
       const offerResponse = await axios({
