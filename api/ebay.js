@@ -241,7 +241,7 @@ class EbayAPI {
     puppeteer.use(StealthPlugin());
     
     const browser = await puppeteer.launch({
-      headless: 'new', // Use visible browser for debugging
+      headless: process.env.NODE_ENV === 'development' ? false : 'new', // Use false in development, 'new' otherwise
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -250,6 +250,7 @@ class EbayAPI {
       
       // Navigate to the authorization URL
       const authUrl = this.getAuthorizationUrl(this.scopes, this.currentAuthState);
+      logger.info(`Navigating to authorization URL: ${authUrl}`);
       await page.goto(authUrl, { waitUntil: 'networkidle2' });
       
       // Wait for username field (first page) and enter username
@@ -758,6 +759,7 @@ class EbayAPI {
         try {
           // We need to get account policies first if not provided
           const accountPolicies = await this.getAccountPolicies(marketplaceId);
+          console.log("accountPolicies", accountPolicies);
           
           offerData.listingPolicies = {
             fulfillmentPolicyId: accountPolicies.fulfillmentPolicyId,

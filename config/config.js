@@ -62,9 +62,9 @@ const config = {
   },
   
   schedules: {
-    listingCron: process.env.LISTING_CRON_SCHEDULE || '0 9 * * *',
-    removalCron: process.env.REMOVAL_CRON_SCHEDULE || '0 18 * * *',
-    messageCron: process.env.MESSAGE_CRON_SCHEDULE || '0 * * * *'
+    listingCron: process.env.LISTING_CRON_SCHEDULE || '0 9 * * *', // Run every day at 9 AM
+    removalCron: process.env.REMOVAL_CRON_SCHEDULE || '0 18 * * *', // Run every day at 6 PM
+    messageCron: process.env.MESSAGE_CRON_SCHEDULE || '0 * * * *' // Run every hour
   }
 };
 

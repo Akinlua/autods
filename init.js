@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const { initDatabase } = require('./db/database');
 const logger = require('./utils/logger');
@@ -19,4 +18,4 @@ const initApp = async () => {
 };
 
 // Run initialization
-initApp();s
+initApp();

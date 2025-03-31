@@ -117,7 +117,7 @@ class AutoDSAPI {
       
       // Launch browser with stealth mode
       const browser = await puppeteer.launch({
-        headless: 'new', // Use the new headless mode
+        headless: process.env.NODE_ENV === 'development' ? false : 'new', // Use false in development, 'new' otherwise
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
       

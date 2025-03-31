@@ -105,11 +105,11 @@ class ProductListingScheduler {
             condition: "NEW",
             categoryId: this.mapToEbayCategory(productDetails.category),
             format: "FIXED_PRICE",
-            // listingPolicies: {
-            //   fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
-            //   paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
-            //   returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
-            // },
+            listingPolicies: {
+              fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
+              paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
+              returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
+            },
             pricingSummary: {
               price: {
                 currency: productDetails.variation_statistics.sell_currency || "USD",
