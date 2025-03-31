@@ -616,8 +616,8 @@ class EbayAPI {
     this.scopes = scopes;
   }
 
-  // Add this new method to check for existing offers for an inventory item
-  async getOffersForInventoryItem(inventoryItemKey) {
+   // Add this new method to check for existing offers for an inventory item
+   async getOffersForInventoryItem(inventoryItemKey) {
     const token = await this.getAccessToken();
     
     try {
@@ -654,28 +654,6 @@ class EbayAPI {
     } catch (error) {
       logger.error(`Failed to delete offer ${offerId}`, { error: error.message });
       return false;
-    }
-  }
-
-  async updateOffer(offerId, offerData) {
-    const token = await this.getAccessToken();
-    
-    try {
-      const response = await axios({
-        method: 'put',
-        url: `${this.baseUrl}/sell/inventory/v1/offer/${offerId}`,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        data: offerData
-      });
-      
-      logger.info(`Successfully updated offer ${offerId}`);
-      return response.data;
-    } catch (error) {
-      logger.error(`Failed to update offer ${offerId}`, { error: error.message });
-      throw new Error(`Failed to update offer: ${error.response?.data?.errors?.[0]?.message || error.message}`);
     }
   }
 
@@ -748,6 +726,24 @@ class EbayAPI {
       // console.log("Country data set to:", JSON.stringify(inventoryItem.product.aspects["Country/Region of Manufacture"]));
       
       // Create inventory item
+
+      //first delete previous offers
+      // Check for existing offers for this inventory item
+      const existingOffers = await this.getOffersForInventoryItem(inventoryItemKey);
+    
+      // If there are existing offers, delete them or update one instead of creating a new one
+      logger.info(`deleting previous offers for ${inventoryItemKey}`);
+      if (existingOffers.length > 0) {
+        logger.info(`Found ${existingOffers.length} existing offers for ${inventoryItemKey}`);
+        
+        // Get the first offer to update
+        const existingOffer = existingOffers[0];
+        const existingOfferId = existingOffer.offerId;
+        
+        for (let i = 0; i < existingOffers.length; i++) {
+          await this.deleteOffer(existingOffers[i].offerId);
+        }
+      }
       logger.info(`Creating inventory item with key: ${inventoryItemKey}`);
       const inventoryItemResponse = await axios({
         method: 'put',
@@ -760,109 +756,6 @@ class EbayAPI {
         data: inventoryItem
       });
       console.log("inventoryItemResponse");
-      
-      // Check for existing offers for this inventory item
-      const existingOffers = await this.getOffersForInventoryItem(inventoryItemKey);
-      
-      // If there are existing offers, delete them or update one instead of creating a new one
-      if (existingOffers.length > 0) {
-        logger.info(`Found ${existingOffers.length} existing offers for ${inventoryItemKey}`);
-        
-        // Get the first offer to update
-        const existingOffer = existingOffers[0];
-        const existingOfferId = existingOffer.offerId;
-        
-        // Delete any additional offers (beyond the first one)
-        for (let i = 1; i < existingOffers.length; i++) {
-          await this.deleteOffer(existingOffers[i].offerId);
-        }
-        
-        // Now create an offer for this inventory item
-        const offerData = {
-          sku: inventoryItemKey,
-          marketplaceId: marketplaceId,
-          format: "FIXED_PRICE",
-          availableQuantity: itemData.availability?.shipToLocationAvailability?.quantity || 1,
-          categoryId: itemData.categoryId || "9355",
-          listingDescription: itemData.product?.description || "Item Description",
-          merchantLocationKey: merchantLocationKey,  // Use the merchant location key
-          pricingSummary: {
-            price: {
-              currency: itemData.pricingSummary?.price?.currency || "USD",
-              value: itemData.pricingSummary?.price?.value || "9.99"
-            }
-          }
-        };
-        
-        // Add listing policies if provided
-        if (itemData.listingPolicies?.fulfillmentPolicyId && 
-            itemData.listingPolicies?.paymentPolicyId && 
-            itemData.listingPolicies?.returnPolicyId) {
-          offerData.listingPolicies = {
-            fulfillmentPolicyId: itemData.listingPolicies.fulfillmentPolicyId,
-            paymentPolicyId: itemData.listingPolicies.paymentPolicyId,
-            returnPolicyId: itemData.listingPolicies.returnPolicyId
-          };
-        } else {
-          try {
-            // We need to get account policies first if not provided
-            const accountPolicies = await this.getAccountPolicies(marketplaceId);
-            
-            offerData.listingPolicies = {
-              fulfillmentPolicyId: accountPolicies.fulfillmentPolicyId,
-              paymentPolicyId: accountPolicies.paymentPolicyId,
-              returnPolicyId: accountPolicies.returnPolicyId
-            };
-          } catch (policyError) {
-            // Log the error but continue without policies if they can't be retrieved
-            logger.warn('Failed to get account policies', { error: policyError.message });
-            console.log('Failed to get account policies:', policyError.message);
-          }
-        }
-        
-        // Update the existing offer instead of creating a new one
-        try {
-          await this.updateOffer(existingOfferId, offerData);
-          logger.info(`Updated existing offer ${existingOfferId} for ${inventoryItemKey}`);
-          
-          // Publish the offer to get the listing ID
-          const publishResponse = await axios({
-            method: 'post',
-            url: `${this.baseUrl}/sell/inventory/v1/offer/${existingOfferId}/publish`,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          // Extract the eBay listing ID from the response
-          const ebayListingId = publishResponse.data.listingId;
-          
-          logger.info(`eBay listing ID: ${ebayListingId}`);
-          
-          return {
-            success: true,
-            inventoryItemKey,
-            offerId: existingOfferId,
-            ebayListingId,
-            ...publishResponse.data
-          };
-        } catch (updateError) {
-          // If update fails, try deleting and creating a new offer
-          logger.warn(`Failed to update offer ${existingOfferId}, will try deleting and creating a new one`, { error: updateError.message });
-          
-          // Try to delete the offer 
-          const deleteResult = await this.deleteOffer(existingOfferId);
-          
-          if (!deleteResult) {
-            // If deletion fails, throw an error
-            throw new Error(`Unable to update or delete existing offer ${existingOfferId}`);
-          }
-          
-          // Now we can proceed with creating a new offer
-        }
-      }
-      
       // Now create an offer for this inventory item
       const offerData = {
         sku: inventoryItemKey,
@@ -877,7 +770,39 @@ class EbayAPI {
             currency: itemData.pricingSummary?.price?.currency || "USD",
             value: itemData.pricingSummary?.price?.value || "9.99"
           }
-        }
+        },
+        // shippingOptions: [  // Manually specifying shipping
+        //     {
+        //         costType: "FLAT_RATE",
+        //         shippingServices: [
+        //             {
+        //                 shippingServiceType: "DOMESTIC",
+        //                 shippingServiceName: "USPS First Class",
+        //                 shippingCost: {
+        //                     value: "5.00",
+        //                     currency: "USD"
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // ],
+        // paymentPolicy: {  // Manually specifying payment
+        //     immediatePay: "REQUIRED",
+        //     paymentMethods: [
+        //         {
+        //             paymentMethodType: "CREDIT_CARD"
+        //         }
+        //     ]
+        // },
+        // returnPolicy: {  // Manually specifying returns
+        //     returnsAccepted: true,
+        //     returnPeriod: {
+        //         value: "30",
+        //         unit: "DAY"
+        //     },
+        //     refundMethod: "MONEY_BACK",
+        //     returnShippingCostPayer: "BUYER"
+        // }
       };
       
       // Add listing policies if provided
@@ -952,25 +877,26 @@ class EbayAPI {
       };
     } catch (error) {
       // Capture complete error details
-      const errorDetails = {
-        message: error.message,
-        responseData: error.response?.data,
-        statusCode: error.response?.status,
-        inventoryItem: inventoryItem,
-        inventoryItemKey: inventoryItemKey,
-        merchantLocationKey: merchantLocationKey
-      };
+      // const errorDetails = {
+      //   message: error.message,
+      //   responseData: error.response?.data,
+      //   statusCode: error.response?.status,
+      //   inventoryItem: inventoryItem,
+      //   inventoryItemKey: inventoryItemKey,
+      //   merchantLocationKey: merchantLocationKey,
+      //   stack: error.stack
+      // };
       
-      // Log comprehensive error information
-      logger.error('Error adding eBay item', errorDetails);
+      // // Log comprehensive error information
+      // logger.error('Error adding eBay item', errorDetails);
       
-      console.log("Error adding item to eBay:");
-      console.log("Error message:", error.message);
-      console.log("Status code:", error.response?.status);
+      // console.log("Error adding item to eBay:");
+      // console.log("Error message:", error.message);
+      // console.log("Status code:", error.response?.status);
       
-      if (error.response?.data?.errors) {
-        console.log("Error details:", JSON.stringify(error.response.data.errors, null, 2));
-      }
+      // if (error.response?.data?.errors) {
+      //   console.log("Error details:", JSON.stringify(error.response.data.errors, null, 2));
+      // }
       
       throw new Error(`Failed to add item: ${error.response?.data?.errors?.[0]?.message || error.message}`);
     }
