@@ -47,7 +47,7 @@ const DEFAULT_SCOPES = [
 ];
 
 class EbayAPI {
-  constructor() {
+  constructor()  {
     this.baseUrl = process.env.EBAY_API_URL;
     this.clientId = process.env.EBAY_CLIENT_ID;
     this.clientSecret = process.env.EBAY_CLIENT_SECRET;
@@ -61,6 +61,7 @@ class EbayAPI {
     this.authorizationInProgress = false;
     this.tokenCallbacks = [];
     this.dbInitialized = false;
+    this.loadTokens= false;
     this.pollingInterval = null;
     this.currentAuthState = null;
     
@@ -100,12 +101,13 @@ class EbayAPI {
     
     try {
       const token = await db.tokens.findOne({ service: 'ebay', active: true }).sort({ createdAt: -1 }).lean().exec();
-      
+      // console.log(token);
       if (token) {
         this.accessToken = token.accessToken;
         this.refreshToken = token.refreshToken;
         this.tokenExpiry = new Date(token.expiresAt).getTime();
         this.scopes = token.scopes;
+        this.loadTokens = true;
         logger.info('Loaded eBay tokens from database');
       } else {
         logger.info('No active eBay tokens found in database');
@@ -374,6 +376,7 @@ class EbayAPI {
 
     try {
       const scopeString = Array.isArray(this.scopes) ? this.scopes.join(' ') : this.scopes;
+      console.log("scopeString");
       
       const response = await axios({
         method: 'post',
@@ -421,8 +424,9 @@ class EbayAPI {
       }
   
       // Try connecting to DB if not initialized yet
-      if (!this.dbInitialized) {
+      if (!this.loadTokens) {
         try {
+          console.log("getacces")
           await this.initializeTokens();
         } catch (error) {
           logger.warn('Failed to initialize database connection, proceeding with in-memory tokens only');
@@ -440,6 +444,7 @@ class EbayAPI {
       }
   
       // If we don't have tokens or refresh failed, trigger authorization flow
+      console.log("triggerAuthorizationFlow");
       return this.triggerAuthorizationFlow();
     } catch (error) {
       logger.error('Unexpected error in getAccessToken', { error: error.message, stack: error.stack });

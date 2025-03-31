@@ -9,6 +9,7 @@ const { productRemovalScheduler } = require('./services/productRemoval');
 const { customerMessageHandler } = require('./services/customerMessages');
 const logger = require('./utils/logger');
 const ebayRoutes = require('./routes/ebay');
+const autodsRoutes = require('./routes/autods');
 const db = require('./db/database');
 
 const app = express();
@@ -29,6 +30,9 @@ app.get('/health', (req, res) => {
 
 // eBay OAuth routes
 app.use('/ebay', ebayRoutes);
+
+// AutoDS routes
+app.use('/autods', autodsRoutes);
 
 // Global error handler middleware
 app.use((err, req, res, next) => {
@@ -100,7 +104,7 @@ const startServer = async () => {
     logger.info(`Server running on port ${PORT}`);
     
     // Initialize schedulers
-    await productListingScheduler.run();
+    // await productListingScheduler.run();
     
     // Schedule product listing - Run every day at 9 AM
     cron.schedule('0 9 * * *', async () => {

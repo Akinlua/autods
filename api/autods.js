@@ -1,4 +1,11 @@
 const axios = require('axios');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const db = require('../db/database');
+const logger = require('../utils/logger');
+
+// Apply stealth plugin to avoid detection
+puppeteer.use(StealthPlugin());
 
 class AutoDSAPI {
   constructor() {
@@ -9,6 +16,7 @@ class AutoDSAPI {
     this.tokenExpiry = null;
     // Default store IDs as a comma-separated string
     this.storeIds = process.env.AUTODS_STORE_IDS || '1173617,1197312';
+    this.dbInitialized = false;
   }
 
   async ensureAuthenticated() {
@@ -18,34 +26,170 @@ class AutoDSAPI {
       return this.token;
     }
 
-    // Token doesn't exist or is expired, get a new one
+    // Try to load token from database first
+    await this.loadTokenFromDb();
+    
+    // Check if loaded token is valid
+    if (this.token && this.tokenExpiry && this.tokenExpiry > new Date(now.getTime() + 5 * 60 * 1000)) {
+      return this.token;
+    }
+
+    // Token doesn't exist, is expired, or not in DB, get a new one
     return this.authenticate();
+  }
+
+  // Initialize database connection
+  async initializeDb() {
+    if (!this.dbInitialized) {
+      try {
+        await db.initDatabase();
+        this.dbInitialized = true;
+        logger.info('Database connection initialized for AutoDS API');
+      } catch (error) {
+        logger.warn('Failed to initialize database connection', { error: error.message });
+      }
+    }
+  }
+
+  // Load token from database
+  async loadTokenFromDb() {
+    await this.initializeDb();
+    
+    if (!this.dbInitialized) {
+      logger.warn('Database not initialized, skipping token loading');
+      return false;
+    }
+    
+    try {
+      const token = await db.tokens.findOne({ service: 'autods', active: true }).sort({ createdAt: -1 }).lean().exec();
+      
+      if (token) {
+        this.token = token.accessToken;
+        this.tokenExpiry = new Date(token.expiresAt).getTime();
+        logger.info('Loaded AutoDS token from database');
+        return true;
+      } else {
+        logger.info('No active AutoDS token found in database');
+        return false;
+      }
+    } catch (error) {
+      logger.error('Failed to load token from database', { error: error.message });
+      return false;
+    }
+  }
+
+  // Save token to database
+  async saveTokenToDb(accessToken, expiresIn) {
+    await this.initializeDb();
+    
+    if (!this.dbInitialized) {
+      logger.warn('Database not initialized, token will only be stored in memory');
+      return;
+    }
+    
+    try {
+      const expiresAt = new Date(Date.now() + expiresIn);
+      
+      // Deactivate all existing tokens
+      await db.tokens.updateMany({ service: 'autods', active: true }, { active: false });
+      
+      // Create new token document
+      await db.tokens.create({
+        service: 'autods',
+        accessToken,
+        expiresAt,
+        active: true
+      });
+      
+      logger.info('Saved AutoDS token to database');
+    } catch (error) {
+      logger.error('Failed to save token to database', { error: error.message });
+    }
   }
 
   async authenticate() {
     try {
-      const response = await axios({
-        method: 'post',
-        url: `${this.baseUrl}/login`,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: {
-          username: this.username,
-          password: this.password
-        }
+      logger.info('Starting browser-based authentication for AutoDS');
+      
+      if (!this.username || !this.password) {
+        throw new Error('AutoDS username or password not configured');
+      }
+      
+      // Launch browser with stealth mode
+      const browser = await puppeteer.launch({
+        headless: false, // Use the new headless mode
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
+      
+      const page = await browser.newPage();
+      
+      // Set up request interception before navigation
+      await page.setRequestInterception(true);
+      
+      // Create a promise that will resolve when we get the token
+      const tokenPromise = new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Token capture timed out after 30 seconds'));
+        }, 30000);
 
-      // Extract token and set expiry (assuming token is valid for 24 hours if not specified)
-      this.token = response.data.token;
+        page.on('request', async request => {
+          const url = request.url();
+          // Allow the request to proceed
+          await request.continue();
+          
+          // Capture token from API requests
+          if (url.includes('v2-api.autods.com') && request.headers()['authorization']) {
+            const authHeader = request.headers()['authorization'];
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+              const authToken = authHeader.replace('Bearer ', '');
+              console.log("authToken captured:", authToken);
+              clearTimeout(timeout);
+              resolve(authToken);
+            }
+          }
+        });
+      });
       
-      // Set token expiry time (adjust this based on actual API response)
-      const expiresIn = response.data.expiresIn || 24 * 60 * 60 * 1000; // Default: 24 hours in milliseconds
-      this.tokenExpiry = new Date(new Date().getTime() + expiresIn);
+      // Navigate to login page
+      await page.goto('https://platform.autods.com/login', { waitUntil: 'networkidle2' });
       
+      // Wait for email and password fields to be available
+      await page.waitForSelector('input[name="email"]');
+      await page.waitForSelector('input[name="password"]');
+      
+      // Enter login credentials
+      await page.type('input[name="email"]', this.username);
+      await page.type('input[name="password"]', this.password);
+      
+      // Click login button and wait for navigation
+      await Promise.all([
+        page.click('button[type="submit"]'),
+        page.waitForNavigation({ waitUntil: 'networkidle2' })
+      ]);
+      
+      // Wait for the token to be captured
+      const authToken = await tokenPromise;
+      console.log("authToken captured:", authToken);
+      if (!authToken) {
+        throw new Error('Failed to capture authentication token');
+      }
+      
+      // Close browser immediately after getting token
+      await browser.close();
+      
+      // Set token and expiry
+      this.token = authToken;
+      this.tokenExpiry = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+      
+      // Save token to database
+      const expiresIn = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      await this.saveTokenToDb(authToken, expiresIn);
+      
+      logger.info('Successfully captured and saved auth token');
       return this.token;
     } catch (error) {
-      throw new Error(`Authentication failed: ${error.response?.data?.message || error.message}`);
+      logger.error('Authentication failed', { error: error.message });
+      throw new Error(`Authentication failed: ${error.message}`);
     }
   }
 
@@ -112,8 +256,11 @@ class AutoDSAPI {
       // If token has expired, try to re-authenticate once
       if (error.response && error.response.status === 401) {
         this.token = null;
+        this.tokenExpiry = null;
+        // Try one more time with a fresh token
         return this.getProducts(filters, limit, offset);
       }
+      logger.error('Failed to get products from AutoDS', { error: error.response?.data?.message || error.message });
       throw new Error(`Failed to get products from AutoDS: ${error.response?.data?.message || error.message}`);
     }
   }
@@ -178,8 +325,10 @@ class AutoDSAPI {
       // If token has expired, try to re-authenticate once
       if (error.response && error.response.status === 401) {
         this.token = null;
+        this.tokenExpiry = null;
         return this.getProductStock(productId);
       }
+      logger.error('Failed to get product stock', { error: error.response?.data?.message || error.message });
       throw new Error(`Failed to get product stock: ${error.response?.data?.message || error.message}`);
     }
   }
@@ -223,36 +372,25 @@ class AutoDSAPI {
       
       const product = results[0];
       
-      // // Add a description field if it doesn't exist (will be populated from elsewhere if needed)
-      // if (!product.description) {
-      //   product.description = product.title;
-      // }
-      
-      // // Ensure we have image URLs array in a standard format
-      // product.images = product.images || [];
-      // if (product.main_picture_url && product.main_picture_url.url) {
-      //   // Add the main picture to the images array if it's not already there
-      //   if (!product.images.some(img => img.url === product.main_picture_url.url)) {
-      //     product.images.unshift({
-      //       url: product.main_picture_url.url,
-      //       image_id: product.main_picture_url.image_id
-      //     });
-      //   }
-      // }
-      
-      // // Extract brand from tags if possible (since the API doesn't seem to have a specific brand field)
-      // // Set default brand if none found
-      // product.brand = product.active_buy_item.brand || "Unbranded";
-      
       return product;
     } catch (error) {
       // If token has expired, try to re-authenticate once
       if (error.response && error.response.status === 401) {
         this.token = null;
+        this.tokenExpiry = null;
         return this.getProductDetails(productId);
       }
+      logger.error('Failed to get product details', { error: error.response?.data?.message || error.message });
       throw new Error(`Failed to get product details: ${error.response?.data?.message || error.message}`);
     }
+  }
+
+  // Force re-authentication
+  async forceRefreshToken() {
+    this.token = null;
+    this.tokenExpiry = null;
+    logger.info('Forcing AutoDS re-authentication');
+    return this.authenticate();
   }
 
   // Get the store IDs currently being used
