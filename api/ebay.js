@@ -55,7 +55,7 @@ const DEFAULT_SCOPES = [
   'https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly',
   'https://api.ebay.com/oauth/api_scope/sell.fulfillment',
   'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
-  'https://api.ebay.com/oauth/api_scope/sell.marketing'
+  'https://api.ebay.com/oauth/api_scope/sell.marketing',
 ];
 
 class EbayAPI {
@@ -963,6 +963,73 @@ class EbayAPI {
   }
 
   async getSellerList() {
+    const token = await this.getAccessToken();
+    
+    try {
+      // Create XML request for GetMyeBaySelling
+      const xmlRequest = `
+        <?xml version="1.0" encoding="utf-8"?>
+        <GetMyeBaySellingRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          <RequesterCredentials>
+            <eBayAuthToken>${token}</eBayAuthToken>
+          </RequesterCredentials>
+          <ActiveList>
+            <Include>true</Include>
+            <Pagination>
+              <EntriesPerPage>200</EntriesPerPage>
+              <PageNumber>1</PageNumber>
+            </Pagination>
+          </ActiveList>
+        </GetMyeBaySellingRequest>
+      `;
+
+      const response = await axios({
+        method: 'post',
+        url: process.env.EBAY_TRADING_API_URL || 'https://api.ebay.com/ws/api.dll',
+        headers: {
+          'Content-Type': 'text/xml',
+          'X-EBAY-API-CALL-NAME': 'GetMyeBaySelling',
+          'X-EBAY-API-SITEID': '0',
+          'X-EBAY-API-COMPATIBILITY-LEVEL': '1191',
+          'X-EBAY-API-IAF-TOKEN': token
+        },
+        data: xmlRequest
+      });
+      
+      // Parse XML response
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const result = await parser.parseStringPromise(response.data);
+      
+      const listings = [];
+      if (result.GetMyeBaySellingResponse && 
+          result.GetMyeBaySellingResponse.ActiveList &&
+          result.GetMyeBaySellingResponse.ActiveList.ItemArray &&
+          result.GetMyeBaySellingResponse.ActiveList.ItemArray.Item) {
+        
+        const items = Array.isArray(result.GetMyeBaySellingResponse.ActiveList.ItemArray.Item) 
+          ? result.GetMyeBaySellingResponse.ActiveList.ItemArray.Item 
+          : [result.GetMyeBaySellingResponse.ActiveList.ItemArray.Item];
+        
+        items.forEach(item => {
+          listings.push({
+            itemId: item.ItemID,
+            title: item.Title,
+            sku: item.SKU || item.ItemID,
+            price: item.CurrentPrice ? item.CurrentPrice.Value : null,
+            quantity: item.Quantity,
+            quantitySold: item.SellingStatus ? item.SellingStatus.QuantitySold : 0
+          });
+        });
+      }
+      
+      return listings;
+    } catch (error) {
+      console.log(error.response?.data || error);
+      throw new Error(`Failed to get seller listings: ${error.response?.data?.errors?.[0]?.message || error.message}`);
+    }
+  }
+
+  async getSellerApiList() {
     const token = await this.getAccessToken();
     
     try {
