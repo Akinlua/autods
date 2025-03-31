@@ -48,6 +48,19 @@ const config = {
     escalationKeywords: (process.env.ESCALATION_KEYWORDS || '').split(',')
   },
   
+  email: {
+    enabled: process.env.EMAIL_ENABLED === 'true',
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    },
+    from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
+    adminEmails: (process.env.ADMIN_EMAILS || '').split(',')
+  },
+  
   schedules: {
     listingCron: process.env.LISTING_CRON_SCHEDULE || '0 9 * * *',
     removalCron: process.env.REMOVAL_CRON_SCHEDULE || '0 18 * * *',

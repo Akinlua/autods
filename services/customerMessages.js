@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 const db = require('../db/database');
 const { generateResponse } = require('../utils/responseGenerator');
 const config = require('../config/config');
+const { emailService } = require('./emailService');
 
 class CustomerMessageHandler {
   constructor() {
@@ -121,12 +122,61 @@ class CustomerMessageHandler {
   }
   
   notifyAdmin(message) {
-    // Implementation depends on notification system (email, SMS, etc.)
-    // This is a placeholder
-    logger.info(`Admin notification for message ${message.messageId} would be sent here`);
+    logger.info(`Sending admin notification for message ${message.messageId}`);
     
-    // In a real implementation, you might use a notification service
-    // e.g., sendEmail, sendSlackMessage, etc.
+    const subject = `[eBay] Escalated Customer Message: ${message.subject || 'No subject'}`;
+    
+    // Prepare email content
+    const text = `
+      A customer message has been escalated and requires your attention.
+
+      Message ID: ${message.messageId}
+      Buyer: ${message.sender}
+      Subject: ${message.subject || 'No subject'}
+      Content:
+      ${message.text}
+
+      This message has been automatically escalated based on its content.
+      Please review and respond appropriately.
+
+      ---
+      eBay Customer Service Bot
+      `;
+
+          // Create HTML version
+          const html = `
+      <h3>eBay Customer Message Escalation</h3>
+      <p>A customer message has been escalated and requires your attention.</p>
+
+      <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px;">
+        <p><strong>Message ID:</strong> ${message.messageId}</p>
+        <p><strong>Buyer:</strong> ${message.sender}</p>
+        <p><strong>Subject:</strong> ${message.subject || 'No subject'}</p>
+        <p><strong>Content:</strong></p>
+        <div style="background-color: #f9f9f9; padding: 10px; border-left: 4px solid #0070ba;">
+          <pre style="white-space: pre-wrap;">${message.text}</pre>
+        </div>
+      </div>
+
+      <p>This message has been automatically escalated based on its content.</p>
+      <p>Please review and respond appropriately.</p>
+
+      <hr>
+      <p style="color: #777; font-size: 0.9em;">eBay Customer Service Bot</p>
+      `;
+
+    // Send the notification email
+    emailService.sendAdminNotification(subject, text, html)
+      .then(result => {
+        if (result.success) {
+          logger.info(`Admin notification email sent successfully for message ${message.messageId}`);
+        } else {
+          logger.warn(`Failed to send admin notification email for message ${message.messageId}`, { error: result.error });
+        }
+      })
+      .catch(error => {
+        logger.error(`Error sending admin notification email for message ${message.messageId}`, { error: error.message });
+      });
   }
 }
 

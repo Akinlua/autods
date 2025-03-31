@@ -105,6 +105,10 @@ const startServer = async () => {
     
     // Initialize schedulers
     // await productListingScheduler.run();
+    // await productRemovalScheduler.run();
+    // await customerMessageHandler.processMessages();
+
+
     
     // Schedule product listing - Run every day at 9 AM
     cron.schedule('0 9 * * *', async () => {

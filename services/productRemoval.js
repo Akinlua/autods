@@ -17,6 +17,7 @@ class ProductRemovalScheduler {
       // Get all active eBay listings
       const ebayListings = await ebayAPI.getSellerList();
       logger.info(`Found ${ebayListings.length} active eBay listings`);
+      // console.log("ebayListings", ebayListings);
       
       // Get current products from AutoDS to compare
       const storeIds = autoDSAPI.getStoreIds();
@@ -59,7 +60,9 @@ class ProductRemovalScheduler {
   async processBatch(listingsBatch, autodsProductMap) {
     for (const listing of listingsBatch) {
       try {
+         
         // Skip if no SKU (we use SKU to match with AutoDS ID)
+        // console.log("listing", listing.sku);
         if (!listing.sku) {
           logger.warn(`Listing ${listing.inventoryItemId} has no SKU, skipping`);
           continue;
@@ -86,13 +89,15 @@ class ProductRemovalScheduler {
         
         // Get product info from map
         const productInfo = autodsProductMap.get(autodsId);
+        console.log("productInfo", productInfo);
         
         // Check if out of stock
+        // console.log("productInfo", productInfo.inStock);
         if (productInfo.inStock <= 0) {
-          logger.info(`Product ${autodsId} is out of stock, removing eBay listing ${listing.inventoryItemId}`);
+          logger.info(`Product ${autodsId} is out of stock, removing eBay listing ${listing.sku}`);
           
           // End the eBay listing
-          await ebayAPI.endItem(listing.inventoryItemId);
+          await ebayAPI.endItem(listing.sku);
           
           // Update database record
           await db.listings.findOneAndUpdate(
@@ -100,7 +105,7 @@ class ProductRemovalScheduler {
             { active: false, endedAt: new Date(), endReason: 'out_of_stock' }
           );
           
-          logger.info(`Successfully removed listing ${listing.inventoryItemId} due to out of stock`);
+          logger.info(`Successfully removed listing ${listing.sku} due to out of stock`);
           continue;
         }
         

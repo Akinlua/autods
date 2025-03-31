@@ -117,7 +117,7 @@ class AutoDSAPI {
       
       // Launch browser with stealth mode
       const browser = await puppeteer.launch({
-        headless: false, // Use the new headless mode
+        headless: 'new', // Use the new headless mode
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
       
@@ -130,7 +130,7 @@ class AutoDSAPI {
       const tokenPromise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
           reject(new Error('Token capture timed out after 30 seconds'));
-        }, 30000);
+        }, 60000);
 
         page.on('request', async request => {
           const url = request.url();
@@ -152,6 +152,7 @@ class AutoDSAPI {
       
       // Navigate to login page
       await page.goto('https://platform.autods.com/login', { waitUntil: 'networkidle2' });
+      logger.info('Navigated to login page');
       
       // Wait for email and password fields to be available
       await page.waitForSelector('input[name="email"]');
@@ -160,6 +161,7 @@ class AutoDSAPI {
       // Enter login credentials
       await page.type('input[name="email"]', this.username);
       await page.type('input[name="password"]', this.password);
+      logger.info('Entered login credentials');
       
       // Click login button and wait for navigation
       await Promise.all([

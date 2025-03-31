@@ -19,8 +19,8 @@ class ProductListingScheduler {
       logger.info(`Fetching products from AutoDS for store IDs: ${storeIds}`);
       
       // Get products from AutoDS using the updated API
-      // const products = await autoDSAPI.getProducts();
-      // logger.info(`Found ${products.length} products from AutoDS`);
+      const products = await autoDSAPI.getProducts();
+      logger.info(`Found ${products.length} products from AutoDS`);
 
       // Get existing eBay listings to avoid duplicates
       const existingListings = await ebayAPI.getSellerList();
@@ -29,119 +29,120 @@ class ProductListingScheduler {
       const existingSkus = existingListings.map(listing => listing.sku);
 
       // Filter products that are not already listed and have enough stock based on variation_statistics
-      // const eligibleProducts = products.filter(product => {
-      //   // Skip products that are already listed
-      //   if (existingSkus.includes(product.id.toString())) {
-      //     logger.info(`Product ${product.id} already listed on eBay, skipping`);
-      //     return false;
-      //   }
+      const eligibleProducts = products.filter(product => {
+        // Skip products that are already listed
+        if (existingSkus.includes(product.id.toString())) {
+          logger.info(`Product ${product.id} already listed on eBay, skipping`);
+          return false;
+        }
 
-      //   // Skip products with errors
-      //   if (product.error_list && product.error_list.length > 0) {
-      //     const errorMessages = product.error_list.map(error => error.message).join('; ');
-      //     logger.info(`Product ${product.id} has errors: ${errorMessages}, skipping`);
-      //     return false;
-      //   }
+        // Skip products with errors
+        // if (product.error_list && product.error_list.length > 0) {
+        //   const errorMessages = product.error_list.map(error => error.message).join('; ');
+        //   logger.info(`Product ${product.id} has errors: ${errorMessages}, skipping`);
+        //   return false;
+        // }
 
-      //   // Check if product has adequate stock from variation_statistics
-      //   if (product.variation_statistics) {
-      //     const inStock = product.variation_statistics.in_stock?.total || 0;
-      //     if (inStock < this.stockThreshold) {
-      //       logger.info(`Product ${product.id} has insufficient stock (${inStock}), skipping`);
-      //       return false;
-      //     }
-      //     return true;
-      //   }
+        // Check if product has adequate stock from variation_statistics
+        if (product.variation_statistics) {
+          const inStock = product.variation_statistics.in_stock?.total || 0;
+          if (inStock < this.stockThreshold) {
+            logger.info(`Product ${product.id} has insufficient stock (${inStock}), skipping`);
+            return false;
+          }
+          return true;
+        }
         
-      //   logger.info(`Product ${product.id} has no variation statistics, skipping`);
-      //   return false;
-      // });
+        logger.info(`Product ${product.id} has no variation statistics, skipping`);
+        return false;
+      });
 
-      // logger.info(`Found ${eligibleProducts.length} eligible products to list`);
+      logger.info(`Found ${eligibleProducts.length} eligible products to list`);
 
-      // // Process eligible products for listing
-      // for (const product of eligibleProducts) {
-      //   try {
-      //     // Get detailed product info (includes enriched data)
-      //     const productDetails = await autoDSAPI.getProductDetails(product.id);
+      // Process eligible products for listing
+      for (const product of eligibleProducts) {
+        try {
+          // Get detailed product info (includes enriched data)
+          const productDetails = await autoDSAPI.getProductDetails(product.id);
           
-      //     // No need to separately get stock info since it's in variation_statistics
+          // No need to separately get stock info since it's in variation_statistics
           
-      //     // Calculate price with markup using variation_statistics
-      //     const basePrice = productDetails.variation_statistics.min_sell_price;
-      //     const sellingPrice = (parseFloat(basePrice) * this.markup).toFixed(2);
+          // Calculate price with markup using variation_statistics
+          const basePrice = productDetails.variation_statistics.min_sell_price;
+          const sellingPrice = (parseFloat(basePrice) * this.markup).toFixed(2);
           
-      //     // Extract all image URLs from the product
-      //     const imageUrls = [];
-      //     // Add main picture URL if present
-      //     if (productDetails.main_picture_url && productDetails.main_picture_url.url) {
-      //       imageUrls.push(productDetails.main_picture_url.url);
-      //     }
-      //     // Add any additional images
-      //     if (productDetails.images && Array.isArray(productDetails.images)) {
-      //       productDetails.images.forEach(image => {
-      //         // Avoid duplicates
-      //         if (image.url && !imageUrls.includes(image.url)) {
-      //           imageUrls.push(image.url);
-      //         }
-      //       });
-      //     }
+          // Extract all image URLs from the product
+          const imageUrls = [];
+          // Add main picture URL if present
+          if (productDetails.main_picture_url && productDetails.main_picture_url.url) {
+            imageUrls.push(productDetails.main_picture_url.url);
+          }
+          // Add any additional images
+          if (productDetails.images && Array.isArray(productDetails.images)) {
+            productDetails.images.forEach(image => {
+              // Avoid duplicates
+              if (image.url && !imageUrls.includes(image.url)) {
+                imageUrls.push(image.url);
+              }
+            });
+          }
           
-      //     // Create eBay listing
-      //     const itemData = {
-      //       sku: productDetails.id.toString(),
-      //       product: {
-      //         title: productDetails.title,
-      //         description: productDetails.description,
-      //         imageUrls: imageUrls,
-      //         aspects: this.mapProductAspects(productDetails),
-      //         brand: productDetails.variations[0].active_buy_item.brand
-      //       },
-      //       availability: {
-      //         shipToLocationAvailability: {
-      //           quantity: Math.min(productDetails.variation_statistics.in_stock.total, 10) // Limit to 10 at a time
-      //         }
-      //       },
-      //       condition: "NEW",
-      //       categoryId: this.mapToEbayCategory(productDetails.category),
-      //       format: "FIXED_PRICE",
-      //       // listingPolicies: {
-      //       //   fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
-      //       //   paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
-      //       //   returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
-      //       // },
-      //       pricingSummary: {
-      //         price: {
-      //           currency: productDetails.variation_statistics.sell_currency || "USD",
-      //           value: sellingPrice
-      //         }
-      //       }
-      //     };
+          // Create eBay listing
+          const itemData = {
+            sku: productDetails.id.toString(),
+            product: {
+              title: productDetails.title,
+              description: productDetails.description,
+              imageUrls: imageUrls,
+              aspects: this.mapProductAspects(productDetails),
+              brand: productDetails.variations[0].active_buy_item.brand
+            },
+            availability: {
+              shipToLocationAvailability: {
+                quantity: Math.min(productDetails.variation_statistics.in_stock.total, 10) // Limit to 10 at a time
+              }
+            },
+            condition: "NEW",
+            categoryId: this.mapToEbayCategory(productDetails.category),
+            format: "FIXED_PRICE",
+            // listingPolicies: {
+            //   fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
+            //   paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
+            //   returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
+            // },
+            pricingSummary: {
+              price: {
+                currency: productDetails.variation_statistics.sell_currency || "USD",
+                value: sellingPrice
+              }
+            }
+          };
 
-      //     // Add the item to eBay
-      //     const result = await ebayAPI.addItem(itemData);
-      //     logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId}`);
+          // Add the item to eBay
+          const result = await ebayAPI.addItem(itemData);
+          logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId}`);
           
-      //     // Store listing details in database
-      //     await db.listings.create({
-      //       autodsId: product.id,
-      //       ebayListingId: result.listingId,
-      //       sku: product.id.toString(),
-      //       title: productDetails.title,
-      //       price: sellingPrice,
-      //       cost: productDetails.variation_statistics.min_buy_price,
-      //       stock: productDetails.variation_statistics.in_stock.total,
-      //       listedAt: new Date()
-      //     });
+          // Store listing details in database
+          await db.listings.create({
+            autodsId: product.id,
+            ebayListingId: result.listingId,
+            sku: product.id.toString(),
+            title: productDetails.title,
+            price: sellingPrice,
+            cost: productDetails.variation_statistics.min_buy_price,
+            stock: productDetails.variation_statistics.in_stock.total,
+            listedAt: new Date()
+          });
           
-      //     // Small delay to avoid API rate limits
-      //     await new Promise(resolve => setTimeout(resolve, 1000));
+          // Small delay to avoid API rate limits
+          logger.info('Waiting for 2 second before listing next product');
+          await new Promise(resolve => setTimeout(resolve, 2000));
           
-      //   } catch (error) {
-      //     logger.error(`Error processing product ${product.id}`, { error: error.message });
-      //     continue; // Continue with next product
-      //   }
-      // }
+        } catch (error) {
+          logger.error(`Error processing product ${product.id}`, { error: error.message });
+          continue; // Continue with next product
+        }
+      }
       
       return true;
     } catch (error) {

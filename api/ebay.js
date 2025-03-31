@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const { exec } = require('child_process');
 const db = require('../db/database');
 const logger = require('../utils/logger');
+const xml2js = require('xml2js');
 
 // Cross-platform function to open URL in browser
 function openBrowser(url) {
@@ -31,6 +32,17 @@ function openBrowser(url) {
       }
     });
   });
+}
+
+// Helper function to escape XML special characters
+function escapeXml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 // Define the required scopes for the application
@@ -216,7 +228,132 @@ class EbayAPI {
     }
   }
 
-  // Function to trigger authorization flow
+  // Add a new method for automated authentication
+  async automatedAuthFlow() {
+    logger.info('Starting automated eBay authentication with Puppeteer');
+    
+    // Start polling for auth codes
+    this.startPollingForAuthCodes();
+    
+    // Launch browser with stealth mode
+    const puppeteer = require('puppeteer-extra');
+    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+    puppeteer.use(StealthPlugin());
+    
+    const browser = await puppeteer.launch({
+      headless: 'new', // Use visible browser for debugging
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    try {
+      const page = await browser.newPage();
+      
+      // Navigate to the authorization URL
+      const authUrl = this.getAuthorizationUrl(this.scopes, this.currentAuthState);
+      await page.goto(authUrl, { waitUntil: 'networkidle2' });
+      
+      // Wait for username field (first page) and enter username
+      await page.waitForSelector('input#userid');
+      await page.type('input#userid', process.env.EBAY_USERNAME);
+      
+      // Click Continue button
+      await Promise.all([
+        page.click('button#signin-continue-btn'),
+        // page.waitForNavigation({ waitUntil: 'networkidle2' })
+      ]);
+      console.log("username");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Wait for password field (second page) and enter password
+      await page.waitForSelector('input#pass');
+      console.log("password");
+      await page.type('input#pass', process.env.EBAY_PASSWORD);
+      console.log("password typed");
+
+      // Wait a moment for any animations to complete
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Find and click the sign in button
+      try {
+        const signInButton = await page.waitForSelector('button#sgnBt', { visible: true, timeout: 10000 });
+        if (signInButton) {
+          await signInButton.click();
+          console.log("Sign in button clicked");
+          await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(err => {
+            logger.warn('Navigation after sign-in timed out, continuing anyway', { error: err.message });
+          });
+        }
+      } catch (error) {
+        logger.warn('Could not find sign in button, attempting to continue', { error: error.message });
+        // Try an alternative approach - sometimes the button has a different ID
+        try {
+          const altSignInButton = await page.$('button[type="submit"]');
+          if (altSignInButton) {
+            await altSignInButton.click();
+            console.log("Alternative sign in button clicked");
+            await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(err => {
+              logger.warn('Navigation after sign-in timed out, continuing anyway', { error: err.message });
+            });
+          }
+        } catch (altError) {
+          logger.warn('Could not find alternative sign in button', { error: altError.message });
+        }
+      }
+      
+      // Check if there's an "Agree and Continue" button that might appear
+      const redirectUrl = process.env.EBAY_RU_NAME_URL || 'https://autods.onrender.com/';
+      
+      try {
+        // Wait for the agree button with a short timeout
+        const agreeButton = await page.waitForSelector('button[name="agree"]', { timeout: 5000 });
+        if (agreeButton) {
+          await Promise.all([
+            agreeButton.click(),
+            page.waitForNavigation({ waitUntil: 'networkidle2' })
+          ]);
+        }
+      } catch (error) {
+        // Button wasn't found, which is fine if we're already at redirect URL
+        logger.info('No agree button found, continuing with authentication flow');
+      }
+      
+      // Check if we've been redirected to our callback URL
+      const currentUrl = page.url();
+      logger.info(`Current URL after authentication: ${currentUrl}`);
+      
+      if (currentUrl.includes(redirectUrl) || currentUrl.includes('code=')) {
+        logger.info('Successfully redirected to callback URL');
+        
+        // Extract the authorization code from the URL
+        const urlObj = new URL(currentUrl);
+        const code = urlObj.searchParams.get('code');
+        const state = urlObj.searchParams.get('state');
+        
+        if (code) {
+          // Process the authorization code directly
+          try {
+            await this.exchangeCodeForToken(code);
+            logger.info('Authorization code processed successfully');
+          } catch (tokenError) {
+            logger.error('Error processing authorization code', { error: tokenError.message });
+            throw tokenError;
+          }
+        } else {
+          logger.warn('No authorization code found in redirect URL');
+        }
+      } else {
+        logger.warn(`Unexpected redirect URL: ${currentUrl}`);
+      }
+    } catch (error) {
+      logger.error('Error during automated authentication', { error: error.message });
+      throw error;
+    } finally {
+      // Always close the browser
+      await browser.close();
+    }
+  }
+
+  // Modify the existing triggerAuthorizationFlow method to use the automated approach first
   async triggerAuthorizationFlow() {
     if (this.authorizationInProgress) {
       // If authorization is already in progress, wait for it to complete
@@ -227,27 +364,21 @@ class EbayAPI {
     
     // Generate a state for this authorization request
     this.currentAuthState = crypto.randomBytes(16).toString('hex');
-    const authUrl = this.getAuthorizationUrl(this.scopes, this.currentAuthState);
     
     try {
-      // For local development, open the browser and start polling
-      if (process.env.NODE_ENV === 'development') {
-        logger.info(`Opening browser for eBay authorization at: ${authUrl}`);
-        
-        // Start polling for auth codes
-        this.startPollingForAuthCodes();
-        
+      // Try the automated flow first if credentials are available
+      if (process.env.EBAY_USERNAME && process.env.EBAY_PASSWORD) {
         try {
-          await openBrowser(authUrl);
-        } catch (err) {
-          logger.warn(`Failed to automatically open browser. Please visit: ${authUrl}`);
-          console.log(`Please visit this URL to authorize the application: ${authUrl}`);
+          await this.automatedAuthFlow();
+        } catch (error) {
+          logger.warn('Automated authentication failed, falling back to manual flow', { error: error.message });
+          // Fall back to the original method if automated fails
+          await this.fallbackAuthFlow();
         }
       } else {
-        // For production, log the URL
-        logger.info(`eBay authorization required. Please visit: ${authUrl}`);
-        console.log(`eBay authorization required. Please visit: ${authUrl}`);
-        // Here you could also implement email notification
+        // Fall back to the original method if credentials are missing
+        logger.info('eBay credentials not found, using manual authentication flow');
+        await this.fallbackAuthFlow();
       }
       
       // Wait for user to complete authorization
@@ -256,6 +387,30 @@ class EbayAPI {
       this.authorizationInProgress = false;
       this.stopPollingForAuthCodes();
       throw error;
+    }
+  }
+
+  // Rename the existing method to be the fallback
+  async fallbackAuthFlow() {
+    const authUrl = this.getAuthorizationUrl(this.scopes, this.currentAuthState);
+    
+    // Start polling for auth codes
+    this.startPollingForAuthCodes();
+    
+    // For local development, open the browser
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(`Opening browser for eBay authorization at: ${authUrl}`);
+      
+      try {
+        await openBrowser(authUrl);
+      } catch (err) {
+        logger.warn(`Failed to automatically open browser. Please visit: ${authUrl}`);
+        console.log(`Please visit this URL to authorize the application: ${authUrl}`);
+      }
+    } else {
+      // For production, log the URL
+      logger.info(`eBay authorization required. Please visit: ${authUrl}`);
+      console.log(`eBay authorization required. Please visit: ${authUrl}`);
     }
   }
 
@@ -460,23 +615,289 @@ class EbayAPI {
     this.scopes = scopes;
   }
 
-  async addItem(itemData) {
+  async addItem(itemData, marketplaceId = 'EBAY_US') {
     const token = await this.getAccessToken();
     
+    // Declare variables outside try block to make them available in catch block
+    let inventoryItem = {};
+    let inventoryItemKey = '';
+    let merchantLocationKey = '';
+    
     try {
-      const response = await axios({
+      // Make sure we have a merchantLocationKey
+      merchantLocationKey = itemData.merchantLocationKey || await this.getOrCreateMerchantLocationKey();
+      console.log("merchantLocationKey", merchantLocationKey);
+      // Use the provided SKU or generate one
+      inventoryItemKey = itemData.sku || `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      // Prepare inventory item data
+      inventoryItem = {
+        availability: {
+          shipToLocationAvailability: {
+            quantity: itemData.availability?.shipToLocationAvailability?.quantity || 1
+          },
+          merchantLocationKey: merchantLocationKey
+        },
+        condition: itemData.condition || 'NEW',
+        product: {
+          title: itemData.product?.title?.substring(0, 79) || 'Item Title',
+          description: itemData.product?.description || 'Item Description',
+          aspects: itemData.product?.aspects || {},
+          imageUrls: itemData.product?.imageUrls || []
+        },
+        locale: 'en-US',
+        packageWeightAndSize: {
+          weight: {
+            value: itemData.packageWeightAndSize?.weight?.value || "1",
+            unit: itemData.packageWeightAndSize?.weight?.unit || "POUND"
+          }
+        }
+      };
+      
+      // Add country - this is required
+      if (!inventoryItem.product) {
+        inventoryItem.product = {};
+      }
+      inventoryItem.product.mpn = itemData.product?.mpn || `MPN-${Date.now()}`;
+      inventoryItem.product.brand = itemData.product?.brand || 'Generic';
+      inventoryItem.product.epid = itemData.product?.epid;
+      inventoryItem.product.upc = itemData.product?.upc;
+      inventoryItem.product.ean = itemData.product?.ean;
+      inventoryItem.product.isbn = itemData.product?.isbn;
+      
+      // Set the country field that's causing the error
+      inventoryItem.product.aspects = inventoryItem.product.aspects || {};
+      
+      // Ensure Country/Region of Manufacture is always set and is an array of strings
+      inventoryItem.product.aspects["Country/Region of Manufacture"] = 
+        (itemData.product?.aspects?.["Country/Region of Manufacture"] || 
+         itemData.country || 
+         ["United States"]);
+        
+      // Make sure it's an array
+      if (!Array.isArray(inventoryItem.product.aspects["Country/Region of Manufacture"])) {
+        inventoryItem.product.aspects["Country/Region of Manufacture"] = 
+          [inventoryItem.product.aspects["Country/Region of Manufacture"]];
+      }
+
+      // For debugging
+      console.log("Country data set to:", JSON.stringify(inventoryItem.product.aspects["Country/Region of Manufacture"]));
+      
+      // Create inventory item
+      logger.info(`Creating inventory item with key: ${inventoryItemKey}`);
+      const inventoryItemResponse = await axios({
+        method: 'put',
+        url: `${this.baseUrl}/sell/inventory/v1/inventory_item/${inventoryItemKey}`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Language': 'en-US',
+          'Authorization': `Bearer ${token}`
+        },
+        data: inventoryItem
+      });
+      console.log("inventoryItemResponse");
+      // Now create an offer for this inventory item
+      const offerData = {
+        sku: inventoryItemKey,
+        marketplaceId: marketplaceId,
+        format: "FIXED_PRICE",
+        availableQuantity: itemData.availability?.shipToLocationAvailability?.quantity || 1,
+        categoryId: itemData.categoryId || "9355",
+        listingDescription: itemData.product?.description || "Item Description",
+        merchantLocationKey: merchantLocationKey,  // Use the merchant location key
+        pricingSummary: {
+          price: {
+            currency: itemData.pricingSummary?.price?.currency || "USD",
+            value: itemData.pricingSummary?.price?.value || "9.99"
+          }
+        },
+        // shippingOptions: [  // Manually specifying shipping
+        //     {
+        //         costType: "FLAT_RATE",
+        //         shippingServices: [
+        //             {
+        //                 shippingServiceType: "DOMESTIC",
+        //                 shippingServiceName: "USPS First Class",
+        //                 shippingCost: {
+        //                     value: "5.00",
+        //                     currency: "USD"
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // ],
+        // paymentPolicy: {  // Manually specifying payment
+        //     immediatePay: "REQUIRED",
+        //     paymentMethods: [
+        //         {
+        //             paymentMethodType: "CREDIT_CARD"
+        //         }
+        //     ]
+        // },
+        // returnPolicy: {  // Manually specifying returns
+        //     returnsAccepted: true,
+        //     returnPeriod: {
+        //         value: "30",
+        //         unit: "DAY"
+        //     },
+        //     refundMethod: "MONEY_BACK",
+        //     returnShippingCostPayer: "BUYER"
+        // }
+      };
+      
+      // Add listing policies if provided
+      if (itemData.listingPolicies?.fulfillmentPolicyId && 
+          itemData.listingPolicies?.paymentPolicyId && 
+          itemData.listingPolicies?.returnPolicyId) {
+        offerData.listingPolicies = {
+          fulfillmentPolicyId: itemData.listingPolicies.fulfillmentPolicyId,
+          paymentPolicyId: itemData.listingPolicies.paymentPolicyId,
+          returnPolicyId: itemData.listingPolicies.returnPolicyId
+        };
+      } else {
+        try {
+          // We need to get account policies first if not provided
+          const accountPolicies = await this.getAccountPolicies(marketplaceId);
+          
+          offerData.listingPolicies = {
+            fulfillmentPolicyId: accountPolicies.fulfillmentPolicyId,
+            paymentPolicyId: accountPolicies.paymentPolicyId,
+            returnPolicyId: accountPolicies.returnPolicyId
+          };
+        } catch (policyError) {
+          // Log the error but continue without policies if they can't be retrieved
+          logger.warn('Failed to get account policies', { error: policyError.message });
+          console.log('Failed to get account policies:', policyError.message);
+        }
+      }
+      
+      if (offerData.listingPolicies) {
+        console.log("offerData.listingPolicies:", JSON.stringify(offerData.listingPolicies));
+      } else {
+        console.log("No listing policies set for offer");
+      }
+      
+      // Create offer
+      const offerResponse = await axios({
         method: 'post',
         url: `${this.baseUrl}/sell/inventory/v1/offer`,
         headers: {
           'Content-Type': 'application/json',
+          'Content-Language': 'en-US',
           'Authorization': `Bearer ${token}`
         },
-        data: itemData
+        data: offerData
       });
       
-      return response.data;
+      // Get the offer ID
+      const offerId = offerResponse.data.offerId;
+      console.log("offerId", offerId);
+      
+      // Publish the offer to get the listing ID
+      const publishResponse = await axios({
+        method: 'post',
+        url: `${this.baseUrl}/sell/inventory/v1/offer/${offerId}/publish`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      // Extract the eBay listing ID from the response
+      const ebayListingId = publishResponse.data.listingId;
+      logger.info(`Ebay listing ID: ${ebayListingId}`);
+      
+      return {
+        success: true,
+        inventoryItemKey,
+        offerId,
+        ebayListingId,
+        ...publishResponse.data
+      };
     } catch (error) {
+      // Capture complete error details
+      const errorDetails = {
+        message: error.message,
+        responseData: error.response?.data,
+        statusCode: error.response?.status,
+        inventoryItem: inventoryItem,
+        inventoryItemKey: inventoryItemKey,
+        merchantLocationKey: merchantLocationKey,
+        stack: error.stack
+      };
+      
+      // Log comprehensive error information
+      logger.error('Error adding eBay item', errorDetails);
+      
+      console.log("Error adding item to eBay:");
+      console.log("Error message:", error.message);
+      console.log("Status code:", error.response?.status);
+      
+      if (error.response?.data?.errors) {
+        console.log("Error details:", JSON.stringify(error.response.data.errors, null, 2));
+      }
+      
       throw new Error(`Failed to add item: ${error.response?.data?.errors?.[0]?.message || error.message}`);
+    }
+  }
+
+  async getAccountPolicies(marketplaceId) {
+    const token = await this.getAccessToken();
+    
+    try {
+      // Get fulfillment policies
+      const fulfillmentResponse = await axios({
+        method: 'get',
+        url: `${this.baseUrl}/sell/account/v1/fulfillment_policy`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        params: {
+          marketplace_id: marketplaceId
+        }
+      });
+      
+      // Get payment policies
+      const paymentResponse = await axios({
+        method: 'get',
+        url: `${this.baseUrl}/sell/account/v1/payment_policy`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        params: {
+          marketplace_id: marketplaceId
+        }
+      });
+      
+      // Get return policies
+      const returnResponse = await axios({
+        method: 'get',
+        url: `${this.baseUrl}/sell/account/v1/return_policy`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        params: {
+          marketplace_id: marketplaceId
+        }
+      });
+      
+      // Get the first policy of each type (default)
+      const fulfillmentPolicyId = fulfillmentResponse.data.fulfillmentPolicies[0]?.fulfillmentPolicyId;
+      const paymentPolicyId = paymentResponse.data.paymentPolicies[0]?.paymentPolicyId;
+      const returnPolicyId = returnResponse.data.returnPolicies[0]?.returnPolicyId;
+      
+      if (!fulfillmentPolicyId || !paymentPolicyId || !returnPolicyId) {
+        throw new Error('Could not find all required policies for eBay account');
+      }
+      
+      return {
+        fulfillmentPolicyId,
+        paymentPolicyId,
+        returnPolicyId
+      };
+    } catch (error) {
+      logger.error('Error getting account policies', { error: error.message });
+      throw new Error(`Failed to get account policies: ${error.response?.data?.errors?.[0]?.message || error.message}`);
     }
   }
 
@@ -510,6 +931,7 @@ class EbayAPI {
           'Authorization': `Bearer ${token}`
         }
       });
+      console.log("response", response);
       
       return true;
     } catch (error) {
@@ -521,21 +943,61 @@ class EbayAPI {
     const token = await this.getAccessToken();
     
     try {
+      // Create XML request for GetMyMessages
+      const xmlRequest = `
+        <?xml version="1.0" encoding="utf-8"?>
+        <GetMyMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          <RequesterCredentials>
+            <eBayAuthToken>${token}</eBayAuthToken>
+          </RequesterCredentials>
+          <DetailLevel>ReturnMessages</DetailLevel>
+          <StartTime>${timeFrom.toISOString()}</StartTime>
+        </GetMyMessagesRequest>
+      `;
+
       const response = await axios({
-        method: 'get',
-        url: `${this.baseUrl}/sell/messaging/v1/member_message`,
+        method: 'post',
+        url: process.env.EBAY_TRADING_API_URL || 'https://api.ebay.com/ws/api.dll',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'text/xml',
+          'X-EBAY-API-CALL-NAME': 'GetMyMessages',
+          'X-EBAY-API-SITEID': '0',
+          'X-EBAY-API-COMPATIBILITY-LEVEL': '1191', // Check documentation for current level
+          'X-EBAY-API-IAF-TOKEN': token
         },
-        params: {
-          creation_date_range_from: timeFrom.toISOString(),
-          limit: 100
-        }
+        data: xmlRequest
       });
       
-      return response.data.messages || [];
+      // Parse XML response
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const result = await parser.parseStringPromise(response.data);
+      
+      logger.info('Successfully retrieved eBay messages');
+      
+      // Extract messages from response
+      const messages = [];
+      if (result.GetMyMessagesResponse.Messages && result.GetMyMessagesResponse.Messages.Message) {
+        const apiMessages = Array.isArray(result.GetMyMessagesResponse.Messages.Message) 
+          ? result.GetMyMessagesResponse.Messages.Message 
+          : [result.GetMyMessagesResponse.Messages.Message];
+        
+        apiMessages.forEach(message => {
+          messages.push({
+            messageId: message.MessageID,
+            sender: message.Sender,
+            subject: message.Subject,
+            text: message.Text,
+            creationDate: new Date(message.ReceiveDate),
+            read: message.Read === 'true',
+            itemId: message.ItemID
+          });
+        });
+      }
+      
+      return messages;
     } catch (error) {
-      throw new Error(`Failed to get messages: ${error.response?.data?.errors?.[0]?.message || error.message}`);
+      logger.error('Error getting eBay messages', { error: error.message });
+      throw new Error(`Failed to get messages: ${error.message}`);
     }
   }
 
@@ -543,21 +1005,156 @@ class EbayAPI {
     const token = await this.getAccessToken();
     
     try {
+      // Create XML request for AddMemberMessageAAQToPartner
+      const xmlRequest = `
+        <?xml version="1.0" encoding="utf-8"?>
+        <AddMemberMessageAAQToPartnerRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          <RequesterCredentials>
+            <eBayAuthToken>${token}</eBayAuthToken>
+          </RequesterCredentials>
+          <ItemID>${escapeXml(messageId)}</ItemID>
+          <MemberMessage>
+            <Subject>Response to your inquiry</Subject>
+            <Body>${escapeXml(content)}</Body>
+            <QuestionType>General</QuestionType>
+          </MemberMessage>
+        </AddMemberMessageAAQToPartnerRequest>
+      `;
+
       const response = await axios({
         method: 'post',
-        url: `${this.baseUrl}/sell/messaging/v1/member_message/${messageId}/reply`,
+        url: process.env.EBAY_TRADING_API_URL || 'https://api.ebay.com/ws/api.dll',
+        headers: {
+          'Content-Type': 'text/xml',
+          'X-EBAY-API-CALL-NAME': 'AddMemberMessageAAQToPartner',
+          'X-EBAY-API-SITEID': '0',
+          'X-EBAY-API-COMPATIBILITY-LEVEL': '1191',
+          'X-EBAY-API-IAF-TOKEN': token
+        },
+        data: xmlRequest
+      });
+      
+      // Parse XML response
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const result = await parser.parseStringPromise(response.data);
+      
+      if (result.AddMemberMessageAAQToPartnerResponse.Ack === 'Success' || 
+          result.AddMemberMessageAAQToPartnerResponse.Ack === 'Warning') {
+        logger.info(`Successfully replied to message ${messageId}`);
+        return { success: true };
+      } else {
+        throw new Error(result.AddMemberMessageAAQToPartnerResponse.Errors.ShortMessage);
+      }
+    } catch (error) {
+      logger.error(`Error replying to message ${messageId}`, { error: error.message });
+      throw new Error(`Failed to reply to message ${messageId}: ${error.message}`);
+    }
+  }
+
+  async getOrCreateMerchantLocationKey() {
+    const token = await this.getAccessToken();
+    
+    try {
+      // First check if we already have a location key
+      const existingLocations = await axios({
+        method: 'get',
+        url: `${this.baseUrl}/sell/inventory/v1/location`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log("existingLocations", existingLocations.data);
+      
+      // If we have at least one location, use the first one
+      if (existingLocations.data.locations && existingLocations.data.locations.length > 0) {
+        return existingLocations.data.locations[0].merchantLocationKey;
+      }
+      
+      // No locations found, create one
+      const locationKey = `WAREHOUSE-001`;
+      
+      // Create a new merchant location
+      await axios({
+        method: 'post',
+        url: `${this.baseUrl}/sell/inventory/v1/location/${locationKey}`,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         data: {
-          responseText: content
+          location: {
+            address: {
+              addressLine1: "123 Main St",
+              addressLine2: "Suite 100",
+              city: "San Jose",
+              stateOrProvince: "CA",
+              postalCode: "95131",
+              country: "US",
+              county: "Santa Clara"
+            }
+          },
+          locationInstructions: "Default warehouse location for inventory items. Access through main entrance.",
+          name: "Main Warehouse", 
+          phone: "555-123-4567",
+          merchantLocationStatus: "ENABLED",
+          locationTypes: ["WAREHOUSE"],
+          // operatingHours: [
+          //   {
+          //     dayOfWeekEnum: "MONDAY",
+          //     intervals: [
+          //       {
+          //         open: "09:00",
+          //         close: "18:00"
+          //       }
+          //     ]
+          //   },
+          //   {
+          //     dayOfWeekEnum: "TUESDAY",
+          //     intervals: [
+          //       {
+          //         open: "09:00",
+          //         close: "18:00"
+          //       }
+          //     ]
+          //   },
+          //   {
+          //     dayOfWeekEnum: "WEDNESDAY",
+          //     intervals: [
+          //       {
+          //         open: "09:00",
+          //         close: "18:00"
+          //       }
+          //     ]
+          //   },
+          //   {
+          //     dayOfWeekEnum: "THURSDAY",
+          //     intervals: [
+          //       {
+          //         open: "09:00",
+          //         close: "18:00"
+          //       }
+          //     ]
+          //   },
+          //   {
+          //     dayOfWeekEnum: "FRIDAY",
+          //     intervals: [
+          //       {
+          //         open: "09:00",
+          //         close: "18:00"
+          //       }
+          //     ]
+          //   }
+          // ],
+          // specialHours: []
         }
       });
       
-      return response.data;
+      return locationKey;
     } catch (error) {
-      throw new Error(`Failed to reply to message ${messageId}: ${error.response?.data?.errors?.[0]?.message || error.message}`);
+      console.log("error", error.response?.data);
+      logger.error('Error getting or creating merchant location key', { error: error.message });
+      // If we can't create a location, use a default value and hope it exists
+      return "WAREHOUSE-1";
     }
   }
 }
