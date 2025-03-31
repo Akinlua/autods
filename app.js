@@ -188,9 +188,9 @@ function startApplication() {
             <p>You can run individual tasks from the command line for testing purposes:</p>
             
             <div class="command">
-              <strong>Windows:</strong> autods-win.exe list<br>
-              <strong>macOS:</strong> ./autods-macos list<br>
-              <strong>Linux:</strong> ./autods-linux list
+              <strong>Windows:</strong> npm start list<br>
+              <strong>macOS:</strong> npm start list<br>
+              <strong>Linux:</strong> npm start list
             </div>
             
             <p>Available commands:</p>
