@@ -818,26 +818,26 @@ class EbayAPI {
       };
     } catch (error) {
       // Capture complete error details
-      const errorDetails = {
-        message: error.message,
-        responseData: error.response?.data,
-        statusCode: error.response?.status,
-        inventoryItem: inventoryItem,
-        inventoryItemKey: inventoryItemKey,
-        merchantLocationKey: merchantLocationKey,
-        stack: error.stack
-      };
+      // const errorDetails = {
+      //   message: error.message,
+      //   responseData: error.response?.data,
+      //   statusCode: error.response?.status,
+      //   inventoryItem: inventoryItem,
+      //   inventoryItemKey: inventoryItemKey,
+      //   merchantLocationKey: merchantLocationKey,
+      //   stack: error.stack
+      // };
       
-      // Log comprehensive error information
-      logger.error('Error adding eBay item', errorDetails);
+      // // Log comprehensive error information
+      // logger.error('Error adding eBay item', errorDetails);
       
-      console.log("Error adding item to eBay:");
-      console.log("Error message:", error.message);
-      console.log("Status code:", error.response?.status);
+      // console.log("Error adding item to eBay:");
+      // console.log("Error message:", error.message);
+      // console.log("Status code:", error.response?.status);
       
-      if (error.response?.data?.errors) {
-        console.log("Error details:", JSON.stringify(error.response.data.errors, null, 2));
-      }
+      // if (error.response?.data?.errors) {
+      //   console.log("Error details:", JSON.stringify(error.response.data.errors, null, 2));
+      // }
       
       throw new Error(`Failed to add item: ${error.response?.data?.errors?.[0]?.message || error.message}`);
     }
