@@ -157,6 +157,32 @@ class ProductListingScheduler {
     
     // Map standard aspects
     if (productDetails.variations[0].active_buy_item.brand) aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
+    // Ensure Brand is always set, use "Generic" if no brand is available
+    if (!aspects["Brand"]) {
+      aspects["Brand"] = ["Generic"];
+    }
+    
+    // Ensure Type is always set
+    if (!aspects["Type"]) {
+      // Try to extract type from title or category
+      let typeValue = "Other";
+      
+      // Check if type info might be in the title
+      const title = productDetails.title || "";
+      const commonTypes = ["Shirt", "Pants", "Dress", "Shoes", "Hat", "Jacket", "Coat", "Sweater",
+                          "Tool", "Device", "Gadget", "Accessory", "Toy", "Game", "Phone", "Case",
+                          "Cover", "Holder", "Stand", "Cable", "Charger", "Adapter", "Set", "Kit"];
+      
+      for (const type of commonTypes) {
+        if (title.includes(type)) {
+          typeValue = type;
+          break;
+        }
+      }
+      
+      // Set the Type aspect
+      aspects["Type"] = [typeValue];
+    }
     
     // Add tags as aspects (tags often contain useful attributes)
     if (productDetails.tags && Array.isArray(productDetails.tags)) {
