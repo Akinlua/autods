@@ -177,6 +177,8 @@ router.get('/callback/store', asyncHandler(async (req, res) => {
     state: state,
     processed: false
   });
+
+  const tokenData = await ebayAPI.exchangeCodeForToken(code);
   
   logger.info('Stored eBay authorization code in database for processing');
   
