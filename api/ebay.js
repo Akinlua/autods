@@ -627,7 +627,7 @@ class EbayAPI {
     try {
       // Make sure we have a merchantLocationKey
       merchantLocationKey = itemData.merchantLocationKey || await this.getOrCreateMerchantLocationKey();
-      console.log("merchantLocationKey", merchantLocationKey);
+      // console.log("merchantLocationKey", merchantLocationKey);
       // Use the provided SKU or generate one
       inventoryItemKey = itemData.sku || `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
@@ -682,7 +682,7 @@ class EbayAPI {
       }
 
       // For debugging
-      console.log("Country data set to:", JSON.stringify(inventoryItem.product.aspects["Country/Region of Manufacture"]));
+      // console.log("Country data set to:", JSON.stringify(inventoryItem.product.aspects["Country/Region of Manufacture"]));
       
       // Create inventory item
       logger.info(`Creating inventory item with key: ${inventoryItemKey}`);
@@ -759,7 +759,7 @@ class EbayAPI {
         try {
           // We need to get account policies first if not provided
           const accountPolicies = await this.getAccountPolicies(marketplaceId);
-          console.log("accountPolicies", accountPolicies);
+          // console.log("accountPolicies", accountPolicies);
           
           offerData.listingPolicies = {
             fulfillmentPolicyId: accountPolicies.fulfillmentPolicyId,
@@ -1065,7 +1065,7 @@ class EbayAPI {
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log("existingLocations", existingLocations.data);
+      // console.log("existingLocations", existingLocations.data);
       
       // If we have at least one location, use the first one
       if (existingLocations.data.locations && existingLocations.data.locations.length > 0) {
