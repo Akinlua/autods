@@ -152,14 +152,33 @@ class ProductListingScheduler {
   }
   
   mapProductAspects(productDetails) {
-    // Map product attributes to eBay aspects
     const aspects = {};
     
     // Map standard aspects
     if (productDetails.variations[0].active_buy_item.brand) aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
-    // Ensure Brand is always set, use "Generic" if no brand is available
+    // Ensure Brand is always set
     if (!aspects["Brand"]) {
       aspects["Brand"] = ["Generic"];
+    }
+    
+    // Add Material aspect (required by eBay)
+    if (!aspects["Material"]) {
+      // Try to determine material from title or description
+      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      const commonMaterials = [
+        "Cotton", "Polyester", "Plastic", "Metal", "Wood", "Glass", "Leather",
+        "Silicone", "Nylon", "Spandex", "Wool", "Aluminum", "Steel", "Fabric"
+      ];
+      
+      let material = "Other";
+      for (const mat of commonMaterials) {
+        if (text.includes(mat.toLowerCase())) {
+          material = mat;
+          break;
+        }
+      }
+      
+      aspects["Material"] = [material];
     }
     
     // Ensure Type is always set

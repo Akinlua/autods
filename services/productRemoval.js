@@ -58,6 +58,7 @@ class ProductRemovalScheduler {
   }
   
   async processBatch(listingsBatch, autodsProductMap) {
+    // console.log(autodsProductMap)
     for (const listing of listingsBatch) {
       try {
          
@@ -127,7 +128,7 @@ class ProductRemovalScheduler {
         // }
         
         // If we get here, the product is in stock and has no errors, so keep the listing active
-        logger.debug(`Product ${autodsId} has stock (${productInfo.inStock}) and no errors, keeping listing active`);
+        logger.info(`Product ${autodsId} has stock (${productInfo.inStock}), keeping listing active`);
         
         // Small delay between each listing check to avoid API rate limits
         await new Promise(resolve => setTimeout(resolve, 500));
