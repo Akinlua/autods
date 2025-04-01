@@ -2,6 +2,29 @@
 
 require('dotenv').config();
 
+
+// module.exports = {
+//   pricing: {
+//       defaultMarkup: process.env.DEFAULT_MARKUP ? parseFloat(process.env.DEFAULT_MARKUP) : 1.3,
+//       minimumMargin: process.env.MINIMUM_MARGIN ? parseFloat(process.env.MINIMUM_MARGIN) : 0.2
+//   },
+//   inventory: {
+//       minimumStock: process.env.MINIMUM_STOCK ? parseInt(process.env.MINIMUM_STOCK) : 5,
+//       maxListingQuantity: process.env.MAX_LISTING_QUANTITY ? parseInt(process.env.MAX_LISTING_QUANTITY) : 10
+//   },
+//   customerService: {
+//       responseTimeHours: process.env.RESPONSE_TIME_HOURS ? parseInt(process.env.RESPONSE_TIME_HOURS) : 24,
+//       escalationKeywords: process.env.ESCALATION_KEYWORDS ?
+//           process.env.ESCALATION_KEYWORDS.split(',').map(k => k.trim()) :
+//           ['refund', 'broken', 'damaged', 'complaint', 'return', 'defective', 'not as described', 'wrong item']
+//   },
+//   scheduling: {
+//       listingCronSchedule: process.env.LISTING_CRON_SCHEDULE || '0 9 * * *', // 9am daily by default
+//       removalCronSchedule: process.env.REMOVAL_CRON_SCHEDULE || '0 18 * * *', // 6pm daily by default
+//       messageCronSchedule: process.env.MESSAGE_CRON_SCHEDULE || '0 * * * *' // Hourly by default
+//   }
+// };
+
 const config = {
   server: {
     port: process.env.PORT || 3000,

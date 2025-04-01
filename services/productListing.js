@@ -155,22 +155,54 @@ class ProductListingScheduler {
     const aspects = {};
     
     // Map standard aspects
-    if (productDetails.variations[0].active_buy_item.brand) aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
-    // Ensure Brand is always set
-    if (!aspects["Brand"]) {
+    if (productDetails.variations[0].active_buy_item.brand) {
+      aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
+    } else {
       aspects["Brand"] = ["Generic"];
     }
-    
-    // Add Material aspect (required by eBay)
-    if (!aspects["Material"]) {
-      // Try to determine material from title or description
+
+    // Add Color (required by eBay)
+    if (!aspects["Color"]) {
+      const commonColors = [
+        "Black", "White", "Red", "Blue", "Green", "Yellow", "Purple", "Pink",
+        "Brown", "Gray", "Orange", "Silver", "Gold", "Multicolor", "Beige"
+      ];
+      
+      let color = "Other";
       const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      
+      for (const clr of commonColors) {
+        if (text.includes(clr.toLowerCase())) {
+          color = clr;
+          break;
+        }
+      }
+      
+      // Check variations for color information
+      if (productDetails.variations && Array.isArray(productDetails.variations)) {
+        const colorVariations = productDetails.variations
+          .map(v => v.active_buy_item?.color || v.color)
+          .filter(Boolean);
+        
+        if (colorVariations.length > 0) {
+          color = colorVariations[0];
+        }
+      }
+      
+      aspects["Color"] = [color];
+    }
+
+    // Add Material (required by eBay)
+    if (!aspects["Material"]) {
       const commonMaterials = [
         "Cotton", "Polyester", "Plastic", "Metal", "Wood", "Glass", "Leather",
-        "Silicone", "Nylon", "Spandex", "Wool", "Aluminum", "Steel", "Fabric"
+        "Silicone", "Nylon", "Spandex", "Wool", "Aluminum", "Steel", "Fabric",
+        "Canvas", "Ceramic", "Rubber", "Stainless Steel", "Alloy"
       ];
       
       let material = "Other";
+      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      
       for (const mat of commonMaterials) {
         if (text.includes(mat.toLowerCase())) {
           material = mat;
@@ -180,17 +212,81 @@ class ProductListingScheduler {
       
       aspects["Material"] = [material];
     }
-    
-    // Ensure Type is always set
-    if (!aspects["Type"]) {
-      // Try to extract type from title or category
-      let typeValue = "Other";
+
+    // Add Size if available
+    if (!aspects["Size"]) {
+      if (productDetails.variations && Array.isArray(productDetails.variations)) {
+        const sizeVariations = productDetails.variations
+          .map(v => v.active_buy_item?.size || v.size)
+          .filter(Boolean);
+        
+        if (sizeVariations.length > 0) {
+          aspects["Size"] = [sizeVariations[0]];
+        } else {
+          aspects["Size"] = ["One Size"];
+        }
+      }
+    }
+
+    // Add Model if available
+    if (!aspects["Model"]) {
+      const model = productDetails.variations[0]?.active_buy_item?.model 
+        || productDetails.model 
+        || `Model-${productDetails.id}`;
+      aspects["Model"] = [model];
+    }
+
+    // Add MPN (Manufacturer Part Number)
+    if (!aspects["MPN"]) {
+      aspects["MPN"] = [`MPN-${productDetails.id}`];
+    }
+
+    // Add Style if it can be determined
+    if (!aspects["Style"]) {
+      const commonStyles = [
+        "Casual", "Modern", "Classic", "Contemporary", "Traditional",
+        "Vintage", "Retro", "Sports", "Business", "Fashion"
+      ];
       
-      // Check if type info might be in the title
+      let style = "Modern";
+      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      
+      for (const sty of commonStyles) {
+        if (text.includes(sty.toLowerCase())) {
+          style = sty;
+          break;
+        }
+      }
+      
+      aspects["Style"] = [style];
+    }
+
+    // Add Department if applicable
+    if (!aspects["Department"]) {
+      const commonDepartments = ["Men", "Women", "Unisex", "Boys", "Girls", "Children"];
+      let department = "Unisex";
+      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      
+      for (const dept of commonDepartments) {
+        if (text.includes(dept.toLowerCase())) {
+          department = dept;
+          break;
+        }
+      }
+      
+      aspects["Department"] = [department];
+    }
+
+    // Add Type if not already set
+    if (!aspects["Type"]) {
+      const commonTypes = [
+        "Shirt", "Pants", "Dress", "Shoes", "Hat", "Jacket", "Coat", "Sweater",
+        "Tool", "Device", "Gadget", "Accessory", "Toy", "Game", "Phone", "Case",
+        "Cover", "Holder", "Stand", "Cable", "Charger", "Adapter", "Set", "Kit"
+      ];
+      
+      let typeValue = "Other";
       const title = productDetails.title || "";
-      const commonTypes = ["Shirt", "Pants", "Dress", "Shoes", "Hat", "Jacket", "Coat", "Sweater",
-                          "Tool", "Device", "Gadget", "Accessory", "Toy", "Game", "Phone", "Case",
-                          "Cover", "Holder", "Stand", "Cable", "Charger", "Adapter", "Set", "Kit"];
       
       for (const type of commonTypes) {
         if (title.includes(type)) {
@@ -199,24 +295,21 @@ class ProductListingScheduler {
         }
       }
       
-      // Set the Type aspect
       aspects["Type"] = [typeValue];
     }
-    
-    // Add tags as aspects (tags often contain useful attributes)
+
+    // Add tags as aspects
     if (productDetails.tags && Array.isArray(productDetails.tags)) {
       productDetails.tags.forEach(tag => {
-        // Skip tags that are too generic or already mapped
         if (!aspects[tag] && tag.length < 30) {
           aspects[tag] = ["Yes"];
         }
       });
     }
-    
+
     // Map category into aspects
     if (productDetails.category && productDetails.category.length > 0) {
       const categoryName = productDetails.category[0].name || '';
-      // Split category names like "Kitchen Tools & Gadgets -> Cutting Boards"
       if (categoryName.includes('->')) {
         const categories = categoryName.split('->').map(c => c.trim());
         categories.forEach(cat => {
@@ -226,7 +319,7 @@ class ProductListingScheduler {
         });
       }
     }
-    
+
     return aspects;
   }
   

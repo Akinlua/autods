@@ -1070,6 +1070,8 @@ class EbayAPI {
   async getMessages(timeFrom) {
     const token = await this.getAccessToken();
     
+    // <MessageStatus>Unanswered</MessageStatus>
+
     try {
       // Create XML request for GetMyMessages
       const now = new Date();
@@ -1082,8 +1084,8 @@ class EbayAPI {
           <MailMessageType>All</MailMessageType>
           <StartTime>${timeFrom.toISOString()}</StartTime>
           <EndTime>${now.toISOString()}</EndTime>
-          <MessageStatus>Unanswered</MessageStatus>
           <DetailLevel>ReturnMessages</DetailLevel>
+          <MessageStatus>Unanswered</MessageStatus>
         </GetMemberMessagesRequest>
       `;
 
@@ -1132,7 +1134,11 @@ class EbayAPI {
                 creationDate: new Date(),
                 read: false,
                 itemId: exchange.Question.ItemID,
-                email: exchange.Question.SenderEmail
+                email: exchange.Question.SenderEmail,
+                recipientID: exchange.Question.SenderID,
+                senderID: exchange.Question.RecipientID,
+                messageType: exchange.Question.MessageType,
+                answered: exchange.Question.MessageStatus
               });
             }
           });
@@ -1193,51 +1199,55 @@ class EbayAPI {
     }
   }
 
-  async replyToMessage(messageId, content, email, displayToPublic = true) {
+  async replyToMessage(messageId, content, email, subject, recipientID, displayToPublic = true) {
     const token = await this.getAccessToken();
     
     try {
-      // Create XML request for AddMemberMessageAAQToPartner
-      const xmlRequest = `
+
+       // The ItemID is assumed to be extracted from the subject.
+      const originalSubject = subject;
+      const itemIdMatch = originalSubject.match(/#(\d+)$/);
+      const itemId = itemIdMatch ? itemIdMatch[1] : ''; // "156275319623"
+      // console.log(itemId)
+
+      const xmlRequest = `    
         <?xml version="1.0" encoding="utf-8"?>
-        <ReplyToMemberMessageRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-          <RequesterCredentials>
-            <eBayAuthToken>${token}</eBayAuthToken>
-          </RequesterCredentials>
-          <ItemID>${escapeXml(messageId)}</ItemID>
+        <AddMemberMessageRTQRequest xmlns="urn:ebay:apis:eBLBaseComponents">
           <MemberMessage>
-            <Email>${email}</Email>
-            <Subject>Response to your inquiry</Subject>
             <Body>${escapeXml(content)}</Body>
             <DisplayToPublic>${displayToPublic}</DisplayToPublic>
+            <ParentMessageID>${escapeXml(messageId)}</ParentMessageID>
+            <RecipientID>${escapeXml(recipientID)}</RecipientID>
           </MemberMessage>
-        </ReplyToMemberMessageRequest>
-
-      `;
+          <MessageID>${escapeXml(messageId)}</MessageID>
+      </AddMemberMessageRTQRequest>     
+        `;
 
       const response = await axios({
         method: 'post',
         url: process.env.EBAY_TRADING_API_URL || 'https://api.ebay.com/ws/api.dll',
         headers: {
           'Content-Type': 'text/xml',
-          'X-EBAY-API-CALL-NAME': 'AddMemberMessageAAQToPartner',
+          'X-EBAY-API-CALL-NAME': 'AddMemberMessageRTQ',
           'X-EBAY-API-SITEID': '0',
           'X-EBAY-API-COMPATIBILITY-LEVEL': '1191',
           'X-EBAY-API-IAF-TOKEN': token
         },
         data: xmlRequest
       });
+      console.log(response.data)
       
       // Parse XML response
       const parser = new xml2js.Parser({ explicitArray: false });
       const result = await parser.parseStringPromise(response.data);
+      console.log(result)
       
-      if (result.AddMemberMessageAAQToPartnerResponse.Ack === 'Success' || 
-          result.AddMemberMessageAAQToPartnerResponse.Ack === 'Warning') {
+      if (result.AddMemberMessageRTQResponse.Ack === 'Success' || 
+          result.AddMemberMessageRTQResponse.Ack === 'Warning') {
         logger.info(`Successfully replied to message ${messageId}`);
         return { success: true };
       } else {
-        throw new Error(result.AddMemberMessageAAQToPartnerResponse.Errors.ShortMessage);
+        throw new Error(result.AddMemberMessageRTQResponse.Errors.ShortMessage);
       }
     } catch (error) {
       logger.error(`Error replying to message ${messageId}`, { error: error.message });
