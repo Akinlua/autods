@@ -71,21 +71,21 @@ class ProductRemovalScheduler {
         const autodsId = listing.sku;
         
         // Check if product exists in AutoDS
-        // if (!autodsProductMap.has(autodsId)) {
-        //   logger.warn(`Product ${autodsId} not found in AutoDS, removing eBay listing ${listing.inventoryItemId}`);
+        if (!autodsProductMap.has(autodsId)) {
+          // logger.warn(`Product ${autodsId} not found in AutoDS, removing eBay listing ${listing.inventoryItemId}`);
           
-        //   // End the eBay listing
-        //   await ebayAPI.endItem(listing.inventoryItemId);
+          // // End the eBay listing
+          // await ebayAPI.endItem(listing.inventoryItemId);
           
-        //   // Update database record
-        //   await db.listings.findOneAndUpdate(
-        //     { sku: autodsId },
-        //     { active: false, endedAt: new Date(), endReason: 'product_not_found' }
-        //   );
+          // // Update database record
+          // await db.listings.findOneAndUpdate(
+          //   { sku: autodsId },
+          //   { active: false, endedAt: new Date(), endReason: 'product_not_found' }
+          // );
           
-        //   logger.info(`Successfully removed listing ${listing.inventoryItemId} due to product not found`);
-        //   continue;
-        // }
+          // logger.info(`Successfully removed listing ${listing.inventoryItemId} due to product not found`);
+          continue;
+        }
         
         // Get product info from map
         const productInfo = autodsProductMap.get(autodsId);
