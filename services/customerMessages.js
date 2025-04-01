@@ -21,16 +21,16 @@ class CustomerMessageHandler {
       console.log("messages:", messages);
       logger.info(`Found ${messages.length} new messages`);
       
-      // // Update last check time
-      // this.lastCheckTime = new Date();
+      // Update last check time
+      this.lastCheckTime = new Date();
       
-      // // Process each message
-      // for (const message of messages) {
-      //   await this.handleMessage(message);
+      // Process each message
+      for (const message of messages) {
+        await this.handleMessage(message);
         
-      //   // Small delay between processing messages
-      //   await new Promise(resolve => setTimeout(resolve, 500));
-      // }
+        // Small delay between processing messages
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
       
       return true;
     } catch (error) {
