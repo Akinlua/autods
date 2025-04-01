@@ -24,7 +24,7 @@ class ProductListingScheduler {
 
       // Get existing eBay listings to avoid duplicates
       const existingListings = await ebayAPI.getSellerList();
-      console.log(existingListings);
+      // console.log(existingListings);
       logger.info(`Found ${existingListings.length} existing eBay listings`);
       const existingSkus = existingListings.map(listing => listing.sku);
 

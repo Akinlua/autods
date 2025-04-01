@@ -89,10 +89,10 @@ class ProductRemovalScheduler {
         
         // Get product info from map
         const productInfo = autodsProductMap.get(autodsId);
-        console.log("productInfo", productInfo);
+        // console.log("productInfo", productInfo);
         
         // Check if out of stock
-        // console.log("productInfo", productInfo.inStock);
+        // console.log(`Product ${productInfo.id} has ${productInfo.inStock} stock`);
         if (productInfo.inStock <= 0) {
           logger.info(`Product ${autodsId} is out of stock, removing eBay listing ${listing.sku}`);
           
