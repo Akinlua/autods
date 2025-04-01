@@ -26,7 +26,14 @@ const asyncHandler = fn => (req, res, next) => {
 
 // Initiate eBay OAuth flow (manual route)
 router.get('/authorize', asyncHandler(async (req, res) => {
-  const authUrl = ebayAPI.getAuthorizationUrl(REQUIRED_SCOPES);
+  // Generate a unique state parameter to track this authorization attempt
+  const state = Math.random().toString(36).substring(7);
+  
+  // Set the current auth state and start polling using the existing method
+  ebayAPI.currentAuthState = state;
+  ebayAPI.startPollingForAuthCodes();
+  
+  const authUrl = ebayAPI.getAuthorizationUrl(REQUIRED_SCOPES, state);
   
   logger.info('Redirecting to eBay authorization page');
   res.redirect(authUrl);
@@ -175,19 +182,18 @@ router.get('/callback/store', asyncHandler(async (req, res) => {
     service: 'ebay',
     authorizationCode: code,
     state: state,
-    processed: false
+    processed: false,
+    createdAt: new Date()
   });
 
-  const tokenData = await ebayAPI.exchangeCodeForToken(code);
-  
   logger.info('Stored eBay authorization code in database for processing');
   
-  // Return a nice success page
+  // Return a nice success page that indicates polling is in progress
   return res.status(200).send(`
     <html>
       <body>
-        <h1>Authorization Successful</h1>
-        <p>Your eBay account has been connected successfully.</p>
+        <h1>Authorization Received</h1>
+        <p>Your authorization has been received and is being processed.</p>
         <p>You can close this window now.</p>
       </body>
     </html>
