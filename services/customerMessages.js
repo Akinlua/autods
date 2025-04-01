@@ -86,7 +86,7 @@ class CustomerMessageHandler {
         const response = await generateResponse(message.text);
         
         // Reply to the message
-        await ebayAPI.replyToMessage(message.messageId, response);
+        await ebayAPI.replyToMessage(message.messageId, response, message.email, message.DisplayToPublic);
         
         // Update database record
         await db.messages.findOneAndUpdate(

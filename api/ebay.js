@@ -1072,15 +1072,19 @@ class EbayAPI {
     
     try {
       // Create XML request for GetMyMessages
+      const now = new Date();
       const xmlRequest = `
         <?xml version="1.0" encoding="utf-8"?>
-        <GetMyMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+        <GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
           <RequesterCredentials>
             <eBayAuthToken>${token}</eBayAuthToken>
           </RequesterCredentials>
-          <DetailLevel>ReturnMessages</DetailLevel>
+          <MailMessageType>All</MailMessageType>
           <StartTime>${timeFrom.toISOString()}</StartTime>
-        </GetMyMessagesRequest>
+          <EndTime>${now.toISOString()}</EndTime>
+          <MessageStatus>Unanswered</MessageStatus>
+          <DetailLevel>ReturnMessages</DetailLevel>
+        </GetMemberMessagesRequest>
       `;
 
       const response = await axios({
@@ -1088,9 +1092,9 @@ class EbayAPI {
         url: process.env.EBAY_TRADING_API_URL || 'https://api.ebay.com/ws/api.dll',
         headers: {
           'Content-Type': 'text/xml',
-          'X-EBAY-API-CALL-NAME': 'GetMyMessages',
+          'X-EBAY-API-CALL-NAME': 'GetMemberMessages',
           'X-EBAY-API-SITEID': '0',
-          'X-EBAY-API-COMPATIBILITY-LEVEL': '1191', // Check documentation for current level
+          'X-EBAY-API-COMPATIBILITY-LEVEL': '1191',
           'X-EBAY-API-IAF-TOKEN': token
         },
         data: xmlRequest
@@ -1104,49 +1108,111 @@ class EbayAPI {
       
       // Extract messages from response
       const messages = [];
-      if (result.GetMyMessagesResponse.Messages && result.GetMyMessagesResponse.Messages.Message) {
-        const apiMessages = Array.isArray(result.GetMyMessagesResponse.Messages.Message) 
-          ? result.GetMyMessagesResponse.Messages.Message 
-          : [result.GetMyMessagesResponse.Messages.Message];
+      
+      // Fixed this section to correctly parse the message structure
+      if (result.GetMemberMessagesResponse) {
+        // Check for different possible response structures
+        let apiMessages = [];
         
-        apiMessages.forEach(message => {
-          messages.push({
-            messageId: message.MessageID,
-            sender: message.Sender,
-            subject: message.Subject,
-            text: message.Text,
-            creationDate: new Date(message.ReceiveDate),
-            read: message.Read === 'true',
-            itemId: message.ItemID
+        if (result.GetMemberMessagesResponse.MemberMessage && 
+            result.GetMemberMessagesResponse.MemberMessage.MemberMessageExchange) {
+          // Handle the structure from your log
+          const exchanges = Array.isArray(result.GetMemberMessagesResponse.MemberMessage.MemberMessageExchange) 
+            ? result.GetMemberMessagesResponse.MemberMessage.MemberMessageExchange 
+            : [result.GetMemberMessagesResponse.MemberMessage.MemberMessageExchange];
+          // console.log("exchanges", exchanges);
+          
+          exchanges.forEach(exchange => {
+            if (exchange.Question && exchange.Question.MessageType !== 'ResponseToASQQuestion') {
+              apiMessages.push({
+                messageId: exchange.Question.MessageID || result.GetMemberMessagesResponse.MessageID,
+                sender: exchange.Question.SenderID || result.GetMemberMessagesResponse.SenderID,
+                subject: exchange.Question.Subject || result.GetMemberMessagesResponse.Subject,
+                text: exchange.Question.Body || result.GetMemberMessagesResponse.Body,
+                creationDate: new Date(),
+                read: false,
+                itemId: exchange.Question.ItemID,
+                email: exchange.Question.SenderEmail
+              });
+            }
           });
+        } 
+        // Also check the direct structure from your error log
+        else if (result.GetMemberMessagesResponse.MessageID) {
+          apiMessages.push({
+            messageId: result.GetMemberMessagesResponse.MessageID,
+            sender: result.GetMemberMessagesResponse.SenderID,
+            subject: result.GetMemberMessagesResponse.Subject,
+            text: result.GetMemberMessagesResponse.Body,
+            creationDate: new Date(),
+            read: false,
+            itemId: null,
+            email: result.GetMemberMessagesResponse.SenderEmail,
+            DisplayToPublic: result.GetMemberMessagesResponse.DisplayToPublic
+          });
+        }
+        // Check the original expected structure as a fallback
+        else if (result.GetMemberMessagesResponse.MemberMessages && 
+                result.GetMemberMessagesResponse.MemberMessages.Message) {
+          apiMessages = Array.isArray(result.GetMemberMessagesResponse.MemberMessages.Message) 
+            ? result.GetMemberMessagesResponse.MemberMessages.Message 
+            : [result.GetMemberMessagesResponse.MemberMessages.Message];
+          
+          apiMessages.forEach(message => {
+            messages.push({
+              messageId: message.MessageID,
+              sender: message.Sender,
+              subject: message.Subject,
+              text: message.Text,
+              creationDate: new Date(message.ReceiveDate),
+              read: message.Read === 'true',
+              itemId: message.ItemID
+            });
+          });
+        }
+        
+        // Process and add each message from apiMessages to the messages array
+        apiMessages.forEach(msg => {
+          if (msg && msg.messageId) {
+            messages.push(msg);
+          }
         });
+        
+        // Log the full response structure for debugging
+        logger.debug('Message response structure:', JSON.stringify(result.GetMemberMessagesResponse));
       }
       
+      logger.info(`Processed ${messages.length} messages from eBay`);
       return messages;
     } catch (error) {
-      logger.error('Error getting eBay messages', { error: error.message });
+      logger.error('Error getting eBay messages', { 
+        error: error.message,
+        response: error.response?.data 
+      });
       throw new Error(`Failed to get messages: ${error.message}`);
     }
   }
 
-  async replyToMessage(messageId, content) {
+  async replyToMessage(messageId, content, email, displayToPublic = true) {
     const token = await this.getAccessToken();
     
     try {
       // Create XML request for AddMemberMessageAAQToPartner
       const xmlRequest = `
         <?xml version="1.0" encoding="utf-8"?>
-        <AddMemberMessageAAQToPartnerRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+        <ReplyToMemberMessageRequest xmlns="urn:ebay:apis:eBLBaseComponents">
           <RequesterCredentials>
             <eBayAuthToken>${token}</eBayAuthToken>
           </RequesterCredentials>
           <ItemID>${escapeXml(messageId)}</ItemID>
           <MemberMessage>
+            <Email>${email}</Email>
             <Subject>Response to your inquiry</Subject>
             <Body>${escapeXml(content)}</Body>
-            <QuestionType>General</QuestionType>
+            <DisplayToPublic>${displayToPublic}</DisplayToPublic>
           </MemberMessage>
-        </AddMemberMessageAAQToPartnerRequest>
+        </ReplyToMemberMessageRequest>
+
       `;
 
       const response = await axios({
