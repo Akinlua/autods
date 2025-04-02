@@ -7,6 +7,9 @@ const logger = require('../utils/logger');
 // Apply stealth plugin to avoid detection
 puppeteer.use(StealthPlugin());
 
+// Platform detection for browser handling
+const isWindows = process.platform === 'win32';
+
 class AutoDSAPI {
   constructor() {
     this.baseUrl = process.env.AUTODS_API_URL || 'https://v2-api.autods.com';
@@ -118,7 +121,13 @@ class AutoDSAPI {
       // Launch browser with stealth mode
       const browser = await puppeteer.launch({
         headless: process.env.NODE_ENV === 'development' ? false : 'new', // Use false in development, 'new' otherwise
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+          '--no-sandbox', 
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu'
+        ],
+        ignoreDefaultArgs: isWindows ? ['--disable-extensions'] : [],
       });
       
       const page = await browser.newPage();
@@ -177,7 +186,16 @@ class AutoDSAPI {
       }
       
       // Close browser immediately after getting token
-      await browser.close();
+      try {
+        // On Windows, try to disconnect first
+        if (isWindows) {
+          await browser.disconnect();
+        }
+        await browser.close();
+      } catch (closeError) {
+        logger.warn('Error closing browser, continuing anyway', { error: closeError.message });
+        // Continue despite error - we already have the token
+      }
       
       // Set token and expiry
       this.token = authToken;
