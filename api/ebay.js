@@ -305,9 +305,10 @@ class EbayAPI {
       const redirectUrl = process.env.EBAY_RU_NAME_URL || 'https://autods.onrender.com/';
       
       try {
-        // Wait for the agree button with a short timeout
-        const agreeButton = await page.waitForSelector('button[name="agree"]', { timeout: 5000 });
+        // Wait for the agree button with a short timeout - look for the submit input as shown in the screenshot
+        const agreeButton = await page.waitForSelector('input[name="submit"], input#submit, .buttonsDiv input[type="submit"]', { timeout: 5000 });
         if (agreeButton) {
+          console.log('Found agree button, clicking it');
           await Promise.all([
             agreeButton.click(),
             page.waitForNavigation({ waitUntil: 'networkidle2' })
