@@ -140,7 +140,62 @@ class ProductListingScheduler {
           await new Promise(resolve => setTimeout(resolve, 2000));
           
         } catch (error) {
-          logger.error(`Error processing product ${product.id}`, { error: error.message });
+          // Check for specific item specific errors
+          const errorMsg = error.message || '';
+          
+          if (errorMsg.includes('item specific') && 
+              (errorMsg.includes('Width') || 
+               errorMsg.includes('Height') || 
+               errorMsg.includes('Length') || 
+               errorMsg.includes('Dimension'))) {
+            
+            logger.warn(`Product ${product.id} missing required dimensions. Attempting to retry with default values.`);
+            
+            try {
+              // Add default dimensions to aspects
+              if (!itemData.product.aspects) {
+                itemData.product.aspects = {};
+              }
+              
+              // Add missing dimensions with default values
+              if (errorMsg.includes('Width') && !itemData.product.aspects['Item Width']) {
+                itemData.product.aspects['Item Width'] = ['5 in'];
+              }
+              if (errorMsg.includes('Height') && !itemData.product.aspects['Item Height']) {
+                itemData.product.aspects['Item Height'] = ['5 in'];
+              }
+              if (errorMsg.includes('Length') && !itemData.product.aspects['Item Length']) {
+                itemData.product.aspects['Item Length'] = ['5 in'];
+              }
+              
+              // Retry listing with the updated aspects
+              logger.info(`Retrying listing for product ${product.id} with added dimensions`);
+              const result = await ebayAPI.addItem(itemData);
+              logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId} after adding dimensions`);
+              
+              // Store listing details in database
+              await db.listings.create({
+                autodsId: product.id,
+                ebayListingId: result.listingId,
+                sku: product.id.toString(),
+                title: productDetails.title,
+                price: sellingPrice,
+                cost: productDetails.variation_statistics.min_buy_price,
+                stock: productDetails.variation_statistics.in_stock.total,
+                listedAt: new Date()
+              });
+              
+              // Small delay to avoid API rate limits
+              logger.info('Waiting for 2 second before listing next product');
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              
+            } catch (retryError) {
+              logger.error(`Error on retry for product ${product.id}`, { error: retryError.message });
+            }
+          } else {
+            logger.error(`Error processing product ${product.id}`, { error: error.message });
+          }
+          
           continue; // Continue with next product
         }
       }
@@ -241,6 +296,106 @@ class ProductListingScheduler {
     if (!aspects["MPN"]) {
       aspects["MPN"] = [`MPN-${productDetails.id}`];
     }
+
+    // Add dimensions (required by many eBay categories)
+    // Try to extract dimensions from variations or product details
+    let width = null;
+    let height = null;
+    let length = null;
+    let unit = "in";  // Default to inches
+
+    // Try to extract dimensions from variations
+    if (productDetails.variations && Array.isArray(productDetails.variations)) {
+      for (const variation of productDetails.variations) {
+        // Check active_buy_item first
+        const buyItem = variation.active_buy_item || {};
+        
+        // Check for width
+        if (buyItem.width) width = buyItem.width;
+        else if (variation.width) width = variation.width;
+        
+        // Check for height
+        if (buyItem.height) height = buyItem.height;
+        else if (variation.height) height = variation.height;
+        
+        // Check for length
+        if (buyItem.length) length = length = buyItem.length;
+        else if (variation.length) length = variation.length;
+        
+        // Check for unit
+        if (buyItem.dimension_unit) unit = buyItem.dimension_unit;
+        else if (variation.dimension_unit) unit = variation.dimension_unit;
+        
+        // If we found all dimensions, break out of loop
+        if (width && height && length) break;
+      }
+    }
+
+    // If dimensions weren't found in variations, check the product details
+    if (!width && productDetails.width) width = productDetails.width;
+    if (!height && productDetails.height) height = productDetails.height;
+    if (!length && productDetails.length) length = productDetails.length;
+    if (productDetails.dimension_unit) unit = productDetails.dimension_unit;
+
+    // Try to extract dimensions from the description
+    if (!width || !height || !length) {
+      const description = productDetails.description || '';
+      
+      // Check for dimension patterns like "5 x 3 x 2 inches" or "5x3x2 cm"
+      const dimensionPatterns = [
+        /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
+        /(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/i,
+        /width:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
+        /height:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
+        /length:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
+        /dimension:?\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/i
+      ];
+      
+      for (const pattern of dimensionPatterns) {
+        const match = description.match(pattern);
+        if (match) {
+          // Pattern with full dimensions
+          if (match.length >= 4) {
+            if (!width) width = match[1];
+            if (!height) height = match[2];
+            if (!length) length = match[3];
+            if (match[4]) {
+              unit = match[4].toLowerCase();
+              if (unit === 'inch') unit = 'in';
+            }
+            break;
+          }
+          // Pattern with single dimension
+          else if (pattern.source.includes('width')) {
+            if (!width) width = match[1];
+            if (match[2]) unit = match[2].toLowerCase();
+          }
+          else if (pattern.source.includes('height')) {
+            if (!height) height = match[1];
+            if (match[2]) unit = match[2].toLowerCase();
+          }
+          else if (pattern.source.includes('length')) {
+            if (!length) length = match[1];
+            if (match[2]) unit = match[2].toLowerCase();
+          }
+        }
+      }
+    }
+
+    // Ensure we have sensible default values if extraction fails
+    if (!width) width = "5";
+    if (!height) height = "5";
+    if (!length) length = "5";
+    
+    // Normalize unit to eBay expectations (in, cm, mm, ft, m)
+    if (!['in', 'cm', 'mm', 'ft', 'm'].includes(unit.toLowerCase())) {
+      unit = 'in';  // Default to inches
+    }
+    
+    // Add dimensions to aspects with units
+    aspects["Item Width"] = [`${width} ${unit}`];
+    aspects["Item Height"] = [`${height} ${unit}`];
+    aspects["Item Length"] = [`${length} ${unit}`];
 
     // Add Style if it can be determined
     if (!aspects["Style"]) {

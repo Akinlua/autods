@@ -659,41 +659,28 @@ class EbayAPI {
   }
 
   async addItem(itemData, marketplaceId = 'EBAY_US') {
-    const token = await this.getAccessToken();
-    
-    // Declare variables outside try block to make them available in catch block
-    let inventoryItem = {};
-    let inventoryItemKey = '';
-    let merchantLocationKey = '';
-    
     try {
-      // Make sure we have a merchantLocationKey
-      merchantLocationKey = itemData.merchantLocationKey || await this.getOrCreateMerchantLocationKey();
-      // console.log("merchantLocationKey", merchantLocationKey);
-      // Use the provided SKU or generate one
-      inventoryItemKey = itemData.sku || `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const token = await this.getAccessToken();
       
-      // Prepare inventory item data
-      inventoryItem = {
+      // Generate a uniqueId sku from itemData.sku and random digits
+      const inventoryItemKey = itemData.sku || `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      // Get a merchant location key or create one if it doesn't exist
+      const merchantLocationKey = await this.getOrCreateMerchantLocationKey();
+      
+      // Create an inventory item
+      const inventoryItem = {
         availability: {
           shipToLocationAvailability: {
             quantity: itemData.availability?.shipToLocationAvailability?.quantity || 1
-          },
-          merchantLocationKey: merchantLocationKey
+          }
         },
-        condition: itemData.condition || 'NEW',
+        condition: itemData.condition || "NEW",
         product: {
-          title: itemData.product?.title?.substring(0, 79) || 'Item Title',
-          description: itemData.product?.description || 'Item Description',
+          title: itemData.product?.title || "Item Title",
+          description: itemData.product?.description || "Item Description",
           aspects: itemData.product?.aspects || {},
           imageUrls: itemData.product?.imageUrls || []
-        },
-        locale: 'en-US',
-        packageWeightAndSize: {
-          weight: {
-            value: itemData.packageWeightAndSize?.weight?.value || "1",
-            unit: itemData.packageWeightAndSize?.weight?.unit || "POUND"
-          }
         }
       };
       
@@ -723,8 +710,21 @@ class EbayAPI {
           [inventoryItem.product.aspects["Country/Region of Manufacture"]];
       }
 
-      // For debugging
-      // console.log("Country data set to:", JSON.stringify(inventoryItem.product.aspects["Country/Region of Manufacture"]));
+      // Ensure common required item specifics are always included
+      const requiredItemSpecifics = [
+        "Item Width", 
+        "Item Height", 
+        "Item Length"
+      ];
+      
+      // Check if any required item specifics are missing and add default values
+      for (const aspect of requiredItemSpecifics) {
+        if (!inventoryItem.product.aspects[aspect]) {
+          // Default to 5 inches for all dimensions
+          inventoryItem.product.aspects[aspect] = ["5 in"];
+          logger.info(`Added default value for missing required aspect: ${aspect}`);
+        }
+      }
       
       // Create inventory item
 
@@ -745,6 +745,7 @@ class EbayAPI {
           await this.deleteOffer(existingOffers[i].offerId);
         }
       }
+      
       logger.info(`Creating inventory item with key: ${inventoryItemKey}`);
       const inventoryItemResponse = await axios({
         method: 'put',
