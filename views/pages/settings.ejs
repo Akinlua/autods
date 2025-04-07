@@ -217,8 +217,8 @@
                                                     <tr>
                                                         <th>Store ID</th>
                                                         <th>Name</th>
-                                                        <th>Type</th>
-                                                        <th>URL</th>
+                                                        <!-- <th>Type</th>
+                                                        <th>URL</th> -->
                                                         <th>Listings</th>
                                                         <th>Status</th>
                                                     </tr>
@@ -422,32 +422,32 @@
                         row.appendChild(nameCell);
                         
                         // Store type cell
-                        const typeCell = document.createElement('td');
-                        const storeTypes = {
-                            1: 'eBay',
-                            2: 'Amazon',
-                            3: 'Walmart',
-                            4: 'Shopify',
-                            5: 'WooCommerce',
-                            6: 'Wix',
-                            7: 'Facebook',
-                            8: 'TikTok'
-                        };
-                        typeCell.textContent = storeTypes[store.store_type] || 'Unknown';
-                        row.appendChild(typeCell);
+                        // const typeCell = document.createElement('td');
+                        // const storeTypes = {
+                        //     1: 'eBay',
+                        //     2: 'Amazon',
+                        //     3: 'Walmart',
+                        //     4: 'Shopify',
+                        //     5: 'WooCommerce',
+                        //     6: 'Wix',
+                        //     7: 'Facebook',
+                        //     8: 'TikTok'
+                        // };
+                        // typeCell.textContent = storeTypes[store.store_type] || 'Unknown';
+                        // row.appendChild(typeCell);
                         
                         // URL cell
-                        const urlCell = document.createElement('td');
-                        if (store.store_url) {
-                            const urlLink = document.createElement('a');
-                            urlLink.href = store.store_url;
-                            urlLink.target = '_blank';
-                            urlLink.textContent = store.store_url;
-                            urlCell.appendChild(urlLink);
-                        } else {
-                            urlCell.textContent = 'N/A';
-                        }
-                        row.appendChild(urlCell);
+                        // const urlCell = document.createElement('td');
+                        // if (store.store_url) {
+                        //     const urlLink = document.createElement('a');
+                        //     urlLink.href = store.store_url;
+                        //     urlLink.target = '_blank';
+                        //     urlLink.textContent = store.store_url;
+                        //     urlCell.appendChild(urlLink);
+                        // } else {
+                        //     urlCell.textContent = 'N/A';
+                        // }
+                        // row.appendChild(urlCell);
                         
                         // Listings count cell
                         const listingsCell = document.createElement('td');
