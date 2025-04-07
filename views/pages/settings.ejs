@@ -31,6 +31,9 @@
                         <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab" aria-controls="api" aria-selected="false">API Connections</button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="stores-tab" data-bs-toggle="tab" data-bs-target="#stores" type="button" role="tab" aria-controls="stores" aria-selected="false">AutoDS Stores</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="false">Email</button>
                     </li>
                 </ul>
@@ -175,6 +178,62 @@
                         </div>
                     </div>
                     
+                    <!-- Stores Settings -->
+                    <div class="tab-pane fade" id="stores" role="tabpanel" aria-labelledby="stores-tab">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> This tab shows your connected AutoDS stores. You can copy the Store ID and use it in the API Connections tab.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                        <h6 class="m-0 font-weight-bold text-primary">Store List</h6>
+                                        <button id="refreshStores" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="storeListLoading" class="text-center py-4 d-none">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading stores...</p>
+                                        </div>
+                                        <div id="storeListError" class="alert alert-danger d-none" role="alert">
+                                            <i class="bi bi-exclamation-triangle"></i> 
+                                            <span id="storeListErrorMessage">Failed to load stores.</span>
+                                        </div>
+                                        <div id="storeListEmpty" class="alert alert-warning d-none" role="alert">
+                                            <i class="bi bi-exclamation-circle"></i> No stores found.
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="storeListTable" class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Store ID</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>URL</th>
+                                                        <th>Listings</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Store data will be populated here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Email Settings -->
                     <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
                         <div class="row">
@@ -267,6 +326,154 @@
                 saveButton.innerHTML = '<i class="bi bi-save"></i> Save Changes';
             }
         });
+    });
+</script>
+
+<!-- Store list handling -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load stores when the stores tab is clicked
+        const storesTab = document.getElementById('stores-tab');
+        if (storesTab) {
+            storesTab.addEventListener('click', function() {
+                loadStoreList();
+            });
+        }
+        
+        // Refresh button click event
+        const refreshStoresBtn = document.getElementById('refreshStores');
+        if (refreshStoresBtn) {
+            refreshStoresBtn.addEventListener('click', function() {
+                loadStoreList();
+            });
+        }
+        
+        // Function to load store list
+        function loadStoreList() {
+            const loadingEl = document.getElementById('storeListLoading');
+            const errorEl = document.getElementById('storeListError');
+            const emptyEl = document.getElementById('storeListEmpty');
+            const tableEl = document.getElementById('storeListTable');
+            const tableBody = tableEl.querySelector('tbody');
+            
+            // Show loading, hide other states
+            loadingEl.classList.remove('d-none');
+            errorEl.classList.add('d-none');
+            emptyEl.classList.add('d-none');
+            
+            // Fetch store list from API
+            fetch('/autods/stores')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch store list');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading
+                    loadingEl.classList.add('d-none');
+                    
+                    // Check if stores exist
+                    if (!data.stores || data.stores.length === 0) {
+                        emptyEl.classList.remove('d-none');
+                        return;
+                    }
+                    
+                    // Clear existing table rows
+                    tableBody.innerHTML = '';
+                    
+                    // Add rows for each store
+                    data.stores.forEach(storeData => {
+                        const store = storeData.store || {};
+                        
+                        const row = document.createElement('tr');
+                        
+                        // Store ID cell with copy button
+                        const idCell = document.createElement('td');
+                        const idWrapper = document.createElement('div');
+                        idWrapper.className = 'd-flex align-items-center';
+                        
+                        const idText = document.createElement('span');
+                        idText.textContent = store.id || 'N/A';
+                        idText.className = 'me-2';
+                        
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'btn btn-sm btn-outline-secondary';
+                        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                        copyBtn.title = 'Copy Store ID';
+                        copyBtn.addEventListener('click', function() {
+                            navigator.clipboard.writeText(store.id)
+                                .then(() => {
+                                    copyBtn.innerHTML = '<i class="bi bi-check"></i>';
+                                    setTimeout(() => {
+                                        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                                    }, 1500);
+                                });
+                        });
+                        
+                        idWrapper.appendChild(idText);
+                        idWrapper.appendChild(copyBtn);
+                        idCell.appendChild(idWrapper);
+                        row.appendChild(idCell);
+                        
+                        // Name cell
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = store.name || 'N/A';
+                        row.appendChild(nameCell);
+                        
+                        // Store type cell
+                        const typeCell = document.createElement('td');
+                        const storeTypes = {
+                            1: 'eBay',
+                            2: 'Amazon',
+                            3: 'Walmart',
+                            4: 'Shopify',
+                            5: 'WooCommerce',
+                            6: 'Wix',
+                            7: 'Facebook',
+                            8: 'TikTok'
+                        };
+                        typeCell.textContent = storeTypes[store.store_type] || 'Unknown';
+                        row.appendChild(typeCell);
+                        
+                        // URL cell
+                        const urlCell = document.createElement('td');
+                        if (store.store_url) {
+                            const urlLink = document.createElement('a');
+                            urlLink.href = store.store_url;
+                            urlLink.target = '_blank';
+                            urlLink.textContent = store.store_url;
+                            urlCell.appendChild(urlLink);
+                        } else {
+                            urlCell.textContent = 'N/A';
+                        }
+                        row.appendChild(urlCell);
+                        
+                        // Listings count cell
+                        const listingsCell = document.createElement('td');
+                        listingsCell.textContent = storeData.total_listings_count || '0';
+                        row.appendChild(listingsCell);
+                        
+                        // Status cell
+                        const statusCell = document.createElement('td');
+                        const statusBadge = document.createElement('span');
+                        statusBadge.className = store.active ? 'badge bg-success' : 'badge bg-danger';
+                        statusBadge.textContent = store.active ? 'Active' : 'Inactive';
+                        statusCell.appendChild(statusBadge);
+                        row.appendChild(statusCell);
+                        
+                        // Add row to table
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    // Show error
+                    loadingEl.classList.add('d-none');
+                    errorEl.classList.remove('d-none');
+                    document.getElementById('storeListErrorMessage').textContent = error.message || 'Failed to load stores.';
+                    console.error('Error loading stores:', error);
+                });
+        }
     });
 </script>
 

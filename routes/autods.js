@@ -157,4 +157,15 @@ router.get('/products', asyncHandler(async (req, res) => {
   }
 }));
 
+// Get store list from AutoDS
+router.get('/stores', asyncHandler(async (req, res) => {
+  try {
+    const stores = await autodsAPI.getStoreList();
+    res.json({ success: true, count: stores.length, stores });
+  } catch (error) {
+    logger.error('Error fetching store list', { error: error.message });
+    res.status(500).json({ error: 'Failed to fetch store list', message: error.message });
+  }
+}));
+
 module.exports = router; 

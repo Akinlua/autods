@@ -468,6 +468,35 @@ class AutoDSAPI {
       throw new Error('Store IDs must be a non-empty string or array');
     }
   }
+
+  // Get the list of stores from AutoDS
+  async getStoreList() {
+    try {
+      const token = await this.ensureAuthenticated();
+      
+      const url = `${this.baseUrl}/store/list`;
+      
+      const response = await axios({
+        method: 'get',
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      return response.data || [];
+    } catch (error) {
+      // If token has expired, try to re-authenticate once
+      if (error.response && error.response.status === 401) {
+        this.token = null;
+        this.tokenExpiry = null;
+        return this.getStoreList();
+      }
+      logger.error('Failed to get store list from AutoDS', { error: error.response?.data?.message || error.message });
+      throw new Error(`Failed to get store list from AutoDS: ${error.response?.data?.message || error.message}`);
+    }
+  }
 }
 
 module.exports = new AutoDSAPI();
