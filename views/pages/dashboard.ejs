@@ -1,0 +1,294 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <!-- Statistics Cards -->
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Listings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.activeListings || 0 %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-list-ul fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ended Listings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.endedListings || 0 %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-archive fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Messages</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.totalMessages || 0 %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-chat-text fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Responded Messages</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.respondedMessages || 0 %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-chat-dots fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Status and Controls -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Scheduled Job Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="jobStatusTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Job</th>
+                                    <th>Last Run</th>
+                                    <th>Run Now</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Product Listing</td>
+                                    <td class="job-time" data-job="listing"><%= jobStatus.listing || 'Never' %></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary run-job-btn" data-job="listing">
+                                            <i class="bi bi-play-fill"></i> Run
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Product Removal</td>
+                                    <td class="job-time" data-job="removal"><%= jobStatus.removal || 'Never' %></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary run-job-btn" data-job="removal">
+                                            <i class="bi bi-play-fill"></i> Run
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Message Handling</td>
+                                    <td class="job-time" data-job="messages"><%= jobStatus.messages || 'Never' %></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary run-job-btn" data-job="messages">
+                                            <i class="bi bi-play-fill"></i> Run
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Latest Listings</h6>
+                </div>
+                <div class="card-body">
+                    <% if (latestListings && latestListings.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Listed At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% latestListings.forEach(listing => { %>
+                                        <tr>
+                                            <td><%= listing.title %></td>
+                                            <td>$<%= listing.price.toString() %></td>
+                                            <td>
+                                                <% if (listing.active) { %>
+                                                    <span class="badge bg-success">Active</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-danger">Ended</span>
+                                                <% } %>
+                                            </td>
+                                            <td><%= new Date(listing.listedAt).toLocaleDateString() %></td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-center">No listings found. Run the product listing job to create some.</p>
+                    <% } %>
+                    <div class="mt-3 text-end">
+                        <a href="/listings" class="btn btn-sm btn-outline-primary">View All Listings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/settings" class="btn btn-outline-primary btn-block">
+                                <i class="bi bi-gear"></i> Configure Settings
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/templates" class="btn btn-outline-info btn-block">
+                                <i class="bi bi-chat-left-text"></i> Edit Message Templates
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/ebay/authorize" target="_blank" class="btn btn-outline-success btn-block">
+                                <i class="bi bi-box-arrow-in-right"></i> eBay Authorization
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/ebay/token-status" target="_blank" class="btn btn-outline-warning btn-block">
+                                <i class="bi bi-key"></i> Check Token Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AutoDS Auth Quick Link -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100 py-2 border-left-primary">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    AutoDS Connection
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800 d-flex justify-content-between align-items-center">
+                    <span id="autodsStatus">Checking...</span>
+                    <a href="/autods/authorize" class="btn btn-sm btn-primary">
+                        <i class="bi bi-arrow-repeat"></i> Authenticate
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle "Run Job" button clicks
+        const runJobButtons = document.querySelectorAll('.run-job-btn');
+        runJobButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const jobType = this.getAttribute('data-job');
+                
+                // Disable button and show loading
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...';
+                
+                try {
+                    // Call API to run the job
+                    const response = await fetchApi('/api/jobs/run', 'POST', { job: jobType });
+                    
+                    if (response.success) {
+                        showToast(`${jobType} job completed successfully`, 'success');
+                        
+                        // Update the last run time
+                        const jobTimeCell = document.querySelector(`.job-time[data-job="${jobType}"]`);
+                        if (jobTimeCell) {
+                            jobTimeCell.textContent = new Date().toLocaleString();
+                        }
+                    } else {
+                        showToast(`Failed to run ${jobType} job: ${response.error}`, 'error');
+                    }
+                } catch (error) {
+                    showToast(`Error running job: ${error.message}`, 'error');
+                } finally {
+                    // Re-enable button
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-play-fill"></i> Run';
+                }
+            });
+        });
+    });
+
+    // Check AutoDS token status
+    async function checkAutodsStatus() {
+        try {
+            const response = await fetch('/autods/token-status');
+            const data = await response.json();
+            
+            const statusElement = document.getElementById('autodsStatus');
+            
+            if (data.memory.hasAccessToken && !data.memory.isExpired) {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'text-success';
+            } else if (data.database.hasToken && !data.database.isExpired) {
+                statusElement.textContent = 'Token in DB';
+                statusElement.className = 'text-warning';
+            } else {
+                statusElement.textContent = 'Not Connected';
+                statusElement.className = 'text-danger';
+            }
+        } catch (error) {
+            console.error('Error checking AutoDS status:', error);
+            document.getElementById('autodsStatus').textContent = 'Status Unknown';
+        }
+    }
+    
+    // Check status when page loads
+    document.addEventListener('DOMContentLoaded', checkAutodsStatus);
+</script>
+
+<%- include('../partials/footer') %> 

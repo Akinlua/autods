@@ -1,9 +1,10 @@
-
 const logger = require('./logger');
 const config = require('../config/config');
+const fs = require('fs');
+const path = require('path');
 
-// Predefined response templates
-const responseTemplates = {
+// Default response templates (only used as fallback)
+const defaultTemplates = {
     shipping: 'Thank you for your message about shipping. Your order will be shipped within 2-3 business days. Once shipped, you will receive a tracking number via eBay. Please allow 7-14 days for delivery depending on your location.',
 
     orderStatus: 'Thank you for inquiring about your order status. We\'ve received your order and it\'s currently being processed. If you have any specific questions about your order, please provide your order number and we\'ll be happy to provide more details.',
@@ -15,9 +16,81 @@ const responseTemplates = {
     general: 'Thank you for your message. We appreciate your interest in our products. Our customer service team will review your inquiry and get back to you within 24 hours if needed. Please let us know if you have any other questions!'
 };
 
+// Response templates to be used by the application
+let responseTemplates = { ...defaultTemplates };
+
+// Path to the JSON templates file
+const templatesFilePath = path.join(__dirname, '../data/responseTemplates.json');
+
+// Load templates from JSON file
+const loadTemplatesFromFile = () => {
+    try {
+        if (fs.existsSync(templatesFilePath)) {
+            const savedTemplates = JSON.parse(fs.readFileSync(templatesFilePath, 'utf8'));
+            
+            // If the JSON file exists, completely replace the templates with its content
+            responseTemplates = savedTemplates;
+            
+            // Check if all required template types exist, if not add the missing ones from defaults
+            for (const key in defaultTemplates) {
+                if (!responseTemplates[key]) {
+                    responseTemplates[key] = defaultTemplates[key];
+                    logger.info(`Added missing template: ${key} from defaults`);
+                }
+            }
+            
+            logger.info('Loaded response templates from JSON file');
+            return true;
+        } else {
+            // If no file exists, create one with the default templates
+            saveTemplatesToFile(defaultTemplates);
+            logger.info('Created new response templates file with defaults');
+            return false;
+        }
+    } catch (error) {
+        logger.error('Error loading templates from file', { error: error.message });
+        return false;
+    }
+};
+
+// Save templates to JSON file
+const saveTemplatesToFile = (templates) => {
+    try {
+        // Ensure data directory exists
+        const dataDir = path.join(__dirname, '../data');
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+        }
+        
+        // Write templates to file
+        fs.writeFileSync(templatesFilePath, JSON.stringify(templates, null, 2));
+        return true;
+    } catch (error) {
+        logger.error('Error saving templates to file', { error: error.message });
+        return false;
+    }
+};
+
+// Initialize by loading templates from file
+loadTemplatesFromFile();
+
+// Function to check if message contains escalation keywords
+const containsEscalationKeywords = (messageText) => {
+    const escalationKeywords = [
+        'supervisor', 'manager', 'frustrated', 'angry', 'upset', 
+        'terrible', 'horrible', 'worst', 'refund', 'compensation', 
+        'complaint', 'disappointed', 'dissatisfied', 'unhappy'
+    ];
+    
+    return escalationKeywords.some(keyword => messageText.includes(keyword));
+};
+
 // Function to generate response based on message content
 const generateResponse = async (messageText) => {
     try {
+        // Always reload templates from file to ensure we have the latest version
+        loadTemplatesFromFile();
+        
         messageText = messageText.toLowerCase();
 
         // Check for keywords to determine the appropriate response
@@ -35,11 +108,6 @@ const generateResponse = async (messageText) => {
         }
 
         if (messageText.includes('return') && !containsEscalationKeywords(messageText)) {
-            return response
-        }
-
-
-        if (messageText.includes('return') && !containsEscalationKeywords(messageText)) {
             return responseTemplates.returns;
         }
 
@@ -52,14 +120,41 @@ const generateResponse = async (messageText) => {
     }
 };
 
-// Helper function to check for escalation keywords
-const containsEscalationKeywords = (text) => {
-    const escalationKeywords = config.customerService.escalationKeywords ||
-        ['refund', 'broken', 'damaged', 'complaint', 'return', 'not working'];
-
-    return escalationKeywords.some(keyword => text.includes(keyword.toLowerCase()));
+// Function to update templates
+const updateTemplates = async (newTemplates) => {
+    try {
+        // Update template values
+        for (const key in newTemplates) {
+            if (responseTemplates.hasOwnProperty(key)) {
+                responseTemplates[key] = newTemplates[key];
+            }
+        }
+        
+        // Save to file
+        const saved = saveTemplatesToFile(responseTemplates);
+        
+        if (saved) {
+            logger.info('Updated response templates successfully');
+            return true;
+        } else {
+            throw new Error('Failed to save templates to file');
+        }
+    } catch (error) {
+        logger.error('Error updating templates', { error: error.message });
+        return false;
+    }
 };
 
-module.exports = { generateResponse };
+// Function to reload templates from file (for admin use)
+const reloadTemplates = () => {
+    return loadTemplatesFromFile();
+};
+
+module.exports = { 
+    generateResponse, 
+    responseTemplates,
+    updateTemplates,
+    reloadTemplates
+};
 
 // config/config.js - Application configuration

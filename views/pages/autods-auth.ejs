@@ -1,0 +1,221 @@
+<%- include('../partials/header', { activePage: 'autods-auth' }) %>
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-xl-8 col-lg-10 mx-auto">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">AutoDS Authentication</h6>
+          <a href="/dashboard" class="btn btn-sm btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" role="alert">
+            <p><strong>Authenticating with AutoDS</strong></p>
+            <p>This page will use your stored AutoDS credentials to authenticate and obtain a new token.</p>
+            <p>The credentials being used are from your <a href="/settings" class="alert-link">system settings</a>.</p>
+          </div>
+          
+          <div id="authStatus" class="mt-4">
+            <div class="text-center">
+              <h5 id="statusMessage">Preparing authentication...</h5>
+              <div id="loadingSpinner" class="my-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+              <div id="authSteps" class="text-left mb-4">
+                <ul class="list-group">
+                  <li class="list-group-item d-flex justify-content-between align-items-center" id="step1">
+                    <span>Checking credentials</span>
+                    <span class="badge bg-secondary rounded-pill" id="badge1">Pending</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center" id="step2">
+                    <span>Authenticating with AutoDS</span>
+                    <span class="badge bg-secondary rounded-pill" id="badge2">Pending</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center" id="step3">
+                    <span>Saving token</span>
+                    <span class="badge bg-secondary rounded-pill" id="badge3">Pending</span>
+                  </li>
+                </ul>
+              </div>
+              <div id="authResult" class="d-none">
+                <div id="authSuccess" class="d-none">
+                  <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> Authentication successful!
+                  </div>
+                  <a href="/dashboard" class="btn btn-primary">
+                    Return to Dashboard
+                  </a>
+                </div>
+                <div id="authError" class="d-none">
+                  <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="errorMessage">Authentication failed.</span>
+                  </div>
+                  <button id="retryButton" class="btn btn-warning">
+                    <i class="bi bi-arrow-clockwise"></i> Retry
+                  </button>
+                  <a href="/dashboard" class="btn btn-secondary ms-2">
+                    Return to Dashboard
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get values from server, handle potential undefined values
+  const startAuth = '<%= typeof startAuth !== "undefined" && startAuth ? true : false %>' === 'true';
+  const username = '<%= typeof username !== "undefined" ? username : "" %>';
+  
+  // Function to update step status
+  function updateStep(step, status, message = null) {
+    const stepElement = document.getElementById(`step${step}`);
+    const badgeElement = document.getElementById(`badge${step}`);
+    
+    if (status === 'pending') {
+      badgeElement.className = 'badge bg-secondary rounded-pill';
+      badgeElement.textContent = 'Pending';
+    } else if (status === 'in-progress') {
+      badgeElement.className = 'badge bg-primary rounded-pill';
+      badgeElement.textContent = 'In Progress';
+    } else if (status === 'success') {
+      badgeElement.className = 'badge bg-success rounded-pill';
+      badgeElement.textContent = 'Complete';
+    } else if (status === 'error') {
+      badgeElement.className = 'badge bg-danger rounded-pill';
+      badgeElement.textContent = 'Failed';
+      if (message) {
+        const messageSpan = document.createElement('div');
+        messageSpan.className = 'small text-danger mt-1';
+        messageSpan.textContent = message;
+        stepElement.appendChild(messageSpan);
+      }
+    }
+  }
+  
+  // Function to start the authentication process
+  async function startAuthentication() {
+    document.getElementById('statusMessage').textContent = 'Authentication Process Started';
+    
+    // Step 1: Check credentials
+    updateStep(1, 'in-progress');
+    
+    // Check if username exists (was passed from server)
+    if (!username) {
+      updateStep(1, 'error', 'AutoDS credentials not found in settings');
+      showError('AutoDS credentials are not configured in settings. Please add them in the Settings page.');
+      return;
+    }
+    
+    updateStep(1, 'success');
+    
+    // Step 2: Authenticate with AutoDS
+    updateStep(2, 'in-progress');
+    document.getElementById('statusMessage').textContent = 'Authenticating with AutoDS...';
+    
+    try {
+      const response = await fetch('/autods/process-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // Set a longer timeout for the fetch request
+        signal: AbortSignal.timeout(70000) // 70 second timeout
+      });
+      
+      // Check if the response is ok
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || 'Unknown server error';
+        } catch (e) {
+          errorMessage = errorText || `Server responded with status: ${response.status}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        updateStep(2, 'success');
+        
+        // Step 3: Token saved
+        updateStep(3, 'in-progress');
+        document.getElementById('statusMessage').textContent = 'Finalizing...';
+        
+        // Brief delay to show progress
+        setTimeout(() => {
+          updateStep(3, 'success');
+          showSuccess();
+        }, 1000);
+      } else {
+        updateStep(2, 'error', result.error);
+        showError(result.error || 'Failed to authenticate with AutoDS');
+      }
+    } catch (error) {
+      // Check if it's a timeout error
+      if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+        updateStep(2, 'error', 'Connection timed out');
+        showError('The authentication process is taking longer than expected. This may mean the authentication is still happening in the background. Please wait a few minutes and check the dashboard to see if authentication was successful.');
+      } else {
+        updateStep(2, 'error', error.message);
+        showError('Error during authentication: ' + error.message);
+      }
+    }
+  }
+  
+  // Function to show success state
+  function showSuccess() {
+    document.getElementById('loadingSpinner').classList.add('d-none');
+    document.getElementById('statusMessage').textContent = 'Authentication Complete';
+    document.getElementById('authResult').classList.remove('d-none');
+    document.getElementById('authSuccess').classList.remove('d-none');
+  }
+  
+  // Function to show error state
+  function showError(message) {
+    document.getElementById('loadingSpinner').classList.add('d-none');
+    document.getElementById('statusMessage').textContent = 'Authentication Failed';
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('authResult').classList.remove('d-none');
+    document.getElementById('authError').classList.remove('d-none');
+  }
+  
+  // Retry button click handler
+  document.getElementById('retryButton').addEventListener('click', function() {
+    document.getElementById('authResult').classList.add('d-none');
+    document.getElementById('authSuccess').classList.add('d-none');
+    document.getElementById('authError').classList.add('d-none');
+    document.getElementById('loadingSpinner').classList.remove('d-none');
+    
+    // Reset steps
+    updateStep(1, 'pending');
+    updateStep(2, 'pending');
+    updateStep(3, 'pending');
+    
+    // Restart authentication
+    startAuthentication();
+  });
+  
+  // Start authentication if flag is set
+  if (startAuth) {
+    setTimeout(() => {
+      startAuthentication();
+    }, 1000);
+  }
+});
+</script>
+
+<%- include('../partials/footer') %> 

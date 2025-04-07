@@ -8,6 +8,7 @@ class ProductRemovalScheduler {
   constructor() {
     this.batchSize = 50; // Process listings in batches
     // Store IDs are now handled in the AutoDS API client
+    this.lastRun = null;
   }
  
   async run() {
@@ -48,6 +49,9 @@ class ProductRemovalScheduler {
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
+      
+      // Update the last run time
+      this.lastRun = new Date();
       
       logger.info('Product removal process completed');
       return true;

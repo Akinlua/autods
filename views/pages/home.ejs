@@ -1,0 +1,371 @@
+<%- include('../partials/header', { activePage: 'home' }) %>
+
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Dashboard</h1>
+    
+    <!-- Cron Job Status -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Cron Job Status</h6>
+                    <div class="dropdown no-arrow">
+                        <button class="btn btn-sm btn-outline-primary" id="refreshStatusBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-primary h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Listing Job</div>
+                                            <div class="h5 mb-0 font-weight-bold" id="listingJobStatus">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                Loading...
+                                            </div>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-primary" id="runListingJobBtn">
+                                                    <i class="bi bi-play-fill"></i> Run Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="bi bi-upload fs-2 text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-success h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Removal Job</div>
+                                            <div class="h5 mb-0 font-weight-bold" id="removalJobStatus">
+                                                <div class="spinner-border spinner-border-sm text-success" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                Loading...
+                                            </div>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-success" id="runRemovalJobBtn">
+                                                    <i class="bi bi-play-fill"></i> Run Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="bi bi-trash fs-2 text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-warning h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Messages Job</div>
+                                            <div class="h5 mb-0 font-weight-bold" id="messagesJobStatus">
+                                                <div class="spinner-border spinner-border-sm text-warning" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                Loading...
+                                            </div>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-warning" id="runMessagesJobBtn">
+                                                    <i class="bi bi-play-fill"></i> Run Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="bi bi-chat-left-text fs-2 text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row">
+        <!-- Active Listings Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Listings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="activeListingsCount">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-tag fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ended Listings Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Ended Listings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="endedListingsCount">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-tag-fill fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Messages (24h)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="messagesCount">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-envelope fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- eBay Status Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                eBay Connection</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ebayStatus">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cart fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <a href="/listings" class="btn btn-primary btn-block py-3">
+                                <i class="bi bi-list-ul me-2"></i> View Listings
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <a href="/templates" class="btn btn-info btn-block py-3">
+                                <i class="bi bi-chat-left-text me-2"></i> Manage Templates
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <a href="/settings" class="btn btn-warning btn-block py-3">
+                                <i class="bi bi-gear me-2"></i> Settings
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <a href="/auth/ebay" class="btn btn-success btn-block py-3">
+                                <i class="bi bi-cart me-2"></i> Connect eBay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load dashboard data
+        loadDashboardData();
+        
+        // Set up refresh button
+        document.getElementById('refreshStatusBtn').addEventListener('click', loadDashboardData);
+        
+        // Set up job buttons
+        document.getElementById('runListingJobBtn').addEventListener('click', function() {
+            runJob('listing');
+        });
+        
+        document.getElementById('runRemovalJobBtn').addEventListener('click', function() {
+            runJob('removal');
+        });
+        
+        document.getElementById('runMessagesJobBtn').addEventListener('click', function() {
+            runJob('messages');
+        });
+    });
+    
+    async function loadDashboardData() {
+        try {
+            // Get job statuses
+            const jobStatus = await fetchApi('/api/jobs/status', 'GET');
+            
+            if (jobStatus) {
+                // Update job statuses
+                updateJobStatus('listingJobStatus', jobStatus.listing);
+                updateJobStatus('removalJobStatus', jobStatus.removal);
+                updateJobStatus('messagesJobStatus', jobStatus.messages);
+            }
+            
+            // Get listing counts
+            const listingCounts = await fetchApi('/api/listings/count', 'GET');
+            
+            if (listingCounts) {
+                document.getElementById('activeListingsCount').textContent = listingCounts.active || 0;
+                document.getElementById('endedListingsCount').textContent = listingCounts.ended || 0;
+            }
+            
+            // Get message count
+            const messageStats = await fetchApi('/api/messages/stats', 'GET');
+            
+            if (messageStats) {
+                document.getElementById('messagesCount').textContent = messageStats.last24Hours || 0;
+            }
+            
+            // Get eBay connection status
+            const authStatus = await fetchApi('/api/auth/status', 'GET');
+            
+            if (authStatus) {
+                const ebayStatusEl = document.getElementById('ebayStatus');
+                if (authStatus.ebayConnected) {
+                    ebayStatusEl.innerHTML = '<span class="text-success">Connected</span>';
+                } else {
+                    ebayStatusEl.innerHTML = '<span class="text-danger">Disconnected</span>';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+            showToast('Failed to load dashboard data', 'error');
+        }
+    }
+    
+    function updateJobStatus(elementId, status) {
+        const element = document.getElementById(elementId);
+        
+        if (status === 'running') {
+            element.innerHTML = '<span class="text-primary">Running <i class="bi bi-arrow-repeat"></i></span>';
+        } else if (status === 'idle') {
+            element.innerHTML = '<span class="text-success">Ready <i class="bi bi-check-circle"></i></span>';
+        } else if (status === 'error') {
+            element.innerHTML = '<span class="text-danger">Error <i class="bi bi-exclamation-triangle"></i></span>';
+        } else {
+            element.innerHTML = '<span class="text-warning">Unknown <i class="bi bi-question-circle"></i></span>';
+        }
+    }
+    
+    async function runJob(jobType) {
+        try {
+            const statusElement = document.getElementById(`${jobType}JobStatus`);
+            const button = document.getElementById(`run${jobType.charAt(0).toUpperCase() + jobType.slice(1)}JobBtn`);
+            
+            // Disable button and show loading state
+            button.disabled = true;
+            statusElement.innerHTML = '<span class="text-primary">Starting... <div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div></span>';
+            
+            // Call API to run job
+            const response = await fetchApi(`/api/jobs/${jobType}/run`, 'POST');
+            
+            if (response.success) {
+                showToast(`${jobType.charAt(0).toUpperCase() + jobType.slice(1)} job started successfully`, 'success');
+                statusElement.innerHTML = '<span class="text-primary">Running <i class="bi bi-arrow-repeat"></i></span>';
+                
+                // Poll for status updates
+                pollJobStatus(jobType);
+            } else {
+                statusElement.innerHTML = '<span class="text-danger">Error <i class="bi bi-exclamation-triangle"></i></span>';
+                showToast(`Failed to start ${jobType} job: ${response.error}`, 'error');
+            }
+        } catch (error) {
+            console.error(`Error running ${jobType} job:`, error);
+            showToast(`Error running ${jobType} job: ${error.message}`, 'error');
+        } finally {
+            // Re-enable button after a delay
+            setTimeout(() => {
+                document.getElementById(`run${jobType.charAt(0).toUpperCase() + jobType.slice(1)}JobBtn`).disabled = false;
+            }, 3000);
+        }
+    }
+    
+    function pollJobStatus(jobType) {
+        const statusElement = document.getElementById(`${jobType}JobStatus`);
+        const pollInterval = setInterval(async () => {
+            try {
+                const jobStatus = await fetchApi('/api/jobs/status', 'GET');
+                
+                if (jobStatus) {
+                    updateJobStatus(`${jobType}JobStatus`, jobStatus[jobType]);
+                    
+                    // If job is no longer running, stop polling
+                    if (jobStatus[jobType] !== 'running') {
+                        clearInterval(pollInterval);
+                        
+                        // Refresh counts after job completes
+                        loadDashboardData();
+                    }
+                }
+            } catch (error) {
+                console.error(`Error polling ${jobType} job status:`, error);
+                clearInterval(pollInterval);
+            }
+        }, 5000); // Poll every 5 seconds
+    }
+</script>
+
+<%- include('../partials/footer') %> 

@@ -16,6 +16,7 @@ class ProductListingScheduler {
   async run() {
     try {
       const storeIds = autoDSAPI.getStoreIds();
+      console.log(storeIds);
       logger.info(`Fetching products from AutoDS for store IDs: ${storeIds}`);
       
       // Get products from AutoDS using the updated API

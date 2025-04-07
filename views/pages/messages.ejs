@@ -1,0 +1,295 @@
+<%- include('../partials/header', {title: 'Messages', user: user, activePage: 'messages'}) %>
+
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Messages</h1>
+    <div>
+      <button type="button" class="btn btn-sm btn-success" id="refreshMessages">
+        <i class="fas fa-sync fa-sm"></i> Refresh
+      </button>
+      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#composeModal">
+        <i class="fas fa-paper-plane fa-sm"></i> Compose
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="row">
+    <!-- Inbox -->
+    <div class="col-xl-4 col-lg-5 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Inbox</h6>
+          <div class="dropdown no-arrow">
+            <a class="dropdown-toggle" href="#" role="button" id="inboxDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="inboxDropdown">
+              <a class="dropdown-item" href="#" id="markAllRead">Mark All as Read</a>
+              <a class="dropdown-item" href="#" id="deleteSelected">Delete Selected</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#" id="inboxSettings">Inbox Settings</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="message-filter p-3 border-bottom">
+            <div class="input-group">
+              <input type="text" class="form-control" id="messageSearch" placeholder="Search messages...">
+              <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="inbox-list">
+            <% if (conversations && conversations.length > 0) { %>
+              <% conversations.forEach(function(conversation, index) { %>
+                <div class="message-item p-3 border-bottom <%= conversation.unread ? 'unread' : '' %>" 
+                     data-conversation-id="<%= conversation.id %>"
+                     data-active="<%= activeConversation && activeConversation.id === conversation.id ? 'true' : 'false' %>">
+                  <div class="d-flex align-items-center">
+                    <div class="form-check me-2">
+                      <input class="form-check-input conversation-checkbox" type="checkbox" value="<%= conversation.id %>" id="conversation<%= conversation.id %>">
+                    </div>
+                    <div class="message-avatar me-3">
+                      <img src="<%= conversation.avatar || '/images/default-avatar.png' %>" alt="<%= conversation.name %>" class="avatar rounded-circle">
+                      <span class="<%= conversation.online ? 'status online' : 'status offline' %>"></span>
+                    </div>
+                    <div class="message-info flex-grow-1">
+                      <div class="d-flex justify-content-between">
+                        <h6 class="mb-0"><%= conversation.name %></h6>
+                        <small class="text-muted"><%= conversation.lastMessageTime %></small>
+                      </div>
+                      <p class="mb-0 text-truncate small">
+                        <% if (conversation.unread) { %><span class="badge bg-primary me-1">New</span><% } %>
+                        <%= conversation.lastMessage %>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="text-center p-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <p>Your inbox is empty</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Conversation -->
+    <div class="col-xl-8 col-lg-7">
+      <div class="card shadow message-window h-100">
+        <% if (activeConversation) { %>
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <div class="message-avatar me-3">
+                <img src="<%= activeConversation.avatar || '/images/default-avatar.png' %>" alt="<%= activeConversation.name %>" class="avatar rounded-circle">
+                <span class="<%= activeConversation.online ? 'status online' : 'status offline' %>"></span>
+              </div>
+              <div>
+                <h6 class="m-0 font-weight-bold"><%= activeConversation.name %></h6>
+                <small class="text-muted">
+                  <%= activeConversation.online ? 'Online' : 'Last seen ' + activeConversation.lastSeen %>
+                </small>
+              </div>
+            </div>
+            <div class="conversation-actions">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="View Listing">
+                <i class="fas fa-tag"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Archive">
+                <i class="fas fa-archive"></i>
+              </button>
+              <div class="dropdown d-inline-block">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="conversationMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="conversationMenu">
+                  <li><a class="dropdown-item" href="#">Mark as Unread</a></li>
+                  <li><a class="dropdown-item" href="#">Mute Notifications</a></li>
+                  <li><a class="dropdown-item text-danger" href="#">Delete Conversation</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="card-body messages-container p-0">
+            <div class="messages-list p-3">
+              <% if (activeConversation.messages && activeConversation.messages.length > 0) { %>
+                <% let previousDate = ''; %>
+                <% activeConversation.messages.forEach(function(message) { %>
+                  <% 
+                    const messageDate = new Date(message.timestamp).toLocaleDateString();
+                    const showDateSeparator = previousDate !== messageDate;
+                    previousDate = messageDate;
+                  %>
+                  
+                  <% if (showDateSeparator) { %>
+                    <div class="message-date-separator my-3">
+                      <span><%= messageDate %></span>
+                    </div>
+                  <% } %>
+                  
+                  <div class="message-bubble <%= message.isMe ? 'message-outgoing' : 'message-incoming' %> mb-3">
+                    <div class="message-content">
+                      <% if (!message.isMe) { %>
+                        <div class="message-sender mb-1">
+                          <%= activeConversation.name %>
+                        </div>
+                      <% } %>
+                      <div class="message-text">
+                        <%= message.text %>
+                      </div>
+                      <div class="message-meta">
+                        <small class="text-muted">
+                          <%= new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+                          <% if (message.isMe) { %>
+                            <% if (message.status === 'read') { %>
+                              <i class="fas fa-check-double text-primary ms-1"></i>
+                            <% } else if (message.status === 'delivered') { %>
+                              <i class="fas fa-check-double ms-1"></i>
+                            <% } else { %>
+                              <i class="fas fa-check ms-1"></i>
+                            <% } %>
+                          <% } %>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div class="text-center p-5">
+                  <p>No messages yet</p>
+                  <p>Send a message to start the conversation</p>
+                </div>
+              <% } %>
+            </div>
+          </div>
+          <div class="card-footer bg-white p-3">
+            <form id="messageForm">
+              <div class="input-group">
+                <button class="btn btn-outline-secondary" type="button" id="attachButton">
+                  <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="text" class="form-control" id="messageInput" placeholder="Type a message...">
+                <button class="btn btn-primary" type="submit" id="sendButton">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="small text-muted mt-2">
+                <% if (activeConversation.typingStatus) { %>
+                  <span class="typing-indicator"><%= activeConversation.name %> is typing...</span>
+                <% } else { %>
+                  <span>Reply with a message to <%= activeConversation.name %></span>
+                <% } %>
+              </div>
+            </form>
+          </div>
+        <% } else { %>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
+            <i class="fas fa-comments fa-5x text-muted mb-4"></i>
+            <h5>Select a conversation</h5>
+            <p class="text-muted">Choose a conversation from the list or start a new one</p>
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#composeModal">
+              <i class="fas fa-paper-plane me-2"></i> New Message
+            </button>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal fade" id="composeModal" tabindex="-1" aria-labelledby="composeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="composeModalLabel">New Message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="composeForm">
+          <div class="mb-3">
+            <label for="recipient" class="form-label">Recipient</label>
+            <select class="form-select" id="recipient">
+              <option value="">Select a recipient</option>
+              <% buyers.forEach(function(buyer) { %>
+                <option value="<%= buyer.id %>"><%= buyer.name %> (<%= buyer.email %>)</option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" placeholder="Message subject">
+          </div>
+          <div class="mb-3">
+            <label for="messageContent" class="form-label">Message</label>
+            <textarea class="form-control" id="messageContent" rows="5" placeholder="Type your message here..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="sendNewMessage">Send Message</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Highlight active conversation
+    const messageItems = document.querySelectorAll('.message-item');
+    messageItems.forEach(item => {
+      if (item.getAttribute('data-active') === 'true') {
+        item.classList.add('active');
+      }
+      
+      item.addEventListener('click', function() {
+        // In a real app, this would navigate to the conversation
+        window.location.href = '/messages/' + this.getAttribute('data-conversation-id');
+      });
+    });
+    
+    // Scroll to bottom of messages
+    const messagesContainer = document.querySelector('.messages-list');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Message form submission
+    const messageForm = document.getElementById('messageForm');
+    if (messageForm) {
+      messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput.value.trim() !== '') {
+          // In a real app, this would send the message via AJAX
+          // Then append the new message to the conversation
+          
+          // Clear input after sending
+          messageInput.value = '';
+        }
+      });
+    }
+    
+    // Mark all as read
+    const markAllReadBtn = document.getElementById('markAllRead');
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // In a real app, this would update all messages as read via AJAX
+        document.querySelectorAll('.message-item.unread').forEach(item => {
+          item.classList.remove('unread');
+        });
+      });
+    }
+  });
+</script>
+
+<%- include('../partials/footer', {page: 'messages'}) %>

@@ -1,0 +1,223 @@
+<%- include('../partials/header', { activePage: 'listings' }) %>
+
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Listings</h1>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Manage Listings</h6>
+            <div class="btn-group">
+                <a href="/listings?filter=active" class="btn btn-<%= filter === 'active' ? 'primary' : 'outline-primary' %>">Active</a>
+                <a href="/listings?filter=ended" class="btn btn-<%= filter === 'ended' ? 'primary' : 'outline-primary' %>">Ended</a>
+                <a href="/listings" class="btn btn-<%= !filter || filter === 'all' ? 'primary' : 'outline-primary' %>">All</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <% if (listings && listings.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="listingsTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>SKU</th>
+                                <th>eBay ID</th>
+                                <th>Price</th>
+                                <th>Cost</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Listed At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% listings.forEach(listing => { %>
+                                <tr>
+                                    <td><%= listing.title %></td>
+                                    <td><%= listing.sku %></td>
+                                    <td><%= listing.ebayListingId %></td>
+                                    <td>$<%= listing.price.toString() %></td>
+                                    <td>$<%= listing.cost.toString() %></td>
+                                    <td><%= listing.stock %></td>
+                                    <td>
+                                        <% if (listing.active) { %>
+                                            <span class="badge bg-success">Active</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Ended</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(listing.listedAt).toLocaleDateString() %></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="https://ebay.com/itm/<%= listing.ebayListingId %>" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-info"
+                                               title="View on eBay">
+                                               <i class="bi bi-eye"></i>
+                                            </a>
+                                            <!-- <% if (listing.active) { %>
+                                                <button class="btn btn-sm btn-outline-danger end-listing-btn" 
+                                                        data-listing-id="<%= listing._id %>"
+                                                        title="End Listing">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            <% } %> -->
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-4">
+                            <% if (page > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/listings?page=<%= page-1 %>&filter=<%= filter %>">
+                                        Previous
+                                    </a>
+                                </li>
+                            <% } else { %>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            <% } %>
+                            
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= page === i ? 'active' : '' %>">
+                                    <a class="page-link" href="/listings?page=<%= i %>&filter=<%= filter %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                            <% } %>
+                            
+                            <% if (page < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/listings?page=<%= page+1 %>&filter=<%= filter %>">
+                                        Next
+                                    </a>
+                                </li>
+                            <% } else { %>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
+            <% } else { %>
+                <div class="text-center my-5">
+                    <i class="bi bi-list-ul text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">No listings found</h4>
+                    <p class="text-muted">
+                        <% if (filter === 'active') { %>
+                            No active listings found. Run the listing job to create some.
+                        <% } else if (filter === 'ended') { %>
+                            No ended listings found.
+                        <% } else { %>
+                            No listings found in the database.
+                        <% } %>
+                    </p>
+                    <button id="runListingJob" class="btn btn-primary mt-2">
+                        <i class="bi bi-play-fill"></i> Run Listing Job
+                    </button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- End Listing Confirmation Modal -->
+<div class="modal fade" id="endListingModal" tabindex="-1" aria-labelledby="endListingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="endListingModalLabel">End Listing</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to end this listing? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmEndListing">End Listing</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle "Run Listing Job" button click
+        const runListingJobBtn = document.getElementById('runListingJob');
+        if (runListingJobBtn) {
+            runListingJobBtn.addEventListener('click', async function() {
+                // Disable button and show loading
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...';
+                
+                try {
+                    // Call API to run the job
+                    const response = await fetchApi('/api/jobs/run', 'POST', { job: 'listing' });
+                    
+                    if (response.success) {
+                        showToast('Listing job completed successfully', 'success');
+                        // Reload the page to show new listings
+                        window.location.reload();
+                    } else {
+                        showToast(`Failed to run listing job: ${response.error}`, 'error');
+                    }
+                } catch (error) {
+                    showToast(`Error running job: ${error.message}`, 'error');
+                } finally {
+                    // Re-enable button
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-play-fill"></i> Run Listing Job';
+                }
+            });
+        }
+        
+        // Handle "End Listing" button clicks
+        const endListingBtns = document.querySelectorAll('.end-listing-btn');
+        let currentListingId = null;
+        const endListingModal = new bootstrap.Modal(document.getElementById('endListingModal'));
+        
+        endListingBtns.forEach(button => {
+            button.addEventListener('click', function() {
+                currentListingId = this.getAttribute('data-listing-id');
+                endListingModal.show();
+            });
+        });
+        
+        // Handle confirmation of ending a listing
+        const confirmEndListingBtn = document.getElementById('confirmEndListing');
+        confirmEndListingBtn.addEventListener('click', async function() {
+            // Disable button and show loading
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            
+            try {
+                // This is a mock action - in a real app, there would be an API endpoint to end a listing
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                showToast('This is a mock action. In a real app, the listing would be ended.', 'success');
+                
+                // Hide modal
+                endListingModal.hide();
+                
+                // In a real app, you'd reload the page or update the UI
+                // window.location.reload();
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'error');
+            } finally {
+                // Reset button
+                this.disabled = false;
+                this.innerHTML = 'End Listing';
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

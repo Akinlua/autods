@@ -10,10 +10,12 @@ class CustomerMessageHandler {
     this.lastCheckTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // Start with messages from last 24 hours
     this.responseTimeWindow = config.customerService.responseTimeHours || 24; // Hours to respond within
     this.escalationKeywords = config.customerService.escalationKeywords || ['refund', 'broken', 'damaged', 'complaint', 'return'];
+    this.lastRun = null;
   }
 
   async processMessages() {
     try {
+      logger.info('Starting customer message processing');
       logger.info(`Checking messages since ${this.lastCheckTime.toISOString()}`);
       
       // Get messages since last check
@@ -32,10 +34,14 @@ class CustomerMessageHandler {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       
-      return true;
+      // Update the last run time
+      this.lastRun = new Date();
+      
+      logger.info('Customer message processing completed successfully');
+      return { success: true };
     } catch (error) {
-      logger.error('Error in customer message handler', { error: error.message });
-      throw error;
+      logger.error('Error processing customer messages', { error: error.message });
+      return { success: false, error: error.message };
     }
   }
   
@@ -83,7 +89,7 @@ class CustomerMessageHandler {
         
       } else {
         // Generate automated response
-        const response = await generateResponse(message.text);
+        const response = await this.generateResponse(message);
         
         // Reply to the message
         await ebayAPI.replyToMessage(message.messageId, response, message.email, message.subject, message.recipientID, message.DisplayToPublic);
@@ -178,6 +184,37 @@ class CustomerMessageHandler {
       .catch(error => {
         logger.error(`Error sending admin notification email for message ${message.messageId}`, { error: error.message });
       });
+  }
+
+  async generateResponse(message) {
+    try {
+        const messageContent = message.content;
+        
+        // Use the customizable templates from responseGenerator
+        const rawResponse = await generateResponse(messageContent);
+        
+        // Replace any template variables with actual values
+        const response = this.replaceTemplateVariables(rawResponse, message);
+        
+        return response;
+    } catch (error) {
+        logger.error('Error generating response', { error: error.message });
+        return 'Thank you for your message. Our customer service team will review your inquiry and get back to you soon.';
+    }
+  }
+
+  replaceTemplateVariables(template, message) {
+    try {
+        // Replace template variables with actual values
+        return template
+            .replace(/{{buyerName}}/g, message.buyerUsername || 'Valued Customer')
+            .replace(/{{itemTitle}}/g, message.itemTitle || 'your purchase')
+            .replace(/{{orderNumber}}/g, message.orderId || 'your recent order')
+            .replace(/{{sellerName}}/g, process.env.EBAY_USERNAME || 'our store');
+    } catch (error) {
+        logger.error('Error replacing template variables', { error: error.message });
+        return template; // Return original template if replacement fails
+    }
   }
 }
 

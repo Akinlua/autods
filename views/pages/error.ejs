@@ -1,0 +1,25 @@
+<%- include('../partials/header', { activePage: 'error' }) %>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Error</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h1><%= typeof errorMessage !== 'undefined' ? errorMessage : (typeof message !== 'undefined' ? message : 'An error occurred') %></h1>
+                        <h2><%= typeof error !== 'undefined' && error.status ? error.status : '500' %></h2>
+                        <pre><%= typeof error !== 'undefined' && error.stack ? error.stack : '' %></pre>
+                    </div>
+                    <a href="/" class="btn btn-primary">
+                        <i class="bi bi-house-door"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 

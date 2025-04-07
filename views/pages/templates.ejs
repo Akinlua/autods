@@ -1,0 +1,132 @@
+<%- include('../partials/header', { activePage: 'templates' }) %>
+
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Message Templates</h1>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Manage Response Templates</h6>
+            <button id="saveTemplates" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Changes
+            </button>
+        </div>
+        <div class="card-body">
+            <p class="mb-3">Customize the automatic response templates for different types of customer messages. These templates will be used to respond to customers based on the content of their messages.</p>
+            
+            <form id="templatesForm">
+                <div id="templatesContainer">
+                    <% if (templates) { %>
+                        <% Object.keys(templates).forEach(key => { %>
+                            <div class="card mb-4">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary text-capitalize"><%= key %></h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="<%= key %>">Response Template:</label>
+                                        <textarea 
+                                            id="<%= key %>" 
+                                            name="<%= key %>" 
+                                            class="form-control template-textarea" 
+                                            rows="6"
+                                            data-template-key="<%= key %>"
+                                        ><%= templates[key] %></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            No templates found. Default templates will be used.
+                        </div>
+                    <% } %>
+                </div>
+            </form>
+            
+            <!-- Template variables reference -->
+            <!-- <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">Template Variables Reference</h6>
+                </div>
+                <div class="card-body">
+                    <p>You can use the following variables in your templates:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>{{buyerName}}</code></td>
+                                <td>The name of the buyer</td>
+                                <td>Hello, {{buyerName}}!</td>
+                            </tr>
+                            <tr>
+                                <td><code>{{itemTitle}}</code></td>
+                                <td>The title of the item being discussed</td>
+                                <td>Regarding your purchase of {{itemTitle}}...</td>
+                            </tr>
+                            <tr>
+                                <td><code>{{orderNumber}}</code></td>
+                                <td>The order number, if available</td>
+                                <td>Your order #{{orderNumber}} is being processed.</td>
+                            </tr>
+                            <tr>
+                                <td><code>{{sellerName}}</code></td>
+                                <td>Your eBay seller name</td>
+                                <td>Thank you for shopping with {{sellerName}}.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const saveButton = document.getElementById('saveTemplates');
+        const form = document.getElementById('templatesForm');
+        
+        // Handle form submission
+        saveButton.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            // Collect template data
+            const templates = {};
+            const textareas = document.querySelectorAll('.template-textarea');
+            
+            textareas.forEach(textarea => {
+                const key = textarea.getAttribute('data-template-key');
+                templates[key] = textarea.value;
+            });
+            
+            // Show loading state
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            
+            try {
+                // Call API to save templates
+                const response = await fetchApi('/api/response-templates', 'POST', templates);
+                
+                if (response.success) {
+                    showToast('Templates saved successfully', 'success');
+                } else {
+                    showToast(`Failed to save templates: ${response.error}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Error saving templates: ${error.message}`, 'error');
+            } finally {
+                // Reset button
+                saveButton.disabled = false;
+                saveButton.innerHTML = '<i class="bi bi-save"></i> Save Changes';
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %> 

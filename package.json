@@ -16,7 +16,11 @@
       "logs/**/*",
       ".env.example"
     ],
-    "targets": ["node16-win-x64", "node16-macos-x64", "node16-linux-x64"]
+    "targets": [
+      "node16-win-x64",
+      "node16-macos-x64",
+      "node16-linux-x64"
+    ]
   },
   "scripts": {
     "start": "node app.js",
@@ -28,9 +32,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.8.4",
+    "body-parser": "^2.2.0",
+    "chart.js": "^4.4.8",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "mongoose": "^8.12.1",
     "morgan": "^1.10.0",
     "node-cron": "^3.0.2",

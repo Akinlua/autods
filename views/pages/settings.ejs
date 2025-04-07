@@ -1,0 +1,273 @@
+<%- include('../partials/header', { activePage: 'settings' }) %>
+
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Settings</h1>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Application Configuration</h6>
+            <button id="saveSettings" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Changes
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="restartAlert" class="alert alert-warning alert-dismissible fade d-none" role="alert">
+                <strong>Settings saved!</strong> The server will restart automatically to apply changes. This page will reload in a few seconds.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <form id="settingsForm">
+                <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="server-tab" data-bs-toggle="tab" data-bs-target="#server" type="button" role="tab" aria-controls="server" aria-selected="true">Server</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="business-tab" data-bs-toggle="tab" data-bs-target="#business" type="button" role="tab" aria-controls="business" aria-selected="false">Business Rules</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="scheduling-tab" data-bs-toggle="tab" data-bs-target="#scheduling" type="button" role="tab" aria-controls="scheduling" aria-selected="false">Scheduling</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab" aria-controls="api" aria-selected="false">API Connections</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="false">Email</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-4" id="settingsTabContent">
+                    <!-- Server Settings -->
+                    <div class="tab-pane fade show active" id="server" role="tabpanel" aria-labelledby="server-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="PORT" class="form-label">HTTP Port</label>
+                                <input type="number" class="form-control" id="PORT" name="PORT" value="<%= settings.server.PORT || '3000' %>" required>
+                                <div class="form-text">The port the server will run on.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="LOG_LEVEL" class="form-label">Log Level</label>
+                                <select class="form-select" id="LOG_LEVEL" name="LOG_LEVEL">
+                                    <option value="error" <%= settings.server.LOG_LEVEL === 'error' ? 'selected' : '' %>>Error</option>
+                                    <option value="warn" <%= settings.server.LOG_LEVEL === 'warn' ? 'selected' : '' %>>Warning</option>
+                                    <option value="info" <%= settings.server.LOG_LEVEL === 'info' ? 'selected' : '' %>>Info</option>
+                                    <option value="debug" <%= settings.server.LOG_LEVEL === 'debug' ? 'selected' : '' %>>Debug</option>
+                                </select>
+                                <div class="form-text">Determines what type of messages are logged.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Business Settings -->
+                    <div class="tab-pane fade" id="business" role="tabpanel" aria-labelledby="business-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="DEFAULT_MARKUP" class="form-label">Default Markup</label>
+                                <input type="number" step="0.01" class="form-control" id="DEFAULT_MARKUP" name="DEFAULT_MARKUP" value="<%= settings.business.DEFAULT_MARKUP || '1.3' %>">
+                                <div class="form-text">Multiplier applied to product cost (e.g., 1.3 = 30% markup).</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="MINIMUM_MARGIN" class="form-label">Minimum Margin</label>
+                                <input type="number" step="0.01" class="form-control" id="MINIMUM_MARGIN" name="MINIMUM_MARGIN" value="<%= settings.business.MINIMUM_MARGIN || '0.2' %>">
+                                <div class="form-text">Minimum profit margin required for product listing (e.g., 0.2 = 20%).</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="MINIMUM_STOCK" class="form-label">Minimum Stock</label>
+                                <input type="number" class="form-control" id="MINIMUM_STOCK" name="MINIMUM_STOCK" value="<%= settings.business.MINIMUM_STOCK || '1' %>">
+                                <div class="form-text">Minimum stock level required for product listing.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="MAX_LISTING_QUANTITY" class="form-label">Max Listing Quantity</label>
+                                <input type="number" class="form-control" id="MAX_LISTING_QUANTITY" name="MAX_LISTING_QUANTITY" value="<%= settings.business.MAX_LISTING_QUANTITY || '10' %>">
+                                <div class="form-text">Maximum quantity to set for eBay listings.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="RESPONSE_TIME_HOURS" class="form-label">Response Time (Hours)</label>
+                                <input type="number" class="form-control" id="RESPONSE_TIME_HOURS" name="RESPONSE_TIME_HOURS" value="<%= settings.business.RESPONSE_TIME_HOURS || '24' %>">
+                                <div class="form-text">Target response time for customer messages in hours.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scheduling Settings -->
+                    <div class="tab-pane fade" id="scheduling" role="tabpanel" aria-labelledby="scheduling-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="LISTING_CRON_SCHEDULE" class="form-label">Product Listing Schedule</label>
+                                <input type="text" class="form-control" id="LISTING_CRON_SCHEDULE" name="LISTING_CRON_SCHEDULE" value="<%= settings.scheduling.LISTING_CRON_SCHEDULE || '0 9 * * *' %>">
+                                <div class="form-text">Cron expression for when to run the listing job. Default: daily at 9 AM.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="REMOVAL_CRON_SCHEDULE" class="form-label">Product Removal Schedule</label>
+                                <input type="text" class="form-control" id="REMOVAL_CRON_SCHEDULE" name="REMOVAL_CRON_SCHEDULE" value="<%= settings.scheduling.REMOVAL_CRON_SCHEDULE || '0 18 * * *' %>">
+                                <div class="form-text">Cron expression for when to run the removal job. Default: daily at 6 PM.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="MESSAGE_CRON_SCHEDULE" class="form-label">Message Check Schedule</label>
+                                <input type="text" class="form-control" id="MESSAGE_CRON_SCHEDULE" name="MESSAGE_CRON_SCHEDULE" value="<%= settings.scheduling.MESSAGE_CRON_SCHEDULE || '0 * * * *' %>">
+                                <div class="form-text">Cron expression for when to check for new messages. Default: hourly.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- API Settings -->
+                    <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">
+                        <h5 class="mb-3">eBay API Settings</h5>
+                        <div class="row">
+                            <!-- <div class="col-md-6 mb-3">
+                                <label for="EBAY_API_URL" class="form-label">eBay API URL</label>
+                                <input type="text" class="form-control" id="EBAY_API_URL" name="EBAY_API_URL" value="<%= settings.api.EBAY_API_URL || '' %>">
+                                <div class="form-text">The eBay API endpoint URL.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_CLIENT_ID" class="form-label">eBay Client ID</label>
+                                <input type="text" class="form-control" id="EBAY_CLIENT_ID" name="EBAY_CLIENT_ID" value="<%= settings.api.EBAY_CLIENT_ID || '' %>">
+                                <div class="form-text">Your eBay API client ID.</div>
+                            </div> -->
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_USERNAME" class="form-label">eBay Username</label>
+                                <input type="text" class="form-control" id="EBAY_USERNAME" name="EBAY_USERNAME" value="<%= settings.api.EBAY_USERNAME || '' %>">
+                                <div class="form-text">Your eBay account username.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_PASSWORD" class="form-label">eBay Password</label>
+                                <input type="password" class="form-control" id="EBAY_PASSWORD" name="EBAY_PASSWORD" placeholder="********">
+                                <div class="form-text">Your eBay account password.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_FULFILLMENT_POLICY_ID" class="form-label">Fulfillment Policy ID</label>
+                                <input type="text" class="form-control" id="EBAY_FULFILLMENT_POLICY_ID" name="EBAY_FULFILLMENT_POLICY_ID" value="<%= settings.api.EBAY_FULFILLMENT_POLICY_ID || '' %>">
+                                <div class="form-text">Your eBay fulfillment policy ID.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_PAYMENT_POLICY_ID" class="form-label">Payment Policy ID</label>
+                                <input type="text" class="form-control" id="EBAY_PAYMENT_POLICY_ID" name="EBAY_PAYMENT_POLICY_ID" value="<%= settings.api.EBAY_PAYMENT_POLICY_ID || '' %>">
+                                <div class="form-text">Your eBay payment policy ID.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EBAY_RETURN_POLICY_ID" class="form-label">Return Policy ID</label>
+                                <input type="text" class="form-control" id="EBAY_RETURN_POLICY_ID" name="EBAY_RETURN_POLICY_ID" value="<%= settings.api.EBAY_RETURN_POLICY_ID || '' %>">
+                                <div class="form-text">Your eBay return policy ID.</div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3 mt-4">AutoDS Settings</h5>
+                        <div class="row">
+                            <!-- <div class="col-md-6 mb-3">
+                                <label for="AUTODS_API_URL" class="form-label">AutoDS API URL</label>
+                                <input type="text" class="form-control" id="AUTODS_API_URL" name="AUTODS_API_URL" value="<%= settings.api.AUTODS_API_URL || '' %>">
+                                <div class="form-text">The AutoDS API endpoint URL.</div>
+                            </div> -->
+                            <div class="col-md-6 mb-3">
+                                <label for="AUTODS_STORE_IDS" class="form-label">AutoDS Store IDs</label>
+                                <input type="text" class="form-control" id="AUTODS_STORE_IDS" name="AUTODS_STORE_IDS" value="<%= settings.api.AUTODS_STORE_IDS || '' %>">
+                                <div class="form-text">Comma-separated list of AutoDS store IDs to monitor.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="AUTODS_USERNAME" class="form-label">AutoDS Username</label>
+                                <input type="text" class="form-control" id="AUTODS_USERNAME" name="AUTODS_USERNAME" value="<%= settings.api.AUTODS_USERNAME || '' %>">
+                                <div class="form-text">Your AutoDS account username.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="AUTODS_PASSWORD" class="form-label">AutoDS Password</label>
+                                <input type="password" class="form-control" id="AUTODS_PASSWORD" name="AUTODS_PASSWORD" placeholder="********">
+                                <div class="form-text">Your AutoDS account password.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Settings -->
+                    <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="EMAIL_ENABLED" class="form-label">Email Notifications</label>
+                                <select class="form-select" id="EMAIL_ENABLED" name="EMAIL_ENABLED">
+                                    <option value="true" <%= settings.email.EMAIL_ENABLED === 'true' ? 'selected' : '' %>>Enabled</option>
+                                    <option value="false" <%= settings.email.EMAIL_ENABLED === 'false' ? 'selected' : '' %>>Disabled</option>
+                                </select>
+                                <div class="form-text">Enable or disable email notifications.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EMAIL_HOST" class="form-label">SMTP Host</label>
+                                <input type="text" class="form-control" id="EMAIL_HOST" name="EMAIL_HOST" value="<%= settings.email.EMAIL_HOST || '' %>">
+                                <div class="form-text">SMTP server host for sending emails.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="EMAIL_PORT" class="form-label">SMTP Port</label>
+                                <input type="number" class="form-control" id="EMAIL_PORT" name="EMAIL_PORT" value="<%= settings.email.EMAIL_PORT || '587' %>">
+                                <div class="form-text">SMTP server port for sending emails.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ADMIN_EMAILS" class="form-label">Admin Email Addresses</label>
+                                <input type="text" class="form-control" id="ADMIN_EMAILS" name="ADMIN_EMAILS" value="<%= settings.email.ADMIN_EMAILS || '' %>">
+                                <div class="form-text">Comma-separated list of email addresses to receive notifications.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const saveButton = document.getElementById('saveSettings');
+        const form = document.getElementById('settingsForm');
+        const restartAlert = document.getElementById('restartAlert');
+        
+        // Handle form submission
+        saveButton.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(form);
+            const settings = {};
+            
+            for (const [key, value] of formData.entries()) {
+                settings[key] = value;
+            }
+            
+            // Show loading state
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            
+            try {
+                // Use direct endpoint to avoid middleware conflicts
+                const response = await fetch('/direct-settings-update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(settings)
+                }).then(res => res.json());
+                
+                if (response.success) {
+                    // Show restart alert
+                    restartAlert.classList.remove('d-none');
+                    restartAlert.classList.add('show');
+                    
+                    // Reload the page after a delay to reconnect to restarted server
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 8000); // Give server time to restart (8 seconds)
+                    
+                    showToast('Settings saved successfully. Server will restart.', 'success');
+                } else {
+                    showToast(`Failed to save settings: ${response.error}`, 'error');
+                    
+                    // Reset button
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '<i class="bi bi-save"></i> Save Changes';
+                }
+            } catch (error) {
+                showToast(`Error saving settings: ${error.message}`, 'error');
+                
+                // Reset button
+                saveButton.disabled = false;
+                saveButton.innerHTML = '<i class="bi bi-save"></i> Save Changes';
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %> 

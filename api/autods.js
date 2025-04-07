@@ -111,6 +111,8 @@ class AutoDSAPI {
   }
 
   async authenticate() {
+    let browser = null;
+    
     try {
       logger.info('Starting browser-based authentication for AutoDS');
       
@@ -119,7 +121,7 @@ class AutoDSAPI {
       }
       
       // Launch browser with stealth mode
-      const browser = await puppeteer.launch({
+      browser = await puppeteer.launch({
         headless: process.env.NODE_ENV === 'development' ? false : 'new', // Use false in development, 'new' otherwise
         args: [
           '--no-sandbox', 
@@ -138,9 +140,22 @@ class AutoDSAPI {
       // Create a promise that will resolve when we get the token
       const tokenPromise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
-          reject(new Error('Token capture timed out after 30 seconds'));
+          logger.error('Token capture timed out after 60 seconds');
+          try {
+            // Close browser before exiting
+            if (browser) {
+              browser.close().catch(err => {
+                logger.error('Error closing browser during timeout', { error: err.message });
+              });
+            }
+          } catch (closeError) {
+            logger.error('Error during browser cleanup on timeout', { error: closeError.message });
+          }
+          
+          // Reject with error instead of exiting the process
+          reject(new Error('Token capture timed out after 60 seconds'));
         }, 60000);
-
+        
         page.on('request', async request => {
           const url = request.url();
           // Allow the request to proceed
@@ -159,8 +174,19 @@ class AutoDSAPI {
         });
       });
       
+      // Navigation error handling
+      page.on('error', err => {
+        logger.error('Page error occurred:', err);
+        // Don't reject here, let the timeout handle it
+      });
+      
+      // Add console logging from the page
+      page.on('console', msg => {
+        console.log(`Browser console [${msg.type()}]: ${msg.text()}`);
+      });
+      
       // Navigate to login page
-      await page.goto('https://platform.autods.com/login', { waitUntil: 'networkidle2' });
+      await page.goto('https://platform.autods.com/login', { waitUntil: 'networkidle2', timeout: 300000 });
       logger.info('Navigated to login page');
       
       // Wait for email and password fields to be available
@@ -175,12 +201,16 @@ class AutoDSAPI {
       // Click login button and wait for navigation
       await Promise.all([
         page.click('button[type="submit"]'),
-        page.waitForNavigation({ waitUntil: 'networkidle2' })
+        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 300000 })
+          .catch(err => {
+            logger.warn('Navigation timeout after login - continuing anyway', { error: err.message });
+            // We'll continue and let the token capture or timeout handle it
+          })
       ]);
       
       // Wait for the token to be captured
       const authToken = await tokenPromise;
-      console.log("authToken captured:", authToken);
+      
       if (!authToken) {
         throw new Error('Failed to capture authentication token');
       }
@@ -192,6 +222,7 @@ class AutoDSAPI {
           await browser.disconnect();
         }
         await browser.close();
+        browser = null; // Set to null to indicate it's closed
       } catch (closeError) {
         logger.warn('Error closing browser, continuing anyway', { error: closeError.message });
         // Continue despite error - we already have the token
@@ -208,6 +239,15 @@ class AutoDSAPI {
       logger.info('Successfully captured and saved auth token');
       return this.token;
     } catch (error) {
+      // Always ensure browser is closed on error
+      if (browser) {
+        try {
+          await browser.close();
+        } catch (closeError) {
+          logger.warn('Error closing browser during error handling', { error: closeError.message });
+        }
+      }
+      
       logger.error('Authentication failed', { error: error.message });
       throw new Error(`Authentication failed: ${error.message}`);
     }
