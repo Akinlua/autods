@@ -1,5 +1,6 @@
 // services/productListing.js - Product listing service
 
+const axios = require('axios');
 const ebayAPI = require('../api/ebay');
 const autoDSAPI = require('../api/autods');
 const logger = require('../utils/logger');
@@ -10,627 +11,638 @@ class ProductListingScheduler {
   constructor() {
     this.markup = config.pricing.defaultMarkup || 1.3; // 30% markup by default
     this.stockThreshold = config.inventory.minimumStock || 1;
-    // Store IDs are now handled in the AutoDS API client
+    this.lastRun = null;
+    // Store IDs are handled in the AutoDS API client
   }
 
   async run() {
     try {
-      const storeIds = autoDSAPI.getStoreIds();
-      console.log(storeIds);
-      logger.info(`Fetching products from AutoDS for store IDs: ${storeIds}`);
+      logger.info('Starting product listing process from AutoDS marketplace to products tab');
       
-      // Get products from AutoDS using the updated API
-      const products = await autoDSAPI.getProducts();
-      logger.info(`Found ${products.length} products from AutoDS`);
+      // Get store ID and supplier_filter from configuration
+      const storeIds = autoDSAPI.getStoreIds();
+      const storeId = storeIds.split(',')[0]; // Using the first store ID
+      logger.info(`Using store ID: ${storeId}`);
+      
 
-      // Get existing eBay listings to avoid duplicates
-      const existingListings = await ebayAPI.getSellerList();
-      // console.log(existingListings);
-      logger.info(`Found ${existingListings.length} existing eBay listings`);
-      const existingSkus = existingListings.map(listing => listing.sku);
+        // Get existing eBay listings to avoid duplicates
+        const existingListings = await ebayAPI.getSellerList();
+        console.log(existingListings);
+        logger.info(`Found ${existingListings.length} existing eBay listings`);
+        const existingSkus = existingListings.map(listing => listing.sku);
 
-      // Filter products that are not already listed and have enough stock based on variation_statistics
-      const eligibleProducts = products.filter(product => {
-        // Skip products that are already listed
-        if (existingSkus.includes(product.id.toString())) {
-          logger.info(`Product ${product.id} already listed on eBay, skipping`);
-          return false;
-        }
 
-        // Skip products with errors
-        // if (product.error_list && product.error_list.length > 0) {
-        //   const errorMessages = product.error_list.map(error => error.message).join('; ');
-        //   logger.info(`Product ${product.id} has errors: ${errorMessages}, skipping`);
-        //   return false;
-        // }
 
-        // Check if product has adequate stock from variation_statistics
-        if (product.variation_statistics) {
-          const inStock = product.variation_statistics.in_stock?.total || 0;
-          if (inStock < this.stockThreshold) {
-            logger.info(`Product ${product.id} has insufficient stock (${inStock}), skipping`);
-            return false;
-          }
-          return true;
-        }
-        
-        logger.info(`Product ${product.id} has no variation statistics, skipping`);
-        return false;
-      });
 
-      logger.info(`Found ${eligibleProducts.length} eligible products to list`);
 
-      // Process eligible products for listing
-      for (const product of eligibleProducts) {
-        try {
-          // Get detailed product info (includes enriched data)
-          const productDetails = await autoDSAPI.getProductDetails(product.id);
-          
-          // No need to separately get stock info since it's in variation_statistics
-          
-          // Calculate price with markup using variation_statistics
-          const basePrice = productDetails.variation_statistics.min_sell_price;
-          const sellingPrice = (parseFloat(basePrice) * this.markup).toFixed(2);
-          
-          // Extract all image URLs from the product
-          const imageUrls = [];
-          // Add main picture URL if present
-          if (productDetails.main_picture_url && productDetails.main_picture_url.url) {
-            imageUrls.push(productDetails.main_picture_url.url);
-          }
-          // Add any additional images
-          if (productDetails.images && Array.isArray(productDetails.images)) {
-            productDetails.images.forEach(image => {
-              // Avoid duplicates
-              if (image.url && !imageUrls.includes(image.url)) {
-                imageUrls.push(image.url);
-              }
-            });
-          }
-          
-          // Create eBay listing
-          const itemData = {
-            sku: productDetails.id.toString(),
-            product: {
-              title: productDetails.title,
-              description: productDetails.description,
-              imageUrls: imageUrls,
-              aspects: this.mapProductAspects(productDetails),
-              brand: productDetails.variations[0].active_buy_item.brand
-            },
-            availability: {
-              shipToLocationAvailability: {
-                quantity: Math.min(productDetails.variation_statistics.in_stock.total, 10) // Limit to 10 at a time
-              }
-            },
-            condition: "NEW",
-            categoryId: this.mapToEbayCategory(productDetails.category),
-            format: "FIXED_PRICE",
-            listingPolicies: {
-              fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
-              paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
-              returnPolicyId: process.env.EBAY_RETURN_POLICY_ID
-            },
-            pricingSummary: {
-              price: {
-                currency: productDetails.variation_statistics.sell_currency || "USD",
-                value: sellingPrice
-              }
-            }
-          };
 
-          // Add the item to eBay
-          const result = await ebayAPI.addItem(itemData);
-          logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId}`);
-          
-          // Store listing details in database
-          await db.listings.create({
-            autodsId: product.id,
-            ebayListingId: result.listingId,
-            sku: product.id.toString(),
-            title: productDetails.title,
-            price: sellingPrice,
-            cost: productDetails.variation_statistics.min_buy_price,
-            stock: productDetails.variation_statistics.in_stock.total,
-            listedAt: new Date()
-          });
-          
-          // Small delay to avoid API rate limits
-          logger.info('Waiting for 2 second before listing next product');
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-        } catch (error) {
-          // Check for specific item specific errors
-          const errorMsg = error.message || '';
-          
-          if (errorMsg.includes('item specific') && 
-              (errorMsg.includes('Width') || 
-               errorMsg.includes('Height') || 
-               errorMsg.includes('Length') || 
-               errorMsg.includes('Dimension'))) {
-            
-            logger.warn(`Product ${product.id} missing required dimensions. Attempting to retry with default values.`);
-            
-            try {
-              // Add default dimensions to aspects
-              if (!itemData.product.aspects) {
-                itemData.product.aspects = {};
-              }
-              
-              // Add missing dimensions with default values
-              if (errorMsg.includes('Width') && !itemData.product.aspects['Item Width']) {
-                itemData.product.aspects['Item Width'] = ['5 in'];
-              }
-              if (errorMsg.includes('Height') && !itemData.product.aspects['Item Height']) {
-                itemData.product.aspects['Item Height'] = ['5 in'];
-              }
-              if (errorMsg.includes('Length') && !itemData.product.aspects['Item Length']) {
-                itemData.product.aspects['Item Length'] = ['5 in'];
-              }
-              
-              // Retry listing with the updated aspects
-              logger.info(`Retrying listing for product ${product.id} with added dimensions`);
-              const result = await ebayAPI.addItem(itemData);
-              logger.info(`Successfully listed product ${product.id} on eBay with listing ID ${result.listingId} after adding dimensions`);
-              
-              // Store listing details in database
-              await db.listings.create({
-                autodsId: product.id,
-                ebayListingId: result.listingId,
-                sku: product.id.toString(),
-                title: productDetails.title,
-                price: sellingPrice,
-                cost: productDetails.variation_statistics.min_buy_price,
-                stock: productDetails.variation_statistics.in_stock.total,
-                listedAt: new Date()
-              });
-              
-              // Small delay to avoid API rate limits
-              logger.info('Waiting for 2 second before listing next product');
-              await new Promise(resolve => setTimeout(resolve, 2000));
-              
-            } catch (retryError) {
-              logger.error(`Error on retry for product ${product.id}`, { error: retryError.message });
-            }
-          } else {
-            logger.error(`Error processing product ${product.id}`, { error: error.message });
-          }
-          
-          continue; // Continue with next product
-        }
+      // Get max number of products to import from env or default to 10
+      const productsToImport = process.env.MAX_LISTING_QUANTITY ? parseInt(process.env.MAX_LISTING_QUANTITY) : 10;
+      logger.info(`Will import ${productsToImport} products`);
+      
+      // Determine the supplier filter from env or default to empty
+      let supplier_filter = [];
+      if (process.env.SUPPLIER_FILTER === 'amazon') {
+        supplier_filter = [{ name: "site_name", value_type: "list", op: "in", value: "amazon" }];
+        logger.info('Using Amazon as supplier filter');
+      } else if (process.env.SUPPLIER_FILTER === 'private_suppliers') {
+        supplier_filter = [{ name: "site_name", value_type: "list", op: "in", value: "private_suppliers" }];
+        logger.info('Using Private Suppliers as supplier filter');
+      } else {
+        logger.info('No supplier filter specified, will use all suppliers');
       }
       
+      // Step 1: Get filtered products from marketplace
+      const filteredProducts = await this.getFilteredProducts(storeId, supplier_filter);
+      logger.info(`Retrieved ${filteredProducts.length} products from marketplace`);
+      
+      if (!filteredProducts || filteredProducts.length === 0) {
+        logger.warn('No products found in marketplace, ending process');
+        this.lastRun = new Date();
+        return false;
+      }
+      
+      // Get already imported products from database to avoid duplicates
+      const importedProducts = await this.getImportedProducts();
+      logger.info(`Found ${importedProducts.length} previously imported products`);
+      
+      // Filter out already imported products
+      const availableProducts = filteredProducts.filter(product => 
+        !importedProducts.includes(product._id) && 
+        !importedProducts.includes(product.id_on_site)
+      );
+      
+      logger.info(`Found ${availableProducts.length} products available for import after filtering`);
+      
+      if (availableProducts.length === 0) {
+        logger.warn('No new products available to import, ending process');
+        this.lastRun = new Date();
+        return false;
+      }
+      
+      // Randomize and select products up to the desired count
+      const selectedProducts = this.getRandomizedProducts(availableProducts, productsToImport);
+      logger.info(`Selected ${selectedProducts.length} products to import`);
+      
+      // Step 2: Import products to draft
+      const importedToDraft = await this.importProductsToDraft(storeId, selectedProducts);
+      
+      if (importedToDraft.length === 0) {
+        logger.warn('Failed to import any products to draft, ending process');
+        this.lastRun = new Date();
+        return false;
+      }
+      
+      // Step 3: Wait 30 seconds for drafts to process
+      logger.info('Waiting 30 seconds for drafts to process...');
+      await new Promise(resolve => setTimeout(resolve, 30000));
+      
+      // Step 4: Get list of drafts
+      const drafts = await this.getProductDrafts(storeId);
+      logger.info(`Found ${drafts.length} drafts in store`);
+      
+      if (!drafts || drafts.length === 0) {
+        logger.warn('No drafts found in store, ending process');
+        this.lastRun = new Date();
+        return false;
+      }
+      
+      // Find the drafts that match our imported products
+      const ourDrafts = this.matchDraftsToProducts(drafts, importedToDraft);
+      logger.info(`Matched ${ourDrafts.length} drafts to our imported products`);
+      
+      // Step 5: Import drafts to products tab
+      const importedToProducts = await this.importDraftsToProductsTab(storeId, ourDrafts);
+      logger.info(`Successfully imported ${importedToProducts.length} products to products tab`);
+      
+      // Step 6: Wait 60 seconds for products to process
+      logger.info('Waiting 60 seconds for products to process...');
+      await new Promise(resolve => setTimeout(resolve, 60000));
+      
+      // Step 7: Get list of products in store to confirm import
+      const productsInStore = await autoDSAPI.getProducts();
+      logger.info(`Found ${productsInStore.length} products in store`);
+      
+      // Verify which products were successfully imported
+      const successfulImports = await this.verifyImportedProducts(productsInStore, importedToProducts);
+      logger.info(`Verified ${successfulImports.length} products were successfully imported`);
+      
+      // Save imported products to database
+      if (successfulImports.length > 0) {
+        await this.saveImportedProducts(successfulImports);
+      } else {
+        logger.warn('No products were successfully verified for import');
+      }
+      
+      // Check if we need to import more products to reach the desired count
+      const remainingCount = productsToImport - (successfulImports.length || 0);
+      
+      if (remainingCount > 0) {
+        logger.info(`Need to import ${remainingCount} more products to reach the desired count of ${productsToImport}`);
+        
+        // Recursive call to import remaining products, with the maxAttempts parameter
+        await this.importRemainingProducts(storeId, supplier_filter, remainingCount, 1, 3);
+      }
+      
+      this.lastRun = new Date();
+      logger.info('Product listing process completed successfully');
       return true;
+      
     } catch (error) {
       logger.error('Error in product listing scheduler', { error: error.message });
+      this.lastRun = new Date();
       throw error;
     }
   }
   
-  mapProductAspects(productDetails) {
+  async getFilteredProducts(storeId, filters = []) {
+    try {
+      const token = await autoDSAPI.ensureAuthenticated();
+      
+      const url = 'https://gw.autods.com/marketplace/api/products/';
+      
+      const payload = {
+        "projection": {
+          "title": {},
+          "images": {},
+          "supplier_name": {},
+          "site_name": {},
+          "id_on_site": {},
+          "product_details": {},
+          "region": {},
+          "private_supplier": {},
+          "is_winning_product": {},
+          "is_free_winning_product": {},
+          "categories": {}
+        },
+        "order_by": {
+            "direction": "desc",
+            "name": "spv_param"
+        },
+        "condition": "and",
+        "limit": 100,
+        "offset": 0,
+        "filters": filters,
+      };
+      
+      const response = await axios({
+        method: 'post',
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        data: payload
+      });
+      
+      return response.data.results || [];
+    } catch (error) {
+      logger.error('Failed to get filtered products from marketplace', { error: error.message });
+      return [];
+    }
+  }
+  
+  getRandomizedProducts(products, count) {
+    // Shuffle the array using Fisher-Yates algorithm
+    const shuffled = [...products];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    // Take the first 'count' elements
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+  }
+  
+  async getImportedProducts() {
+    try {
+      // Get products that were previously imported from the database
+      const importedListings = await db.listings.find({}).lean();
+      return importedListings.map(listing => listing.autodsId);
+    } catch (error) {
+      logger.error('Error getting imported products from database', { error: error.message });
+      return [];
+    }
+  }
+  
+  async importProductsToDraft(storeId, products) {
+    const importedProducts = [];
+    
+    for (const product of products) {
+      try {
+        const token = await autoDSAPI.ensureAuthenticated();
+        
+        const url = `https://v2-api.autods.com/products/single_draft_product/${storeId}/`;
+        
+        const isSitePrivateSuppliers = product.site_name === "private_suppliers";
+        
+        const payload = {
+          "urls": [],
+          "region": 1,
+          "status": 1,
+          "buy_site_id": isSitePrivateSuppliers ? 27 : 1,
+          "upload_as_draft": false,
+          "is_sample_loading": false,
+          "upload_type": "marketplace",
+          "action_source": 4,
+          "new_products": [
+            {
+              "asin": isSitePrivateSuppliers ? product._id : product.id_on_site
+            }
+          ]
+        };
+        
+        const response = await axios({
+          method: 'post',
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          data: payload
+        });
+        
+        if (response.status === 200) {
+          logger.info(`Successfully imported product ${product._id} - ${product.title} to draft`);
+          importedProducts.push({
+            id: product._id,
+            id_on_site: product.id_on_site,
+            site_name: product.site_name,
+            title: product.title
+          });
+        }
+        
+        // Add a small delay to avoid API rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+      } catch (error) {
+        console.log(error);
+        logger.error(`Error importing product ${product._id} to draft`, { error: error.message });
+      }
+    }
+    
+    return importedProducts;
+  }
+  
+  async getProductDrafts(storeId) {
+    try {
+      const token = await autoDSAPI.ensureAuthenticated();
+      
+      const url = `https://v2-api.autods.com/products/${storeId}/list/`;
+      
+      const payload = {
+        limit: 100,
+        offset: 0,
+        condition: "and",
+        filters: [],
+        order_by: {
+            "name": "id",
+            "direction": "desc"
+        },
+        product_status: 1,
+        projection: [
+            "id",
+            "main_picture_url",
+            "site_id",
+            "title",
+            "autods_store_id",
+            "bulk_action_started",
+            "amount_of_variations",
+            "category",
+            "tags",
+            "configuration",
+            "note",
+            "variation_statistics",
+            "manufacturer",
+            "status",
+            "scheduled_datetime",
+            "payment_policy_id",
+            "payment_policy_name",
+            "shipping_policy_id",
+            "shipping_policy_name",
+            "return_policy_id",
+            "return_policy_name",
+            "recomended_category",
+            "postal_code",
+            "error_list",
+            "facebook_shop_channel_status",
+            "catalog_asin",
+            "mutation_status",
+            "dynamic_policy_enabled",
+            "is_updated"
+        ]
+      };
+      
+      const response = await axios({
+        method: 'post',
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        data: payload
+      });
+      
+      return response.data.results || [];
+    } catch (error) {
+      logger.error('Failed to get drafts from store', { error: error.message });
+      return [];
+    }
+  }
+  
+  matchDraftsToProducts(drafts, importedProducts) {
+    // Match drafts to our imported products based on title or other identifiers
+    // This is an approximation as there's no direct ID mapping between marketplace and drafts
+    const matchedDrafts = [];
+    
+    for (const draft of drafts) {
+      for (const product of importedProducts) {
+        // Try to match by title comparison
+        if (draft.title && product.title && 
+            draft.title.toLowerCase().includes(product.title.toLowerCase()) ||
+            product.title.toLowerCase().includes(draft.title.toLowerCase())) {
+          matchedDrafts.push({
+            draft_id: draft.id,
+            product_id: product._id,
+            title: draft.title
+          });
+          break;
+        }
+      }
+    }
+    
+    return matchedDrafts;
+  }
+  
+  async importDraftsToProductsTab(storeId, drafts) {
+    const importedDrafts = [];
+    
+    for (const draft of drafts) {
+      try {
+        const token = await autoDSAPI.ensureAuthenticated();
+        
+        const url = `https://v2-api.autods.com/products/${storeId}/import_to_marketplace`;
+
+        const payload = {
+            "condition": "and",
+            "filters": [
+                {
+                    "name": "id",
+                    "value_list": [
+                        draft.draft_id
+                    ],
+                    "op": "in",
+                    "value_type": "list"
+                }
+            ],
+            "product_status": 1
+        }
+      
+        
+        const response = await axios({
+          method: 'post',
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          data: payload
+        });
+        
+        if (response.status === 200) {
+          logger.info(`Successfully imported draft ${draft.draft_id}- ${draft.title} to products tab`);
+          importedDrafts.push({
+            draft_id: draft.draft_id,
+            product_id: draft.product_id,
+            title: draft.title
+          });
+        }
+        
+        // Add a small delay to avoid API rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+      } catch (error) {
+        logger.error(`Error importing draft ${draft.draft_id} to products tab`, { error: error.message });
+      }
+    }
+    
+    return importedDrafts;
+  }
+  
+  async verifyImportedProducts(productsInStore, importedToProducts) {
+    if (!productsInStore || !importedToProducts || !Array.isArray(productsInStore) || !Array.isArray(importedToProducts)) {
+      logger.warn(`Invalid input to verifyImportedProducts. productsInStore: ${!!productsInStore}, importedToProducts: ${!!importedToProducts}`);
+      return [];
+    }
+    
+    const verifiedProducts = [];
+    
+    for (const importedProduct of importedToProducts) {
+      if (!importedProduct) continue;
+      
+      for (const storeProduct of productsInStore) {
+        if (!storeProduct || !storeProduct.title) continue;
+        
+        // Match by title or ID if available
+        if (importedProduct.title && 
+            (storeProduct.title.toLowerCase().includes(importedProduct.title.toLowerCase()) ||
+            importedProduct.title.toLowerCase().includes(storeProduct.title.toLowerCase()))) {
+          
+          verifiedProducts.push({
+            autods_id: storeProduct.id,
+            title: storeProduct.title,
+            marketplace_id: importedProduct.product_id,
+            item_id_on_site: storeProduct.item_id_on_site || ''
+          });
+          break;
+        }
+      }
+    }
+    
+    logger.info(`Verified ${verifiedProducts.length} products with details: ${JSON.stringify(verifiedProducts.map(p => p.title))}`);
+    return verifiedProducts;
+  }
+  
+  async saveImportedProducts(products) {
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      logger.warn('No products to save to database');
+      return;
+    }
+    
+    for (const product of products) {
+      try {
+        if (!product || !product.autods_id) {
+          logger.warn(`Invalid product data, skipping: ${JSON.stringify(product)}`);
+          continue;
+        }
+        
+        // Save to database as a listing without eBay info
+        await db.listings.create({
+          autodsId: product.autods_id.toString(),
+          ebayListingId: 'pending_' + Date.now(), // Using timestamp to ensure uniqueness
+          item_id_on_site: product.item_id_on_site || '',
+          sku: product.autods_id.toString(),
+          title: product.title || 'Unknown Product',
+          price: 0, // Will be updated later
+          cost: 0, // Will be updated later
+          stock: 0, // Will be updated later
+          active: true,
+          listedAt: new Date()
+        });
+        
+        logger.info(`Saved imported product ${product.autods_id} to database with item_id_on_site: ${product.item_id_on_site || 'N/A'}`);
+      } catch (error) {
+        logger.error(`Error saving product ${product.autods_id} to database`, { error: error.message });
+      }
+    }
+  }
+  
+  async importRemainingProducts(storeId, supplier_filter, count, attempt = 1, maxAttempts = 3) {
+    try {
+      logger.info(`Starting process to import ${count} additional products (attempt ${attempt} of ${maxAttempts})`);
+      
+      // Get filtered products from marketplace
+      const filteredProducts = await this.getFilteredProducts(storeId, supplier_filter);
+      logger.info(`Retrieved ${filteredProducts.length} products from marketplace for additional import`);
+      
+      if (!filteredProducts || filteredProducts.length === 0) {
+        logger.warn('No products found in marketplace for additional import, ending process');
+        return false;
+      }
+      
+      // Get already imported products from database to avoid duplicates
+      const importedProducts = await this.getImportedProducts();
+      logger.info(`Found ${importedProducts.length} previously imported products`);
+      
+      // Filter out already imported products
+      const availableProducts = filteredProducts.filter(product => 
+        !importedProducts.includes(product._id) && 
+        !importedProducts.includes(product.id_on_site)
+      );
+      
+      logger.info(`Found ${availableProducts.length} products available for additional import after filtering`);
+      
+      if (availableProducts.length === 0) {
+        logger.warn('No new products available for additional import, ending process');
+        return false;
+      }
+      
+      // Randomize and select products up to the desired count
+      const selectedProducts = this.getRandomizedProducts(availableProducts, count);
+      logger.info(`Selected ${selectedProducts.length} products for additional import`);
+      
+      // Import products to draft
+      const importedToDraft = await this.importProductsToDraft(storeId, selectedProducts);
+      
+      if (importedToDraft.length === 0) {
+        logger.warn('Failed to import any additional products to draft, ending process');
+        return false;
+      }
+      
+      // Wait 30 seconds for drafts to process
+      logger.info('Waiting 30 seconds for additional drafts to process...');
+      await new Promise(resolve => setTimeout(resolve, 30000));
+      
+      // Get list of drafts
+      const drafts = await this.getProductDrafts(storeId);
+      logger.info(`Found ${drafts.length} drafts in store for additional import`);
+      
+      if (!drafts || drafts.length === 0) {
+        logger.warn('No drafts found in store for additional import, ending process');
+        return false;
+      }
+      
+      // Find the drafts that match our imported products
+      const ourDrafts = this.matchDraftsToProducts(drafts, importedToDraft);
+      logger.info(`Matched ${ourDrafts.length} drafts to our additional imported products`);
+      
+      // Import drafts to products tab
+      const importedToProducts = await this.importDraftsToProductsTab(storeId, ourDrafts);
+      logger.info(`Successfully imported ${importedToProducts.length} additional products to products tab`);
+      
+      // Wait 30 seconds for products to process
+      logger.info('Waiting 30 seconds for additional products to process...');
+      await new Promise(resolve => setTimeout(resolve, 30000));
+      
+      // Get list of products in store to confirm import
+      const productsInStore = await autoDSAPI.getProducts();
+      logger.info(`Found ${productsInStore.length} products in store after additional import`);
+      
+      // Verify which products were successfully imported
+      const successfulImports = await this.verifyImportedProducts(productsInStore, importedToProducts);
+      logger.info(`Verified ${successfulImports.length} additional products were successfully imported`);
+      
+      // Save imported products to database
+      if (successfulImports.length > 0) {
+        await this.saveImportedProducts(successfulImports);
+      } else {
+        logger.warn('No additional products were successfully verified for import');
+      }
+      
+      // Check if we need to import more products to reach the desired count
+      const remainingCount = count - (successfulImports.length || 0);
+      
+      if (remainingCount > 0 && attempt < maxAttempts) {
+        logger.info(`Still need to import ${remainingCount} more products to reach the desired count of ${count} (attempt ${attempt} of ${maxAttempts})`);
+        
+        // Recursive call to import the remaining products
+        return await this.importRemainingProducts(storeId, supplier_filter, remainingCount, attempt + 1, maxAttempts);
+      } else if (remainingCount > 0) {
+        logger.warn(`Couldn't import all requested products after ${maxAttempts} attempts. Successfully imported ${count - remainingCount} out of ${count} products.`);
+      }
+      
+      return true;
+    } catch (error) {
+      logger.error('Error in additional product import', { error: error.message });
+      return false;
+    }
+  }
+  
+  // Utility methods for eBay listing (kept from original implementation)
+  mapProductAspects(product) {
     const aspects = {};
     
-    // Map standard aspects
-    if (productDetails.variations[0].active_buy_item.brand) {
-      aspects["Brand"] = [productDetails.variations[0].active_buy_item.brand];
-    } else {
-      aspects["Brand"] = ["Generic"];
-    }
-
-    // Add Color (required by eBay)
-    if (!aspects["Color"]) {
-      const commonColors = [
-        "Black", "White", "Red", "Blue", "Green", "Yellow", "Purple", "Pink",
-        "Brown", "Gray", "Orange", "Silver", "Gold", "Multicolor", "Beige"
-      ];
+    if (product.variations && product.variations[0].active_buy_item) {
+      const item = product.variations[0].active_buy_item;
       
-      let color = "Other";
-      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
+      // Map common aspects like brand, model, etc.
+      if (item.brand) aspects.Brand = [item.brand];
+      if (item.model) aspects.Model = [item.model];
+      if (item.color) aspects.Color = [item.color];
+      if (item.size) aspects.Size = [item.size];
+      if (item.material) aspects.Material = [item.material];
       
-      for (const clr of commonColors) {
-        if (text.includes(clr.toLowerCase())) {
-          color = clr;
-          break;
-        }
-      }
-      
-      // Check variations for color information
-      if (productDetails.variations && Array.isArray(productDetails.variations)) {
-        const colorVariations = productDetails.variations
-          .map(v => v.active_buy_item?.color || v.color)
-          .filter(Boolean);
-        
-        if (colorVariations.length > 0) {
-          color = colorVariations[0];
-        }
-      }
-      
-      aspects["Color"] = [color];
-    }
-
-    // Add Material (required by eBay)
-    if (!aspects["Material"]) {
-      const commonMaterials = [
-        "Cotton", "Polyester", "Plastic", "Metal", "Wood", "Glass", "Leather",
-        "Silicone", "Nylon", "Spandex", "Wool", "Aluminum", "Steel", "Fabric",
-        "Canvas", "Ceramic", "Rubber", "Stainless Steel", "Alloy"
-      ];
-      
-      let material = "Other";
-      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
-      
-      for (const mat of commonMaterials) {
-        if (text.includes(mat.toLowerCase())) {
-          material = mat;
-          break;
-        }
-      }
-      
-      aspects["Material"] = [material];
-    }
-
-    // Add Size if available
-    if (!aspects["Size"]) {
-      if (productDetails.variations && Array.isArray(productDetails.variations)) {
-        const sizeVariations = productDetails.variations
-          .map(v => v.active_buy_item?.size || v.size)
-          .filter(Boolean);
-        
-        if (sizeVariations.length > 0) {
-          aspects["Size"] = [sizeVariations[0]];
-        } else {
-          aspects["Size"] = ["One Size"];
-        }
-      }
-    }
-
-    // Add Model if available
-    if (!aspects["Model"]) {
-      const model = productDetails.variations[0]?.active_buy_item?.model 
-        || productDetails.model 
-        || `Model-${productDetails.id}`;
-      aspects["Model"] = [model];
-    }
-
-    // Add MPN (Manufacturer Part Number)
-    if (!aspects["MPN"]) {
-      aspects["MPN"] = [`MPN-${productDetails.id}`];
-    }
-
-    // Add dimensions (required by many eBay categories)
-    // Try to extract dimensions from variations or product details
-    let width = null;
-    let height = null;
-    let length = null;
-    let unit = "in";  // Default to inches
-
-    // Try to extract dimensions from variations
-    if (productDetails.variations && Array.isArray(productDetails.variations)) {
-      for (const variation of productDetails.variations) {
-        // Check active_buy_item first
-        const buyItem = variation.active_buy_item || {};
-        
-        // Check for width
-        if (buyItem.width) width = buyItem.width;
-        else if (variation.width) width = variation.width;
-        
-        // Check for height
-        if (buyItem.height) height = buyItem.height;
-        else if (variation.height) height = variation.height;
-        
-        // Check for length
-        if (buyItem.length) length = length = buyItem.length;
-        else if (variation.length) length = variation.length;
-        
-        // Check for unit
-        if (buyItem.dimension_unit) unit = buyItem.dimension_unit;
-        else if (variation.dimension_unit) unit = variation.dimension_unit;
-        
-        // If we found all dimensions, break out of loop
-        if (width && height && length) break;
-      }
-    }
-
-    // If dimensions weren't found in variations, check the product details
-    if (!width && productDetails.width) width = productDetails.width;
-    if (!height && productDetails.height) height = productDetails.height;
-    if (!length && productDetails.length) length = productDetails.length;
-    if (productDetails.dimension_unit) unit = productDetails.dimension_unit;
-
-    // Try to extract dimensions from the description
-    if (!width || !height || !length) {
-      const description = productDetails.description || '';
-      
-      // Check for dimension patterns like "5 x 3 x 2 inches" or "5x3x2 cm"
-      const dimensionPatterns = [
-        /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
-        /(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/i,
-        /width:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
-        /height:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
-        /length:?\s*(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|m)/i,
-        /dimension:?\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/i
-      ];
-      
-      for (const pattern of dimensionPatterns) {
-        const match = description.match(pattern);
-        if (match) {
-          // Pattern with full dimensions
-          if (match.length >= 4) {
-            if (!width) width = match[1];
-            if (!height) height = match[2];
-            if (!length) length = match[3];
-            if (match[4]) {
-              unit = match[4].toLowerCase();
-              if (unit === 'inch') unit = 'in';
-            }
-            break;
-          }
-          // Pattern with single dimension
-          else if (pattern.source.includes('width')) {
-            if (!width) width = match[1];
-            if (match[2]) unit = match[2].toLowerCase();
-          }
-          else if (pattern.source.includes('height')) {
-            if (!height) height = match[1];
-            if (match[2]) unit = match[2].toLowerCase();
-          }
-          else if (pattern.source.includes('length')) {
-            if (!length) length = match[1];
-            if (match[2]) unit = match[2].toLowerCase();
-          }
-        }
-      }
-    }
-
-    // Ensure we have sensible default values if extraction fails
-    if (!width) width = "5";
-    if (!height) height = "5";
-    if (!length) length = "5";
-    
-    // Normalize unit to eBay expectations (in, cm, mm, ft, m)
-    if (!['in', 'cm', 'mm', 'ft', 'm'].includes(unit.toLowerCase())) {
-      unit = 'in';  // Default to inches
-    }
-    
-    // Add dimensions to aspects with units
-    aspects["Item Width"] = [`${width} ${unit}`];
-    aspects["Item Height"] = [`${height} ${unit}`];
-    aspects["Item Length"] = [`${length} ${unit}`];
-
-    // Add Style if it can be determined
-    if (!aspects["Style"]) {
-      const commonStyles = [
-        "Casual", "Modern", "Classic", "Contemporary", "Traditional",
-        "Vintage", "Retro", "Sports", "Business", "Fashion"
-      ];
-      
-      let style = "Modern";
-      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
-      
-      for (const sty of commonStyles) {
-        if (text.includes(sty.toLowerCase())) {
-          style = sty;
-          break;
-        }
-      }
-      
-      aspects["Style"] = [style];
-    }
-
-    // Add Department if applicable
-    if (!aspects["Department"]) {
-      const commonDepartments = ["Men", "Women", "Unisex", "Boys", "Girls", "Children"];
-      let department = "Unisex";
-      const text = (productDetails.title + ' ' + productDetails.description).toLowerCase();
-      
-      for (const dept of commonDepartments) {
-        if (text.includes(dept.toLowerCase())) {
-          department = dept;
-          break;
-        }
-      }
-      
-      aspects["Department"] = [department];
-    }
-
-    // Add Type if not already set
-    if (!aspects["Type"]) {
-      const commonTypes = [
-        "Shirt", "Pants", "Dress", "Shoes", "Hat", "Jacket", "Coat", "Sweater",
-        "Tool", "Device", "Gadget", "Accessory", "Toy", "Game", "Phone", "Case",
-        "Cover", "Holder", "Stand", "Cable", "Charger", "Adapter", "Set", "Kit"
-      ];
-      
-      let typeValue = "Other";
-      const title = productDetails.title || "";
-      
-      for (const type of commonTypes) {
-        if (title.includes(type)) {
-          typeValue = type;
-          break;
-        }
-      }
-      
-      aspects["Type"] = [typeValue];
-    }
-
-    // Add tags as aspects
-    if (productDetails.tags && Array.isArray(productDetails.tags)) {
-      productDetails.tags.forEach(tag => {
-        if (!aspects[tag] && tag.length < 30) {
-          aspects[tag] = ["Yes"];
-        }
-      });
-    }
-
-    // Map category into aspects
-    if (productDetails.category && productDetails.category.length > 0) {
-      const categoryName = productDetails.category[0].name || '';
-      if (categoryName.includes('->')) {
-        const categories = categoryName.split('->').map(c => c.trim());
-        categories.forEach(cat => {
-          if (cat && !aspects[cat] && cat.length < 30) {
-            aspects[cat] = ["Yes"];
+      // Map any other aspects from the item's specifications
+      if (item.specifications && Array.isArray(item.specifications)) {
+        item.specifications.forEach(spec => {
+          if (spec.name && spec.value) {
+            aspects[spec.name] = [spec.value];
           }
         });
       }
     }
-
+    
     return aspects;
   }
   
-  mapToEbayCategory(categories) {
-    // Extract category from the AutoDS category format
-    // Categories in v2 API might be in an array format
-    if (!categories || !Array.isArray(categories) || categories.length === 0) {
-      return '220'; // Default to 'Everything Else' category
+  mapToEbayCategory(category) {
+    // Simplified version, in production would use a more robust category mapping
+    const categoryMap = {
+      'Electronics': '293',
+      'Clothing': '11450',
+      'Home & Garden': '11700',
+      'Toys & Hobbies': '220',
+      'Sporting Goods': '888',
+      'Jewelry & Watches': '281',
+      'Health & Beauty': '26395'
+    };
+    
+    if (category && categoryMap[category]) {
+      return categoryMap[category];
     }
     
-    // Try to get the category ID from the first category entry
-    const firstCategory = categories[0];
-    if (firstCategory.category_id) {
-      return firstCategory.category_id;
-    }
-    
-    // Fallback to category mapping based on name
-    if (firstCategory.name) {
-      const categoryName = firstCategory.name.toLowerCase();
-      // This would ideally be a more comprehensive mapping
-      const categoryMap = {
-        // Electronics
-        'electronics': '293',
-        'computers': '58058',
-        'tablets': '171485',
-        'cell phones': '15032',
-        'smartphones': '9355',
-        'cameras': '625',
-        'video games': '1249',
-        'car electronics': '14923',
-        'tv': '32852',
-        'audio': '14969',
-        'headphones': '112529',
-        'smart home': '175574',
-        
-        // Fashion
-        'clothing': '11450',
-        'men': '1059',
-        'women': '15724',
-        'shoes': '63889',
-        'jewelry': '281',
-        'watches': '14324',
-        'accessories': '4251',
-        'handbags': '169291',
-        'kids clothing': '171146',
-        
-        // Home & Garden
-        'home': '11700',
-        'kitchen': '20625',
-        'furniture': '3197',
-        'bedding': '20444',
-        'bathroom': '26677',
-        'garden': '159912',
-        'tools': '631',
-        'decor': '10033',
-        'appliances': '20710',
-        'lighting': '20697',
-        
-        // Toys & Hobbies
-        'toys': '220',
-        'collectibles': '1',
-        'action figures': '246',
-        'dolls': '237',
-        'games': '233',
-        'puzzles': '19169',
-        'rc toys': '2562',
-        'building toys': '183446',
-        
-        // Health & Beauty
-        'beauty': '26395',
-        'health': '67588',
-        'makeup': '31786',
-        'skin care': '11863',
-        'fragrances': '180345',
-        'hair care': '11854',
-        'bath & body': '11838',
-        'massage': '36447',
-        'vitamins': '180959',
-        
-        // Sports & Outdoors
-        'sports': '888',
-        'fitness': '15273',
-        'cycling': '7294',
-        'camping': '16034',
-        'fishing': '1492',
-        'hunting': '7301',
-        'golf': '1513',
-        'swimming': '74952',
-        'tennis': '1585',
-        'winter sports': '1059',
-        'outdoor recreation': '159043',
-        
-        // Pets
-        'pet supplies': '1281',
-        'dog supplies': '20742',
-        'cat supplies': '20741',
-        'fish supplies': '20753',
-        'bird supplies': '20744',
-        'small animal supplies': '20754',
-        
-        // Automotive
-        'automotive': '6028',
-        'car parts': '33612',
-        'motorcycle parts': '10063',
-        'atv parts': '43962',
-        'boat parts': '26429',
-        'truck parts': '33637',
-        
-        // Business & Industrial
-        'business': '12576',
-        'industrial': '11804',
-        'office': '1185',
-        'manufacturing': '92074',
-        'retail': '11818',
-        
-        // Books, Movies & Music
-        'books': '267',
-        'movies': '11232',
-        'music': '11233',
-        'magazines': '280',
-        
-        // Baby
-        'baby': '2984',
-        'baby clothing': '3082',
-        'strollers': '66700',
-        'car seats': '66692',
-        'feeding': '20400',
-        'toys': '19069',
-        
-        // Crafts
-        'crafts': '14339',
-        'art supplies': '28102',
-        'sewing': '160737',
-        'scrapbooking': '160724',
-        'knitting': '160722',
-        
-        // Musical Instruments
-        'instruments': '619',
-        'guitars': '33034',
-        'drums': '180010',
-        'keyboards': '180016',
-        
-        // Default
-        'other': '220' // Everything Else
-      };
-      
-      // Check if any keywords from the map are in the category name
-      for (const [key, value] of Object.entries(categoryMap)) {
-        if (categoryName.includes(key)) {
-          return value;
-        }
-      }
-    }
-    
-    return '220'; // Default to 'Everything Else' category
+    // Default to "Everything Else" category
+    return '99';
   }
 }
 

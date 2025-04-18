@@ -19,7 +19,11 @@ const ListingSchema = new mongoose.Schema({
   ebayListingId: {
     type: String,
     required: true,
-    unique: true
+    // unique: true
+  },
+  item_id_on_site: {
+    type: String,
+    sparse: true
   },
   sku: {
     type: String,

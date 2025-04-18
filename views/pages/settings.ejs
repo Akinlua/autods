@@ -81,7 +81,16 @@
                             <div class="col-md-6 mb-3">
                                 <label for="MAX_LISTING_QUANTITY" class="form-label">Max Listing Quantity</label>
                                 <input type="number" class="form-control" id="MAX_LISTING_QUANTITY" name="MAX_LISTING_QUANTITY" value="<%= settings.business.MAX_LISTING_QUANTITY || '10' %>">
-                                <div class="form-text">Maximum quantity to set for eBay listings.</div>
+                                <div class="form-text">Number of products to import from marketplace in each run.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="SUPPLIER_FILTER" class="form-label">Supplier Filter</label>
+                                <select class="form-select" id="SUPPLIER_FILTER" name="SUPPLIER_FILTER">
+                                    <option value="" <%= !settings.business.SUPPLIER_FILTER ? 'selected' : '' %>>No filter (all suppliers)</option>
+                                    <option value="amazon" <%= settings.business.SUPPLIER_FILTER === 'amazon' ? 'selected' : '' %>>Amazon</option>
+                                    <option value="private_suppliers" <%= settings.business.SUPPLIER_FILTER === 'private_suppliers' ? 'selected' : '' %>AutoDS Suppliers</option>
+                                </select>
+                                <div class="form-text">Filter products by supplier when importing from marketplace.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="RESPONSE_TIME_HOURS" class="form-label">Response Time (Hours)</label>
@@ -103,6 +112,11 @@
                                 <label for="REMOVAL_CRON_SCHEDULE" class="form-label">Product Removal Schedule</label>
                                 <input type="text" class="form-control" id="REMOVAL_CRON_SCHEDULE" name="REMOVAL_CRON_SCHEDULE" value="<%= settings.scheduling.REMOVAL_CRON_SCHEDULE || '0 18 * * *' %>">
                                 <div class="form-text">Cron expression for when to run the removal job. Default: daily at 6 PM.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="REMOVAL_COUNT" class="form-label">Number of Products to Remove</label>
+                                <input type="number" class="form-control" id="REMOVAL_COUNT" name="REMOVAL_COUNT" value="<%= settings.scheduling.REMOVAL_COUNT || '5' %>">
+                                <div class="form-text">Number of most recently added products to remove each time the removal job runs.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="MESSAGE_CRON_SCHEDULE" class="form-label">Message Check Schedule</label>

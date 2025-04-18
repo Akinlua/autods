@@ -1,0 +1,1926 @@
+get filtered products
+POST https://gw.autods.com/marketplace/api/products/
+
+BODY
+{
+    "projection": {
+        "title": {},
+        "images": {},
+        "supplier_name": {},
+        "site_name": {},
+        "id_on_site": {},
+        "product_details": {},
+        "region": {},
+        "private_supplier": {},
+        "is_winning_product": {},
+        "is_free_winning_product": {},
+        "categories": {}
+    },
+    "order_by": {
+        "direction": "desc",
+        "name": "spv_param"
+    },
+    "condition": "and",
+    "limit": 20,
+    "offset": 20,
+    "filters": [
+        {
+            "name": "site_name",
+            "value_type": "list",
+            "op": "in",
+            "value": "amazon" OR "private_suppliers"
+        }
+    ]
+}
+
+
+RESPONSE
+
+{
+    "results": [
+        {
+            "_id": "67aceeca513587200f513247",
+            "id_on_site": "8332829917337",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Heimish Full Size Butterfly Sleeve Round Neck Floral Tiered Top Plus Size",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/060df0ef-6b6f-486b-8240-ad3773644c71-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/beb36575-2865-4e6d-a5ea-42272d4963f4-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f2dee582-e5a6-4807-b7a6-97600fc6044a-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e82e32c5-deeb-4285-bea9-053e582cd686-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6495cd7e-a4de-4db9-88a2-8b0c4dfe6096-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/84334766-178a-4b4c-8411-adf8984879cd-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7b38b9f2-2ee6-45a1-970f-17215bbfb3f1-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/8f28f18f-5a9d-4b51-905e-136e89fabc96-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0739272d-b6dc-41d9-9fb2-6f771c750944-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/9a2eb415-d005-4781-8c85-fbf1166b5aad-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/afd291e1-bb3d-4e23-801f-34291ff78aec-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f3dd638a-50e8-4bc0-a488-1a82d3682556-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6e73b3aa-a22c-4bec-a273-b3ebdad13306-Min.jpg?v=1739335209",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/3f4bd14b-f5fe-43fb-9ae7-cce3cb624521-Min.jpg?v=1739335209"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 20.21,
+                "max_price": 21.88,
+                "min_msrp_price": 28.87,
+                "max_msrp_price": 31.26,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f513253",
+            "id_on_site": "8318278467737",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Flower Print Jumpsuit - Gathered Bust Sleeveless Style",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Women's Jumpsuits, Rompers & Overalls",
+                    "autods_category_id": "6173ef2762f03545a4bfcef2"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d7cb8b47-617c-4c1f-a667-f1a36459f667-Min.jpg?v=1738616007",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7c09109b-a53f-4e5c-aa0e-4a5861b999cf-Min.jpg?v=1738616006",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f7e23320-0a22-442e-a204-599aad63a598-Min.jpg?v=1738616006",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2366edd8-b0b8-4f4b-91ad-06d43ddf5368-Min.jpg?v=1738616006",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/ca7370fa-8945-44a0-ad7a-68d980cfe793-Min.jpg?v=1738616006"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": 20
+            },
+            "product_details": {
+                "min_price": 43.77,
+                "max_price": 43.77,
+                "min_msrp_price": 75.04,
+                "max_msrp_price": 75.04,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f51325b",
+            "id_on_site": "8332831326361",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Heimish Full Size Crisscross Tie Dye Babydoll Top Plus Size",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/1a0e2849-6e14-47cd-a21c-d7263ead3303-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/8739b08b-9267-4516-8009-65f054357405-Min.jpg?v=1739335275",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/fb1ecf49-f640-4cd2-9488-c3a85a7cd37c-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/68e94d9d-dfed-4f70-9618-ac32c35ddef3-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f3eae7b9-00d1-4ff1-805c-751a3fc7b9b4-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6647f54f-7f88-4c23-b6bc-53cf50594b2b-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7fad1a3a-9219-46fe-acd1-2f5469b85f64-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/896c058c-74ab-4f01-8460-53480143249a-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/57f96cda-db17-4f63-8922-8e2d7a980ff7-Min.jpg?v=1739335276",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/07853f0b-d9b2-46ce-b3d1-f85ab7399f9a-Min.jpg?v=1739335276"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 15.67,
+                "max_price": 15.67,
+                "min_msrp_price": 22.39,
+                "max_msrp_price": 22.39,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f51327b",
+            "id_on_site": "8327523532953",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Mineral Wash Cotton Gauze Mini Shirt Dress",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Dresses",
+                    "autods_category_id": "6173ef2762f03545a4bfceab"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6d1ccdf4-0c7d-40f7-9258-a6ffabd950f5-Min.jpg?v=1739009743",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/47a25b1c-58f1-4c01-bbb5-ad83f45fe5ed-Min.jpg?v=1739009743",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/b4d35885-bd57-49b6-b9e5-aeea4b95894d-Min.jpg?v=1739009743",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/5bdd970f-c59a-46ac-8bcf-3da5bfe5cb98-Min.jpg?v=1739009743",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2b0a2077-f99d-4111-9661-4166a1ff5c34-Min.jpg?v=1739009743"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 38.1,
+                "max_price": 38.1,
+                "min_msrp_price": 54.43,
+                "max_msrp_price": 54.43,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f51329f",
+            "id_on_site": "8332845482137",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Annie Wear Openwork Button Down Drop Shoulder Shirt",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/8bf9fa29-2e65-4370-8cd4-8d2cfee42538-Min.jpg?v=1739335929",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e68caba1-6920-438d-aa6b-807349db37c8-Min.jpg?v=1739335929",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/75aa3930-3b68-4e49-88b8-9f41e4343a2f-Min.jpg?v=1739335929",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/b03d61fe-8326-4b05-8e6c-cfff22a92c9b-Min.jpg?v=1739335929",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/084bd6e2-ccee-485e-9e79-8e782db57c9c-Min.jpg?v=1739335929",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0dfc6f8c-f8e7-49a9-ab12-cd18e93f4ccd-Min.jpg?v=1739335929"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 31.18,
+                "max_price": 31.18,
+                "min_msrp_price": 44.55,
+                "max_msrp_price": 44.55,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5132ef",
+            "id_on_site": "8329572614297",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Floral Smocked Back Ruffled Hem Maxi Cami Dress",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Dresses",
+                    "autods_category_id": "6173ef2762f03545a4bfceab"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/29b776cd-00d2-41ea-98b8-dcd32db7ab57-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0801b295-ab79-46db-8266-4f11d0fb4d86-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e70cca82-4b5c-4e67-bdd3-13e8cbdf6ab5-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0950024f-605f-4bbc-ad74-566304a0d98d-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0d20b99c-3cb6-46c4-a768-2d1c277766bd-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/878ec6a1-7764-4305-9e9f-23cef42cdcef-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7b0f4229-15a3-4877-bf65-1b48521a875d-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/c96d4bc8-f8f0-4686-94ff-b1b71d18baec-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/bb118fe4-2857-4026-9664-fa9e655680ab-Min.jpg?v=1739094138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/dc1a5aa1-b574-4736-96fa-a8da15e242c5-Min.jpg?v=1739094138"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 41.12,
+                "max_price": 41.12,
+                "min_msrp_price": 58.75,
+                "max_msrp_price": 58.75,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5133df",
+            "id_on_site": "8317585555609",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Marina West Polka Dot One-Piece Swimsuit - Beachy Keen Tied Plunge Design",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/00a4754b-a17c-43ae-9a3d-af6d724cfaf8-Min.jpg?v=1738577138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/b313018e-6288-4c17-a523-b0cc6045a718-Min.jpg?v=1738577138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/a3586533-f6df-40da-b24e-482f9dc17b51-Min.jpg?v=1738577138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/c9ea6f83-03a3-402a-a59c-4d61572898f0-Min.jpg?v=1738577138",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2a9926d3-c9ca-4ba3-8a3f-4f57485a6ef3-Min.jpg?v=1738577138"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": 20
+            },
+            "product_details": {
+                "min_price": 26.36,
+                "max_price": 26.36,
+                "min_msrp_price": 45.19,
+                "max_msrp_price": 45.19,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67af1133c0ffe1926b678735",
+            "id_on_site": "8334683799705",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Himawari Waterproof Canvas Backpack Bag with Side Pockets",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Men",
+                    "autods_category_id": "6169735894f2b1708dcce45b"
+                },
+                {
+                    "index": 2,
+                    "name": "Accessories",
+                    "autods_category_id": "6173ef0962f03545a4bf988c"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/aa16e3dc-6e4f-4389-a94f-75e64a810343-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6152e928-9543-4109-b024-f53d564b2fba-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e76bfb4f-1326-4664-bdbd-bc9d38a9fda9-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/5a4673e5-b89b-41dc-99f1-0f04c5bfb881-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/024fb03c-889c-4f09-a77d-f8932d8a7d93-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/87fa5c2e-df0a-4326-8dd5-25f1cfa61e93-Min.jpg?v=1739417221",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/583fd75a-f608-4efa-a6cb-73db2c696fc2-Min.jpg?v=1739417221"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 28.69,
+                "max_price": 28.69,
+                "min_msrp_price": 40.99,
+                "max_msrp_price": 40.99,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f513359",
+            "id_on_site": "8332830113945",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Celeste Full Size Gingham Print Top With Puff Sleeves Plus Size",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/3925dd22-20c1-42e3-ba97-560b9fdc55ec-Min.jpg?v=1739335216",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/4fb1ef6f-ed09-4bde-bbfc-491b572315f7-Min.jpg?v=1739335216",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/91a8658d-967d-470f-a550-9564f442322e-Min.jpg?v=1739335216",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/ce399d99-6997-4741-8c56-e86b60c71eeb-Min.jpg?v=1739335216",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/750f2bf3-ecea-41d9-8e5a-5e71ed1ec683-Min.jpg?v=1739335216"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 26.96,
+                "max_price": 28.55,
+                "min_msrp_price": 38.51,
+                "max_msrp_price": 40.79,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f513377",
+            "id_on_site": "8330028843161",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Paisley Patchwork Print Satin Ruffle Crop Cami",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d17e8805-5f8d-454b-8aba-5025bb817cbd-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/731b4a09-f856-466b-b705-d02a7a3f64e3-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/eab55858-9265-4c98-baeb-cf38983ce2f4-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2e37d71c-169e-428a-a646-567e8a2cb195-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/91363634-a8ee-4268-9381-c836b1d88ec1-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/11cd29ec-7f54-48a7-b09b-54e196bcb634-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e9bcf797-cced-4539-be1a-df2a01d35262-Min.jpg?v=1739128879",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/91796dd6-5573-435a-8010-f28575c0908b-Min.jpg?v=1739128879"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 26.8,
+                "max_price": 26.8,
+                "min_msrp_price": 38.29,
+                "max_msrp_price": 38.29,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f513397",
+            "id_on_site": "8330029367449",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Paisley Patchwork Print Satin Ruffle Crop Cami",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/80c1fa17-148b-48f5-af42-9d80bf15e568-Min.jpg?v=1739128909",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e04ffa38-b1cd-4a08-a2e3-44a79930acdf-Min.jpg?v=1739128909",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/4ba6c770-a196-4c9c-8285-652218da59ff-Min.jpg?v=1739128909",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/61f3275c-9dcb-4a9d-bbb9-d666468cb464-Min.jpg?v=1739128909",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/9aefea88-fced-4eb9-98de-7a96da0fad30-Min.jpg?v=1739128910"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 26.8,
+                "max_price": 26.8,
+                "min_msrp_price": 38.29,
+                "max_msrp_price": 38.29,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5133cb",
+            "id_on_site": "8332853379225",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Annie Wear Tie Back Abstract Print Mock Neck Half Sleeve Blouse",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/b7ce62f2-2b8b-4a47-8921-52804221577f-Min.jpg?v=1739336267",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/c10a80f5-824e-419f-92bf-50cbae4ab6ae-Min.jpg?v=1739336267",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/4b61f646-0dee-474a-99a6-7250d44c4f0c-Min.jpg?v=1739336268",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2fc258cc-642c-4348-b254-dae379bac6f4-Min.jpg?v=1739336267",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/904a2c19-8d72-44f6-9132-0299dfe07d4b-Min.jpg?v=1739336268"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 28.75,
+                "max_price": 28.75,
+                "min_msrp_price": 41.07,
+                "max_msrp_price": 41.07,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67af1133c0ffe1926b6784d7",
+            "id_on_site": "8334716469401",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Nicole Lee USA Flower Pattern Adjustable Strap Backpack Bag",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Tops & Tees",
+                    "autods_category_id": "6173ef2762f03545a4bfcec5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/edd29114-2ea1-40fb-9d95-5cd16651573b-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/0225f790-7613-49ff-b26f-89a379b2e996-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/78c9bca8-5add-47aa-aeec-9e85d964e3f0-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/733194e9-5f6a-4e51-bae2-a3e36dcc03fe-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/4dc692fd-f56a-4c3e-b74e-686ef0c206ac-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/537b3c1f-516a-49ed-84b4-ada478ce806f-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6e10417b-5dda-478a-88a2-4bc19179000f-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d08d8907-e18c-40a3-80b1-cf62ed4af549-Min.jpg?v=1739418355",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d9024169-45f2-40a5-9953-807e7b91158b-Min.jpg?v=1739418355"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 41.61,
+                "max_price": 41.61,
+                "min_msrp_price": 59.44,
+                "max_msrp_price": 59.44,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67af1133c0ffe1926b6785ab",
+            "id_on_site": "8333881278617",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Fame Buckle Closure Crescent Faux Leather Crossbody Bag",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Tops & Tees",
+                    "autods_category_id": "6173ef2762f03545a4bfcec5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/e5be475c-f065-4dc0-a5b4-3f1106b99340-Min.jpg?v=1739392845",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d034691b-5eec-44b3-9d16-d7c94cc7f44f-Min.jpg?v=1739392845",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7a51b3f7-8bea-4091-b8aa-665afb96f065-Min.jpg?v=1739392846",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/402d9d46-82ab-4ebe-a270-26fcf20eabf3-Min.jpg?v=1739392845",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/15b541a0-d72f-4ca1-937b-b9f2551304a4-Min.jpg?v=1739392846",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d0f0dda8-20c8-4ade-b8a3-29472e595cf8-Min.jpg?v=1739392845"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 36.88,
+                "max_price": 36.88,
+                "min_msrp_price": 52.69,
+                "max_msrp_price": 52.69,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f514143",
+            "id_on_site": "8328959099033",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Stretch Twill Decor Button Sleeveless Midi Dress",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Dresses",
+                    "autods_category_id": "6173ef2762f03545a4bfceab"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6783aa21-cd45-4c97-8908-a73691a792c1-Min.jpg?v=1739056422",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/a440b52b-eb8a-4232-9420-5312f644c263-Min.jpg?v=1739056422",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/8d1e0c83-2f38-4708-9cf5-6319021bf9e3-Min.jpg?v=1739056422",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/98534691-0c9b-4347-a8a8-b3d4ebab034f-Min.jpg?v=1739056422",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2a83564c-bc24-4986-85c8-44c528bda420-Min.jpg?v=1739056422",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/86ba88fc-7f3c-4b7a-bc63-13f137b85db2-Min.jpg?v=1739056422"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 44.14,
+                "max_price": 44.14,
+                "min_msrp_price": 63.06,
+                "max_msrp_price": 63.06,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f513d7f",
+            "id_on_site": "8329564618905",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Lace Detail Ruffled Button Down Tiered Dress",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Dresses",
+                    "autods_category_id": "6173ef2762f03545a4bfceab"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/18a54883-fd74-4179-b756-30c7d31fe62c-Min.jpg?v=1739093590",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/b7c202d0-4b45-4299-9da8-f7c100d284e7-Min.jpg?v=1739093590",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/8aaca6ba-79b5-4551-aa9e-40eb085fc400-Min.jpg?v=1739093590",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6d13d45c-4f79-4d3f-a2cc-0dc68f45caac-Min.jpg?v=1739093590",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/180afbcc-9153-499c-824a-ebe833ecb93e-Min.jpg?v=1739093590"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 41.12,
+                "max_price": 41.12,
+                "min_msrp_price": 58.75,
+                "max_msrp_price": 58.75,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67af1133c0ffe1926b678637",
+            "id_on_site": "8334679376025",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Himawari Contrast Waterproof Backpack Bag with Reinforced Edges",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Tops & Tees",
+                    "autods_category_id": "6173ef2762f03545a4bfcec5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/9878d0f9-8a29-4e9a-a930-e86e54623ded-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/7004fbae-53f9-4762-8bf3-1611ede9195a-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6b2cffb8-4d5b-4da7-bb35-23c1e710ada4-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6aadfa26-32de-4480-8517-ce4b4df07b37-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d8702019-60f0-4a8c-98d4-8dc22cdb0825-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d4b89cfe-6e1f-4938-b436-4d12b0e23a7f-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/a20a41b6-9092-4559-9c67-8fc4c3def53a-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d0e4c3d8-fd27-4280-8bb2-ea9d93835c65-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/a5be3b23-feb3-4562-9206-851a9e23f756-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/d5bee899-8a88-4fd6-9539-e8ec134ad006-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/fb95081d-c1d5-4992-b585-f64e56f28237-Min.jpg?v=1739417041",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/645b1ec6-874f-4d02-8d55-fcffd982e127-Min.jpg?v=1739417041"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": null
+            },
+            "product_details": {
+                "min_price": 27.41,
+                "max_price": 27.41,
+                "min_msrp_price": 39.16,
+                "max_msrp_price": 39.16,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5140f5",
+            "id_on_site": "8318281941145",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Button Detail Jumpsuit - Short Sleeve Wide Leg Jumpsuit",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Women's Jumpsuits, Rompers & Overalls",
+                    "autods_category_id": "6173ef2762f03545a4bfcef2"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/274a65ba-58cb-427a-a8cb-0b9d2f895c07-Min.jpg?v=1738616160",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/70b7aa9f-69fa-4674-87bd-893e478b4594-Min.jpg?v=1738616160",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/012061aa-f926-478f-838d-d2a83e011481-Min.jpg?v=1738616160",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/202162bf-ed08-45a0-bf22-49799ad76949-Min.jpg?v=1738616160",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/273f4c90-fd30-42ca-9e9e-7a9a90c8e9cf-Min.jpg?v=1738616160",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/91833de9-55a8-4628-8f92-d05f72741509-Min.jpg?v=1738616160"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": 20
+            },
+            "product_details": {
+                "min_price": 35.85,
+                "max_price": 35.85,
+                "min_msrp_price": 61.46,
+                "max_msrp_price": 61.46,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5140df",
+            "id_on_site": "8317666328729",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Aloha Forest Swim Dress – Marina West Swim Full Size Clear Waters",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Activewear",
+                    "autods_category_id": "6173ef2762f03545a4bfced5"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/786bf11c317045e58eb58902f952c46d-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/78454b88e8d64615a466806486b7214f-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/988b597f4c864835aadde550d2ec70fc-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/1fc8e2ba60ac421eb44ec37647e73091-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f27f09d20f6344619a314bb433240be2-Min.jpg?v=1738581827",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/3985a6ff0b5940afa7cb56068f33679d-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/189d40ee0230457683fe8efa88424d23-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/f6ab030e96d64dc1a11cd7a9f1bbd59a-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/eabee183c5124bf38368402f612b9fa3-Min.jpg?v=1738581826",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/00c690ec7bca40ba9a290c05cb710b03-Min.jpg?v=1738581826"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": 20
+            },
+            "product_details": {
+                "min_price": 35.72,
+                "max_price": 35.72,
+                "min_msrp_price": 61.24,
+                "max_msrp_price": 61.24,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        },
+        {
+            "_id": "67aceeca513587200f5140ab",
+            "id_on_site": "8318282760345",
+            "region": "US",
+            "site_name": "private_suppliers",
+            "title": "Mittoshop Button Detail Wide Leg Jumpsuit for Women",
+            "categories": [
+                {
+                    "index": 0,
+                    "name": "Clothing, Shoes & Jewelry",
+                    "autods_category_id": "6169735894f2b1708dcce22c"
+                },
+                {
+                    "index": 1,
+                    "name": "Women",
+                    "autods_category_id": "6169735894f2b1708dcce235"
+                },
+                {
+                    "index": 2,
+                    "name": "Clothing",
+                    "autods_category_id": "6173ef0862f03545a4bf970d"
+                },
+                {
+                    "index": 3,
+                    "name": "Women's Jumpsuits, Rompers & Overalls",
+                    "autods_category_id": "6173ef2762f03545a4bfcef2"
+                }
+            ],
+            "images": [
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/428e41bc-6191-4cf6-8de3-d4b64951c69b-Min.jpg?v=1738616197",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/13ce9fce-aaad-4b10-93c9-e672673b7b84-Min.jpg?v=1738616197",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/302e7873-50f9-42ef-87d1-67b8a2afb726-Min.jpg?v=1738616197",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/6c917ea2-8700-4a09-92b2-43ddf6a7ac41-Min.jpg?v=1738616197",
+                "https://cdn.shopify.com/s/files/1/0666/1314/9849/files/2f02cf30-0712-400a-8a44-6e6396deba89-Min.jpg?v=1738616197"
+            ],
+            "supplier_name": "Bassem ",
+            "is_winning_product": null,
+            "is_free_winning_product": null,
+            "private_supplier": {
+                "id": 886624,
+                "store_type": "shopify",
+                "autods_user_id": "2555510",
+                "is_logo_invoice_allowed": false,
+                "policy_return_approve": true,
+                "product_condition": "new",
+                "policy_description": "Postmarked within 14 days of purchase. \nItems must be new, unused, with original tags/labels. \nEXCEPTIONS (NO Return): Jewelry, Swimwear, Underwear, Lingerie, Costumes, Adult Products.",
+                "restricted_marketplace_names": [],
+                "map_percent": 20
+            },
+            "product_details": {
+                "min_price": 35.85,
+                "max_price": 35.85,
+                "min_msrp_price": 61.46,
+                "max_msrp_price": 61.46,
+                "min_price_warehouse": "US",
+                "min_shipping_time": 2,
+                "max_shipping_time": 4,
+                "min_shipping_cost": 4.99,
+                "max_shipping_cost": 4.99
+            }
+        }
+    ],
+    "region": "US",
+    "currency": "USD"
+}
+
+Import to draft
+POST https://v2-api.autods.com/products/single_draft_product/1129428/
+
+
+
+{
+    "urls": [],
+    "region": 1,
+    "status": 1,
+    "buy_site_id": 1,
+    "upload_as_draft": false,
+    "is_sample_loading": false,
+    "upload_type": "marketplace",
+    "action_source": 4,
+    "new_products": [
+        {
+            "asin": "B095T1D9WW"
+        }
+    ]
+}
+
+RESPONSE 200 OK
+{
+    "status": "Product uploading started",
+    "pre_draft_initial_id": "4906b637-11ff-47c4-b6f9-adf206cd5d1b"
+}
+
+
+get list of draft to be imported
+POST https://v2-api.autods.com/products/1129428/list/
+{
+    "limit": 20,
+    "offset": 0,
+    "condition": "and",
+    "filters": [],
+    "order_by": {
+        "name": "id",
+        "direction": "desc"
+    },
+    "product_status": 1,
+    "projection": [
+        "id",
+        "main_picture_url",
+        "site_id",
+        "title",
+        "autods_store_id",
+        "bulk_action_started",
+        "amount_of_variations",
+        "category",
+        "tags",
+        "configuration",
+        "note",
+        "variation_statistics",
+        "manufacturer",
+        "status",
+        "scheduled_datetime",
+        "payment_policy_id",
+        "payment_policy_name",
+        "shipping_policy_id",
+        "shipping_policy_name",
+        "return_policy_id",
+        "return_policy_name",
+        "recomended_category",
+        "postal_code",
+        "error_list",
+        "facebook_shop_channel_status",
+        "catalog_asin",
+        "mutation_status",
+        "dynamic_policy_enabled",
+        "is_updated"
+    ]
+}
+
+RESPONSE 200 OK
+{
+    "results": [
+        {
+            "status": 1,
+            "shipping_policy_id": "351241473022",
+            "dynamic_policy_enabled": false,
+            "variation_statistics": {
+                "sell_currency": "USD",
+                "max_sell_price": 17.56,
+                "max_profit": 5.0,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "min_buy_price": 9.98,
+                "min_profit": 5.0,
+                "supplier_region": [
+                    {
+                        "url": "https://www.amazon.com/dp/B0828Z8V7W/ref=sr_1_8?th=1&psc=1",
+                        "region": 1,
+                        "site_id": 1,
+                        "item_id_on_site": "B0828Z8V7W"
+                    }
+                ],
+                "in_stock": {
+                    "total": 1
+                },
+                "on_hold": {
+                    "total": 0
+                },
+                "max_buy_price": 9.98,
+                "min_sell_price": 17.56
+            },
+            "title": "Veryfitpro Id115Plus HR Replacement Bands for Veryfit Pro Id115Plus HR Fitness Tracker Smart Watch",
+            "autods_store_id": 1129428,
+            "payment_policy_name": "Immediate Pay",
+            "shipping_policy_name": "Expedited US Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "url": "https://www.ebay.com/b/75072",
+                    "category_id": "75072",
+                    "name": "Blood Pressure Monitoring"
+                }
+            ],
+            "payment_policy_id": "351241944022",
+            "return_policy_name": "USA Returns",
+            "main_picture_url": {
+                "index": 0,
+                "url": "https://autods-scraper-images.s3-us-west-2.amazonaws.com/56615f63abe5af7e7423f57ee95a0d25.png",
+                "actions": {
+                    "flip_x": false,
+                    "resize_y": null,
+                    "rotate": 0,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "flip_y": false
+                },
+                "image_id": "5601506c-11a2-44d8-ba02-f02f48f4adf6"
+            },
+            "dynamic_policy_handling_time": 3,
+            "dynamic_policy_gsp_enabled": false,
+            "postal_code": "80216",
+            "is_ai_generated_draft": false,
+            "site_id": 1,
+            "amount_of_variations": 1,
+            "return_policy_id": "351241709022",
+            "configuration": {
+                "item_city_location": "Denver, Colorado",
+                "preferred_shipping_type": 2,
+                "disable_stock_monitoring": false,
+                "item_country_location": "United States",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "disable_supplier_changes_error": false
+            },
+            "id": "680022db2666250740cd4d2e",
+            "recomended_category": [
+                {
+                    "category_name": "Blood Pressure Monitoring",
+                    "url": "https://www.ebay.com/b/75072",
+                    "category_id": "75072",
+                    "name": "Blood Pressure Monitoring"
+                }
+            ],
+            "is_ai_generated": false,
+            "tags": [
+                "Sports & Outdoors",
+                "Exercise & Fitness",
+                "Fitness Technology",
+                "Activity & Fitness Trackers"
+            ]
+        },
+        {
+            "status": 1,
+            "shipping_policy_id": "351438349022",
+            "dynamic_policy_enabled": false,
+            "variation_statistics": {
+                "sell_currency": "USD",
+                "max_sell_price": 9.31,
+                "max_profit": 1.8,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "min_buy_price": 6.0,
+                "min_profit": 1.8,
+                "supplier_region": [
+                    {
+                        "url": "https://platform.autods.com/marketplace/all-products/679f290810b16f48ddbe8b7f",
+                        "region": 7,
+                        "site_id": 27,
+                        "item_id_on_site": "51147219927208"
+                    }
+                ],
+                "in_stock": {
+                    "total": 4
+                },
+                "on_hold": {
+                    "total": 0
+                },
+                "max_buy_price": 6.0,
+                "min_sell_price": 9.31
+            },
+            "title": "Women’S Striped Cotton Crew Socks – 1 Pair, Soft & Breathable, Colorful Casual Socks, Size 9-11",
+            "autods_store_id": 1129428,
+            "payment_policy_name": "Immediate Pay",
+            "shipping_policy_name": "Standard US & International Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "url": "https://www.ebay.com/b/163588",
+                    "category_id": "163588",
+                    "name": "Socks"
+                }
+            ],
+            "payment_policy_id": "351241944022",
+            "return_policy_name": "USA returns allowed within 14 days",
+            "main_picture_url": {
+                "index": 5,
+                "url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/6KMAAOSwvlhn~lDV/$_3.PNG",
+                "image_id_on_site": "88356a22-84d5-4c71-83ac-2501a2b2ad42",
+                "actions": {
+                    "flip_x": false,
+                    "resize_y": null,
+                    "rotate": 0,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "flip_y": false
+                },
+                "image_id": "88356a22-84d5-4c71-83ac-2501a2b2ad42"
+            },
+            "dynamic_policy_handling_time": 3,
+            "dynamic_policy_gsp_enabled": false,
+            "postal_code": "80216",
+            "is_ai_generated_draft": false,
+            "site_id": 1,
+            "amount_of_variations": 4,
+            "return_policy_id": "351241709022",
+            "configuration": {
+                "item_city_location": "Denver, Colorado",
+                "preferred_shipping_type": 2,
+                "disable_stock_monitoring": false,
+                "item_country_location": "United States",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "disable_supplier_changes_error": false
+            },
+            "id": "67fe50c013a4ecd1400e23d7",
+            "recomended_category": [
+                {
+                    "category_name": "Socks",
+                    "url": "https://www.ebay.com/b/163588",
+                    "category_id": "163588",
+                    "name": "Socks"
+                }
+            ],
+            "error_list": [
+                {
+                    "external_link": "https://help.autods.com/solutions-for-ebays-common-error-messages-for-your-listings#variationspecifics",
+                    "error_type": 4,
+                    "error_code": "VariationNames",
+                    "message": "eBay error: You are trying to add variations to a single product or the variation specifics need to match. Learn more about the workarounds here.",
+                    "severity": 1
+                },
+                {
+                    "error_type": 6,
+                    "error_code": "400",
+                    "message": "Product Description contains a word you blacklisted, keyword (Amazon)",
+                    "severity": 2,
+                    "error_task": "general_pre_draft_item_validation"
+                }
+            ],
+            "is_ai_generated": false,
+            "tags": [
+                "Other Category"
+            ]
+        },
+        {
+            "status": 1,
+            "shipping_policy_id": "351438349022",
+            "dynamic_policy_enabled": false,
+            "variation_statistics": {
+                "sell_currency": "USD",
+                "max_sell_price": 17.82,
+                "max_profit": 3.28,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "min_buy_price": 11.92,
+                "min_profit": 3.28,
+                "supplier_region": [
+                    {
+                        "url": "https://platform.autods.com/marketplace/all-products/679f286afe010c3675619fb4",
+                        "region": 7,
+                        "site_id": 27,
+                        "item_id_on_site": "51211128930472"
+                    }
+                ],
+                "in_stock": {
+                    "total": 24
+                },
+                "on_hold": {
+                    "total": 0
+                },
+                "max_buy_price": 11.92,
+                "min_sell_price": 17.82
+            },
+            "title": "Kids Slouch Socks – 3 Pairs, Knee-High Cotton Scrunch Socks, Soft & Stretchy, Ages 3-15",
+            "autods_store_id": 1129428,
+            "payment_policy_name": "Immediate Pay",
+            "shipping_policy_name": "Standard US & International Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "url": "https://www.ebay.com/b/153797",
+                    "category_id": "153797",
+                    "name": "Socks & Tights"
+                }
+            ],
+            "payment_policy_id": "351241944022",
+            "return_policy_name": "USA returns allowed within 14 days",
+            "main_picture_url": {
+                "index": 0,
+                "url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/hvYAAOSwxiBoACfE/$_3.PNG",
+                "image_id_on_site": "a16e9c02-16d3-42b9-8537-198c1e7d5c22",
+                "actions": {
+                    "flip_x": false,
+                    "resize_y": null,
+                    "rotate": 0,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "flip_y": false
+                },
+                "image_id": "a16e9c02-16d3-42b9-8537-198c1e7d5c22"
+            },
+            "dynamic_policy_handling_time": 3,
+            "dynamic_policy_gsp_enabled": false,
+            "postal_code": "80216",
+            "is_ai_generated_draft": false,
+            "site_id": 1,
+            "amount_of_variations": 24,
+            "return_policy_id": "351241709022",
+            "configuration": {
+                "item_city_location": "Denver, Colorado",
+                "preferred_shipping_type": 2,
+                "disable_stock_monitoring": false,
+                "item_country_location": "United States",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "disable_supplier_changes_error": false
+            },
+            "id": "67fe4e69400e1ff3fbf8c307",
+            "recomended_category": [
+                {
+                    "category_name": "Socks & Tights",
+                    "url": "https://www.ebay.com/b/153797",
+                    "category_id": "153797",
+                    "name": "Socks & Tights"
+                }
+            ],
+            "error_list": [
+                {
+                    "external_link": "https://help.autods.com/solutions-for-ebays-common-error-messages-for-your-listings#variationspecifics",
+                    "error_type": 4,
+                    "error_code": "VariationNames",
+                    "message": "eBay error: You are trying to add variations to a single product or the variation specifics need to match. Learn more about the workarounds here.",
+                    "severity": 1
+                },
+                {
+                    "error_type": 6,
+                    "message": "HTTPConnectionPool(host='scraper-api-v3-prod-scrapers.prod-scrapers.svc', port=80): Read timed out. (read timeout=20)",
+                    "severity": 2,
+                    "error_task": "preprocess_draft_images"
+                }
+            ],
+            "is_ai_generated": false,
+            "tags": [
+                "Other Category"
+            ]
+        },
+        {
+            "status": 1,
+            "shipping_policy_id": "351241473022",
+            "dynamic_policy_enabled": false,
+            "variation_statistics": {
+                "sell_currency": "USD",
+                "max_sell_price": 72.19,
+                "max_profit": 8.41,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "min_buy_price": 54.09,
+                "min_profit": 8.41,
+                "supplier_region": [
+                    {
+                        "url": "https://www.amazon.com/dp/B07YZ5M1RY/ref=sr_1_16?psc=1",
+                        "region": 1,
+                        "site_id": 1,
+                        "item_id_on_site": "B07YZ5M1RY"
+                    }
+                ],
+                "in_stock": {
+                    "total": 1
+                },
+                "on_hold": {
+                    "total": 0
+                },
+                "max_buy_price": 54.09,
+                "min_sell_price": 72.19
+            },
+            "title": "Steel Mace Bell for Strength Training - Support Full Body, Muscles, Shoulder, Grips & Forearms Workouts to Rehabilitation, Stretching 5, 7, 10, 15, 20, 25, 30Lb for Woman & Man",
+            "autods_store_id": 1129428,
+            "payment_policy_name": "Immediate Pay",
+            "shipping_policy_name": "Expedited US Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "url": "https://www.ebay.com/b/137864",
+                    "category_id": "137864",
+                    "name": "Barbells & Attachments"
+                }
+            ],
+            "payment_policy_id": "351241944022",
+            "return_policy_name": "USA Returns",
+            "main_picture_url": {
+                "index": 0,
+                "url": "https://autods-scraper-images.s3-us-west-2.amazonaws.com/74ef156c8e5c471a2325a0a30c4c4980.png",
+                "actions": {
+                    "flip_x": false,
+                    "resize_y": null,
+                    "rotate": 0,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "flip_y": false
+                },
+                "image_id": "8f137292-90a7-49f9-a095-e6932daf5dec"
+            },
+            "dynamic_policy_handling_time": 3,
+            "dynamic_policy_gsp_enabled": false,
+            "postal_code": "80216",
+            "is_ai_generated_draft": false,
+            "site_id": 1,
+            "amount_of_variations": 1,
+            "return_policy_id": "351241709022",
+            "configuration": {
+                "item_city_location": "Denver, Colorado",
+                "preferred_shipping_type": 2,
+                "disable_stock_monitoring": false,
+                "item_country_location": "United States",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "disable_supplier_changes_error": false
+            },
+            "id": "67fe4e2a9947b646980e2367",
+            "recomended_category": [
+                {
+                    "category_name": "Barbells & Attachments",
+                    "url": "https://www.ebay.com/b/137864",
+                    "category_id": "137864",
+                    "name": "Barbells & Attachments"
+                }
+            ],
+            "error_list": [
+                {
+                    "error_type": 6,
+                    "error_code": "400",
+                    "message": "Product Description contains a word you blacklisted, keyword (Health)",
+                    "severity": 2,
+                    "error_task": "general_pre_draft_item_validation"
+                }
+            ],
+            "is_ai_generated": false,
+            "tags": [
+                "Sports & Outdoors",
+                "Exercise & Fitness",
+                "Strength Training Equipment",
+                "Weights & Accessories",
+                "Bars"
+            ]
+        },
+        {
+            "status": 1,
+            "shipping_policy_id": "351241473022",
+            "dynamic_policy_enabled": false,
+            "variation_statistics": {
+                "sell_currency": "USD",
+                "max_sell_price": 48.26,
+                "max_profit": 14.1,
+                "out_of_stock": {
+                    "total": 0
+                },
+                "min_buy_price": 22.74,
+                "min_profit": 11.67,
+                "supplier_region": [
+                    {
+                        "url": "https://sites.autods.com/aliexpress/?id=3256806541267935",
+                        "region": 6,
+                        "site_id": 2,
+                        "item_id_on_site": "3256806541267935_29"
+                    }
+                ],
+                "in_stock": {
+                    "total": 4
+                },
+                "on_hold": {
+                    "total": 0
+                },
+                "max_buy_price": 27.59,
+                "min_sell_price": 39.9
+            },
+            "title": "K56Pro Smart Watch for Men Heart Rate Blood Bluetooth Sport 400Mah Long Standby 1.39 Inch 360*360 HD Screen Outdoors Smartwatch",
+            "autods_store_id": 1129428,
+            "payment_policy_name": "Immediate Pay",
+            "shipping_policy_name": "USA Shipping",
+            "category": [
+                {
+                    "_cls": "ItemEbayCategory",
+                    "url": "https://www.ebay.com/b/178893",
+                    "category_id": "178893",
+                    "name": "Smart Watches"
+                }
+            ],
+            "payment_policy_id": "351241944022",
+            "return_policy_name": "USA Returns",
+            "main_picture_url": {
+                "index": 6,
+                "url": "https://autods-scraper-images.s3-us-west-2.amazonaws.com/2bc9ee8511bf3a75a44e1f053cf416c6.png",
+                "actions": {
+                    "flip_x": false,
+                    "resize_y": null,
+                    "rotate": 0,
+                    "paste_watermark": false,
+                    "resize_x": null,
+                    "flip_y": false
+                },
+                "image_id": "9d8d997b-6aed-4f8f-a6d5-6966e8ec9e3c"
+            },
+            "dynamic_policy_handling_time": 3,
+            "dynamic_policy_gsp_enabled": false,
+            "postal_code": "310052",
+            "is_ai_generated_draft": false,
+            "site_id": 1,
+            "amount_of_variations": 4,
+            "return_policy_id": "351241709022",
+            "configuration": {
+                "item_city_location": "Shenzhen",
+                "preferred_shipping_type": 2,
+                "disable_stock_monitoring": false,
+                "item_country_location": "China",
+                "disable_price_monitoring": false,
+                "disable_auto_order": false,
+                "disable_supplier_changes_error": false
+            },
+            "id": "67fe4e2711eaca8ec4e4c249",
+            "recomended_category": [
+                {
+                    "category_name": "Smart Watches",
+                    "url": "https://www.ebay.com/b/178893",
+                    "category_id": "178893",
+                    "name": "Smart Watches"
+                }
+            ],
+            "error_list": [
+                {
+                    "error_type": 6,
+                    "error_code": "400",
+                    "message": "Product Description contains a word you blacklisted, keyword (Battery)",
+                    "severity": 2,
+                    "error_task": "general_pre_draft_item_validation"
+                }
+            ],
+            "is_ai_generated": false,
+            "tags": [
+                "Consumer Electronics",
+                "Smart Electronics",
+                "Wearable Devices"
+            ]
+        }
+    ]
+}
+
+
+import to products tab/marketplace /ebay
+POST https://v2-api.autods.com/products/1129428/import_to_marketplace
+
+{
+    "condition": "and",
+    "filters": [
+        {
+            "name": "id",
+            "value_list": [
+                "680025499343c7756cdbecbc"
+            ],
+            "op": "in",
+            "value_type": "list"
+        }
+    ],
+    "product_status": 1
+}
+
+RESPONSE 200 OK
+{
+    "status": "products were sent to be imported to marketplace",
+    "bulk_action": {
+        "id": 113013376,
+        "created_date": "2025-04-16 22:01:44",
+        "modified_at": "2025-04-16 22:01:44",
+        "action_type": 2,
+        "seen": false,
+        "status": 1,
+        "error_reason": null,
+        "retry_count": 0,
+        "request_json": {
+            "filters": [
+                {
+                    "op": "in",
+                    "name": "id",
+                    "value_list": [
+                        "680025499343c7756cdbecbc"
+                    ],
+                    "value_type": "list"
+                }
+            ],
+            "condition": "and",
+            "product_status": 1
+        },
+        "user_id": 3020424
+    }
+}

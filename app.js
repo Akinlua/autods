@@ -234,8 +234,8 @@ function startApplication() {
         'PORT', 'LOG_LEVEL', 'DEFAULT_MARKUP', 'MINIMUM_MARGIN', 
         'MINIMUM_STOCK', 'MAX_LISTING_QUANTITY', 'RESPONSE_TIME_HOURS',
         'LISTING_CRON_SCHEDULE', 'REMOVAL_CRON_SCHEDULE', 'MESSAGE_CRON_SCHEDULE',
-        'EMAIL_ENABLED', 'EMAIL_HOST', 'EMAIL_PORT', 'ADMIN_EMAILS', 
-        'AUTODS_STORE_IDS', 'ESCALATION_KEYWORDS',
+        'REMOVAL_COUNT', 'EMAIL_ENABLED', 'EMAIL_HOST', 'EMAIL_PORT', 'ADMIN_EMAILS', 
+        'AUTODS_STORE_IDS', 'ESCALATION_KEYWORDS', 'SUPPLIER_FILTER',
         'EBAY_API_URL', 'EBAY_CLIENT_ID', 'EBAY_USERNAME', 'EBAY_PASSWORD',
         'EBAY_FULFILLMENT_POLICY_ID', 'EBAY_PAYMENT_POLICY_ID', 'EBAY_RETURN_POLICY_ID',
         'AUTODS_API_URL', 'AUTODS_USERNAME', 'AUTODS_PASSWORD'
@@ -425,12 +425,14 @@ function startApplication() {
       if (filteredConfig.MINIMUM_MARGIN) groupedSettings.business.MINIMUM_MARGIN = filteredConfig.MINIMUM_MARGIN;
       if (filteredConfig.MINIMUM_STOCK) groupedSettings.business.MINIMUM_STOCK = filteredConfig.MINIMUM_STOCK;
       if (filteredConfig.MAX_LISTING_QUANTITY) groupedSettings.business.MAX_LISTING_QUANTITY = filteredConfig.MAX_LISTING_QUANTITY;
+      if (filteredConfig.SUPPLIER_FILTER) groupedSettings.business.SUPPLIER_FILTER = filteredConfig.SUPPLIER_FILTER;
       if (filteredConfig.RESPONSE_TIME_HOURS) groupedSettings.business.RESPONSE_TIME_HOURS = filteredConfig.RESPONSE_TIME_HOURS;
       
       // Scheduling settings
       if (filteredConfig.LISTING_CRON_SCHEDULE) groupedSettings.scheduling.LISTING_CRON_SCHEDULE = filteredConfig.LISTING_CRON_SCHEDULE;
       if (filteredConfig.REMOVAL_CRON_SCHEDULE) groupedSettings.scheduling.REMOVAL_CRON_SCHEDULE = filteredConfig.REMOVAL_CRON_SCHEDULE;
       if (filteredConfig.MESSAGE_CRON_SCHEDULE) groupedSettings.scheduling.MESSAGE_CRON_SCHEDULE = filteredConfig.MESSAGE_CRON_SCHEDULE;
+      if (filteredConfig.REMOVAL_COUNT) groupedSettings.scheduling.REMOVAL_COUNT = filteredConfig.REMOVAL_COUNT;
       
       // API settings (eBay & AutoDS)
       if (filteredConfig.EBAY_API_URL) groupedSettings.api.EBAY_API_URL = filteredConfig.EBAY_API_URL;
