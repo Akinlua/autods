@@ -27,7 +27,7 @@ class ProductListingScheduler {
 
         // Get existing eBay listings to avoid duplicates
         const existingListings = await ebayAPI.getSellerList();
-        console.log(existingListings);
+        // console.log(existingListings);
         logger.info(`Found ${existingListings.length} existing eBay listings`);
         const existingSkus = existingListings.map(listing => listing.sku);
 
@@ -576,7 +576,7 @@ class ProductListingScheduler {
       if (successfulImports.length > 0) {
         await this.saveImportedProducts(successfulImports);
       } else {
-        logger.warn('No additional products were successfully verified for import');
+        logger.info('No additional products were successfully verified for import');
       }
       
       // Check if we need to import more products to reach the desired count
@@ -588,7 +588,7 @@ class ProductListingScheduler {
         // Recursive call to import the remaining products
         return await this.importRemainingProducts(storeId, supplier_filter, remainingCount, attempt + 1, maxAttempts);
       } else if (remainingCount > 0) {
-        logger.warn(`Couldn't import all requested products after ${maxAttempts} attempts. Successfully imported ${count - remainingCount} out of ${count} products.`);
+        // logger.warn(`Couldn't import all requested products after ${maxAttempts} attempts. Successfully imported ${count - remainingCount} out of ${count} products.`);
       }
       
       return true;
