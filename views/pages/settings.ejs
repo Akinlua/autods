@@ -88,7 +88,7 @@
                                 <select class="form-select" id="SUPPLIER_FILTER" name="SUPPLIER_FILTER">
                                     <option value="" <%= !settings.business.SUPPLIER_FILTER ? 'selected' : '' %>>No filter (all suppliers)</option>
                                     <option value="amazon" <%= settings.business.SUPPLIER_FILTER === 'amazon' ? 'selected' : '' %>>Amazon</option>
-                                    <option value="private_suppliers" <%= settings.business.SUPPLIER_FILTER === 'private_suppliers' ? 'selected' : '' %>AutoDS Suppliers</option>
+                                    <option value="private_suppliers" <%= settings.business.SUPPLIER_FILTER === 'private_suppliers' ? 'selected' : '' %>>AutoDS Suppliers</option>
                                 </select>
                                 <div class="form-text">Filter products by supplier when importing from marketplace.</div>
                             </div>
