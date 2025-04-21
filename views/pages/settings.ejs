@@ -147,7 +147,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="EBAY_PASSWORD" class="form-label">eBay Password</label>
-                                <input type="password" class="form-control" id="EBAY_PASSWORD" name="EBAY_PASSWORD" placeholder="********">
+                                <input type="text" class="form-control" id="EBAY_PASSWORD" name="EBAY_PASSWORD" placeholder="password" value="<%= settings.api.EBAY_PASSWORD || '' %>">
                                 <div class="form-text">Your eBay account password.</div>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -186,7 +186,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="AUTODS_PASSWORD" class="form-label">AutoDS Password</label>
-                                <input type="password" class="form-control" id="AUTODS_PASSWORD" name="AUTODS_PASSWORD" placeholder="********">
+                                <input type="text" class="form-control" id="AUTODS_PASSWORD" name="AUTODS_PASSWORD" placeholder="password" value="<%= settings.api.AUTODS_PASSWORD || '' %>">
                                 <div class="form-text">Your AutoDS account password.</div>
                             </div>
                         </div>

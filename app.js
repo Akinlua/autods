@@ -399,11 +399,11 @@ function startApplication() {
       const filteredConfig = {};
       for (const key in envConfig) {
         // Skip sensitive keys
-        if (key.includes('SECRET') || key.includes('PASSWORD') || key.includes('TOKEN')) {
-          filteredConfig[key] = '***********';
-        } else {
+        // if (key.includes('SECRET') || key.includes('PASSWORD') || key.includes('TOKEN')) {
+        //   filteredConfig[key] = '***********';
+        // } else {
           filteredConfig[key] = envConfig[key];
-        }
+        // }
       }
       
       // Group settings by category
@@ -438,14 +438,14 @@ function startApplication() {
       if (filteredConfig.EBAY_API_URL) groupedSettings.api.EBAY_API_URL = filteredConfig.EBAY_API_URL;
       if (filteredConfig.EBAY_CLIENT_ID) groupedSettings.api.EBAY_CLIENT_ID = filteredConfig.EBAY_CLIENT_ID;
       if (filteredConfig.EBAY_USERNAME) groupedSettings.api.EBAY_USERNAME = filteredConfig.EBAY_USERNAME;
-      if (filteredConfig.EBAY_PASSWORD) groupedSettings.api.EBAY_PASSWORD = '***********';
+      if (filteredConfig.EBAY_PASSWORD) groupedSettings.api.EBAY_PASSWORD = filteredConfig.EBAY_PASSWORD;
       if (filteredConfig.EBAY_FULFILLMENT_POLICY_ID) groupedSettings.api.EBAY_FULFILLMENT_POLICY_ID = filteredConfig.EBAY_FULFILLMENT_POLICY_ID;
       if (filteredConfig.EBAY_PAYMENT_POLICY_ID) groupedSettings.api.EBAY_PAYMENT_POLICY_ID = filteredConfig.EBAY_PAYMENT_POLICY_ID;
       if (filteredConfig.EBAY_RETURN_POLICY_ID) groupedSettings.api.EBAY_RETURN_POLICY_ID = filteredConfig.EBAY_RETURN_POLICY_ID;
       if (filteredConfig.AUTODS_API_URL) groupedSettings.api.AUTODS_API_URL = filteredConfig.AUTODS_API_URL;
       if (filteredConfig.AUTODS_STORE_IDS) groupedSettings.api.AUTODS_STORE_IDS = filteredConfig.AUTODS_STORE_IDS;
       if (filteredConfig.AUTODS_USERNAME) groupedSettings.api.AUTODS_USERNAME = filteredConfig.AUTODS_USERNAME;
-      if (filteredConfig.AUTODS_PASSWORD) groupedSettings.api.AUTODS_PASSWORD = '***********';
+      if (filteredConfig.AUTODS_PASSWORD) groupedSettings.api.AUTODS_PASSWORD = filteredConfig.AUTODS_PASSWORD;
       
       // Email settings
       if (filteredConfig.EMAIL_ENABLED) groupedSettings.email.EMAIL_ENABLED = filteredConfig.EMAIL_ENABLED;
